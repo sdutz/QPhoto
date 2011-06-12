@@ -1,5 +1,5 @@
 /*
-    QPhoto: a smart gallery generator
+    QPhoto: a small gallery generator
     Copyright (C) <Lorenzo Zambelli>
 
     This program is free software: you can redistribute it and/or modify
@@ -40,7 +40,8 @@ public:
     QString         GetListItem(  int n) ;
     int             GetItemCount( void) ;
     void            ShowSettingsDlg() ;
-    QColor          GetColor( void) { return m_Color ; } ;
+    QColor          GetColor( void)   { return m_Color ; } ;
+    int             GetSeconds( void) { return m_nSec ; } ;
 
 private :
     void            LoadSettings() ;
@@ -50,6 +51,7 @@ private :
     QString         m_szLastDir ;
     QStringList     m_lszList ;
     QColor          m_Color ;
+    int             m_nSec ;
 };
 
 #endif // CONFMGR_H

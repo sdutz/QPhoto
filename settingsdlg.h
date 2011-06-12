@@ -1,5 +1,5 @@
 /*
-    QPhoto: a smart gallery generator
+    QPhoto: a small gallery generator
     Copyright (C) <Lorenzo Zambelli>
 
     This program is free software: you can redistribute it and/or modify
@@ -32,18 +32,26 @@ class SettingsDlg : public QDialog
 public:
     explicit SettingsDlg(QWidget *parent = 0);
     ~SettingsDlg();
-    QColor GetColor() { return m_Color ; } ;
+    void     SetInitColor( const QColor& color) ;
+    void     SetInitSeconds( int nSec) ;
+    QColor   GetColor()   { return m_Color ; } ;
+    int      GetSeconds() { return m_nSeconds ; } ;
+
+private :
+    void UpdateColorButton() ;
 
 private slots:
-
 
     void on_Color_Btn_clicked();
 
     void on_Default_Btn_clicked();
 
+    void on_spinSec_valueChanged(int );
+
 private:
     Ui::SettingsDlg *ui;
     QColor          m_Color ;
+    int             m_nSeconds ;
 };
 
 #endif // SETTINGSDLG_H

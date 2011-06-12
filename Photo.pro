@@ -13,11 +13,16 @@ TEMPLATE = app
 SOURCES += main.cpp\
         cphoto.cpp \
     aboutdlg.cpp \
-    photoview.cpp
+    photoview.cpp \
+    confmgr.cpp \
+    settingsdlg.cpp
 
 HEADERS  += cphoto.h \
     aboutdlg.h \
-    photoview.h
+    photoview.h \
+    confmgr.h \
+    settingsdlg.h
 
 FORMS    += cphoto.ui \
-    aboutdlg.ui
+    aboutdlg.ui \
+    settingsdlg.ui

@@ -1,3 +1,22 @@
+/*
+    QPhoto: a small gallery generator
+    Copyright (C) <Lorenzo Zambelli>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 #include "photoview.h"
 #include <QMouseEvent>
 #include <QGraphicsRectItem>
@@ -48,6 +67,8 @@ void PhotoView::mouseMoveEvent( QMouseEvent* e)
     int     nWidth ;
     int     nHeight ;
     QPointF ptP ;
+    QPen    pen ;
+    QBrush  brush ;
 
     if ( ! m_bDrag)
         return ;
@@ -60,7 +81,9 @@ void PhotoView::mouseMoveEvent( QMouseEvent* e)
     if ( m_pRect != NULL)
         m_pScene->removeItem( ( QGraphicsItem*) m_pRect) ;
 
-    m_pRect = m_pScene->addRect( m_Pt.x(), m_Pt.y(), nWidth, nHeight) ;
+    pen.setColor( m_pConf->GetColor());
+
+    m_pRect = m_pScene->addRect( m_Pt.x(), m_Pt.y(), nWidth, nHeight, pen) ;
 }
 
 //----------------------------------------------------
@@ -112,10 +135,8 @@ PhotoView::ShowPhoto( const QString& szFile)
 //----------------------------------------------------
 void PhotoView::ZoomOut() {
 
-    if ( m_dScale > SCALE_FACTOR) {
-        scale( SCALE_FACTOR_MINUS, SCALE_FACTOR_MINUS) ;
-        m_dScale -= SCALE_FACTOR ;
-    }
+    scale( SCALE_FACTOR_MINUS, SCALE_FACTOR_MINUS) ;
+    m_dScale -= SCALE_FACTOR ;
 }
 
 //----------------------------------------------------

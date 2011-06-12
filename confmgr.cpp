@@ -26,6 +26,7 @@
 #define HISTORY_FILE       "history.txt"
 #define LAST_DIR           "LastDir"
 #define COLOR              "Color"
+#define SLIDESHOWSEC       "SlideShowSec"
 
 
 //----------------------------------------------------
@@ -157,6 +158,7 @@ void ConfMgr::LoadSettings()
     m_szLastDir = cSet.value( LAST_DIR, "").toString() ;
     szColor     = cSet.value( COLOR, szBlack).toString() ;
     m_Color.setNamedColor( szColor);
+    m_nSec      = cSet.value( SLIDESHOWSEC, 5).toInt() ;
 }
 
 //----------------------------------------------------
@@ -166,12 +168,19 @@ void ConfMgr::WriteSettings()
 
     cSet.setValue( LAST_DIR, m_szLastDir);
     cSet.setValue( COLOR, m_Color.name()) ;
+    cSet.setValue( SLIDESHOWSEC, m_nSec);
 }
 
 //----------------------------------------------------
 void ConfMgr::ShowSettingsDlg()
 {
     SettingsDlg cDlg ;
-    if ( cDlg.exec() == QDialog::Accepted)
+
+    cDlg.SetInitColor( m_Color) ;
+    cDlg.SetInitSeconds( m_nSec) ;
+
+    if ( cDlg.exec() == QDialog::Accepted) {
         m_Color = cDlg.GetColor() ;
+        m_nSec  = cDlg.GetSeconds() ;
+    }
 }

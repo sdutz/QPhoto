@@ -1,16 +1,37 @@
+/*
+    QPhoto: a small gallery generator
+    Copyright (C) <Lorenzo Zambelli>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "cphoto.h"
 #include "ui_cphoto.h"
 #include <QFileDialog>
 #include <QTextStream>
 #include <QKeyEvent>
+#include <QTimer>
 #include <QMessageBox>
 #include "aboutdlg.h"
 
 
 //----------------------------------------------------
-#define HISTORY_FILE       "history.txt"
 #define MIN_WIDTH          814
 #define MIN_HEIGHT         764
+#define LEFT_BUTTON        3
+#define RIGHT_BUTTON       5
+#define SCENE_OFFS         20
 
 
 //----------------------------------------------------
@@ -21,22 +42,57 @@ CPhoto::CPhoto(QWidget *parent) :
     ui->setupUi(this);
     m_szFileName    = "" ;
     m_nCurr         = -1 ;
+    m_bOrdChanged   = false ;
+    m_bFullScreen   = false ;
    // TODO recuperare la cartella dei documenti!
-    m_szLastDir     = "/home/sdutz" ;
     m_bShiftPressed = false ;
+    m_bCtrlPressed  = false ;
     setMinimumSize( MIN_WIDTH, MIN_HEIGHT);
-
+    m_pConf = new ConfMgr() ;
     SetIds();
     CreateActions();
-    BuildMenu();
-    LoadList();
+    BuildContextMenu();
+    BuildSlideShowMenu();
+    ShowList();
     SetToolTips() ;
+    ui->ImgView->SetConfMgr( m_pConf);
 }
 
 //----------------------------------------------------
 CPhoto::~CPhoto()
 {
+    DeleteAction() ;
+
+    if ( m_pConf != NULL)
+        delete m_pConf ;
+
+    if ( m_pTimer != NULL)
+        delete m_pTimer ;
+
     delete ui;
+}
+
+//----------------------------------------------------
+void CPhoto::DeleteAction()
+{
+    if ( m_pMoveUpAct != NULL)
+        delete m_pMoveUpAct ;
+    if ( m_pMoveDownAct != NULL)
+        delete m_pMoveDownAct ;
+    if ( m_pZoomAllAct != NULL)
+        delete m_pZoomAllAct ;
+    if ( m_pConfigAct != NULL)
+        delete m_pConfigAct ;
+    if ( m_pStartSlideShowAct != NULL)
+        delete m_pStartSlideShowAct ;
+    if ( m_pEndSlideShowAct != NULL)
+        delete m_pEndSlideShowAct ;
+    if ( m_pPauseSlideShowAct != NULL)
+        delete m_pPauseSlideShowAct ;
+    if ( m_pShowFullScreen != NULL)
+        delete m_pShowFullScreen ;
+    if ( m_pExitFullScreen != NULL)
+        delete m_pExitFullScreen ;
 }
 
 //----------------------------------------------------
@@ -65,21 +121,57 @@ void CPhoto::SetToolTips()
 void CPhoto::CreateActions()
 {
     m_pMoveUpAct = new QAction( "MoveUp", this) ;
-    connect( m_pMoveUpAct, SIGNAL( triggered()), this, SLOT( MoveCurrUp())) ;
+    connect( m_pMoveUpAct, SIGNAL( triggered()), this, SLOT( OnMoveCurrUp())) ;
 
     m_pMoveDownAct = new QAction( "MoveDown", this) ;
-    connect( m_pMoveDownAct, SIGNAL( triggered()), this, SLOT( MoveCurrDown())) ;
+    connect( m_pMoveDownAct, SIGNAL( triggered()), this, SLOT( OnMoveCurrDown())) ;
 
     m_pZoomAllAct = new QAction( "ZoomAll", this) ;
-    connect( m_pZoomAllAct, SIGNAL( triggered()), this, SLOT( ZoomAll())) ;
+    connect( m_pZoomAllAct, SIGNAL( triggered()), this, SLOT( OnZoomAll())) ;
+
+    m_pConfigAct = new QAction( "Config", this) ;
+    connect( m_pConfigAct, SIGNAL( triggered()), this, SLOT( OnConfig())) ;
+
+    m_pStartSlideShowAct = new QAction( "Start SlideShow", this) ;
+    connect( m_pStartSlideShowAct, SIGNAL( triggered()), this, SLOT( OnStartSlideShow())) ;
+
+    m_pEndSlideShowAct = new QAction( "End SlideShow", this) ;
+    connect( m_pEndSlideShowAct, SIGNAL( triggered()), this, SLOT( OnEndSlideShow())) ;
+
+    m_pPauseSlideShowAct = new QAction( "Pause SlideShow", this) ;
+    connect( m_pPauseSlideShowAct, SIGNAL( triggered()), this, SLOT( OnPauseSlideShow())) ;
+
+    m_pShowFullScreen = new QAction( "Show Fullscreen", this) ;
+    connect( m_pShowFullScreen, SIGNAL( triggered()), this, SLOT( SwitchFullScreen())) ;
+
+    m_pExitFullScreen = new QAction( "Exit Fullscreen", this) ;
+    connect( m_pExitFullScreen, SIGNAL( triggered()), this, SLOT( SwitchFullScreen())) ;
+
+    m_pTimer = new QTimer( this) ;
+    connect( m_pTimer, SIGNAL( timeout()), this, SLOT( on_BtnRight_clicked())) ;
 }
 
 //----------------------------------------------------
-void CPhoto::BuildMenu()
+void CPhoto::BuildContextMenu()
 {
     m_ContextMenu.addAction( m_pMoveUpAct) ;
     m_ContextMenu.addAction( m_pMoveDownAct) ;
     m_ContextMenu.addAction( m_pZoomAllAct) ;
+    m_ContextMenu.addAction( m_pConfigAct) ;
+    m_ContextMenu.addAction( m_pShowFullScreen) ;
+}
+
+//----------------------------------------------------
+void CPhoto::BuildSlideShowMenu()
+{
+    m_SlideShowMenu.addAction( m_pStartSlideShowAct) ;
+    m_SlideShowMenu.addAction( m_pPauseSlideShowAct) ;
+    m_SlideShowMenu.addAction( m_pEndSlideShowAct) ;
+    m_SlideShowMenu.addAction( m_pZoomAllAct) ;
+    m_SlideShowMenu.addAction( m_pExitFullScreen) ;
+
+    m_pPauseSlideShowAct->setEnabled( false);
+    m_pEndSlideShowAct->setEnabled( false);
 }
 
 //----------------------------------------------------
@@ -97,36 +189,36 @@ void CPhoto::LoadFile()
     QString szFile ;
     QString szFilters ;
 
-    szFilters = "List (*.txt)" ;
-    szFile    = QFileDialog::getOpenFileName( this, "Open File",
-                             m_szLastDir, szFilters) ;
+    szFilters       = "List (*.txt)" ;
+    szFile          = QFileDialog::getOpenFileName( this, "Open File",
+                      m_pConf->GetLastDir(), szFilters) ;
 
+    if ( szFile.isEmpty())
+        return ;
+
+    ui->ImgView->SetShiftPressed( false);
+    m_bShiftPressed = false ;
     DeleteAll();
-    LoadList( szFile);
+    ShowList( szFile);
 }
 
 //----------------------------------------------------
 void CPhoto::LoadImage()
 {
-    int     nIdx ;
     QString szFilters ;
-    QString szHomePath ;
 
 
     szFilters    = "Images (*.jpeg *.jpg)" ;
     m_szFileName = QFileDialog::getOpenFileName( this, "Open File",
-                             m_szLastDir, szFilters) ;
+                   m_pConf->GetLastDir(), szFilters) ;
 
-    nIdx         = m_szFileName.lastIndexOf( "\\") ;
-    m_szLastDir  = m_szFileName.left( nIdx) ;
+    if( m_szFileName.isEmpty())
+       return ;
 
-    if( ! m_szFileName.isEmpty())
-        ShowPhoto( true) ;
+    ShowPhoto( true) ;
     m_nCurr = ui->ImgList->count() - 1 ;
     ui->ImgList->setCurrentRow( m_nCurr);
 }
-
-
 
 //----------------------------------------------------
 bool CPhoto::ShowPhoto( bool bToAddToList)
@@ -136,32 +228,21 @@ bool CPhoto::ShowPhoto( bool bToAddToList)
 
     if ( ui->ImgView->ShowPhoto( m_szFileName)) {
         setWindowTitle( m_szFileName);
-        if( bToAddToList  &&  ! FindInList( m_szFileName))
+        if( bToAddToList  &&  ! m_pConf->FindInList( m_szFileName)) {
+            m_pConf->AddToList( m_szFileName);
             ui->ImgList->addItem( m_szFileName) ;
+        }
     }
 
     return true ;
 }
 
 //----------------------------------------------------
-bool CPhoto::FindInList( const QString& szFile)
-{
-    int     n ;
-    QString szCurr ;
-
-    for ( n = 0 ;  n < m_lszList.count() ;  n ++) {
-        szCurr = m_lszList.at( n) ;
-        if ( szCurr.compare( szFile) == 0)
-            return true ;
-    }
-
-    return false ;
-}
-
-//----------------------------------------------------
 void CPhoto::on_BtnExit_clicked()
 {
-    WriteList();
+    if ( m_bOrdChanged)
+        RefreshList() ;
+    m_pConf->WriteList();
     QDialog::close() ;
 }
 
@@ -193,30 +274,6 @@ void CPhoto::on_BtnPlus_clicked()
 }
 
 //----------------------------------------------------
-void CPhoto::WriteList( const QString& szFile)
-{
-    int     n ;
-    int     nItems ;
-    QString szMyFile ;
-
-    szMyFile = szFile.isEmpty() ? HISTORY_FILE : szFile ;
-
-    QFile cFile( szMyFile) ;
-
-    nItems = ui->ImgList->count() ;
-
-    if( ! cFile.open( QIODevice::WriteOnly | QIODevice::Text))
-        return ;
-
-    QTextStream out( &cFile) ;
-
-    for( n = 0 ;  n < nItems ;  n ++)
-        out<<ui->ImgList->item(n)->text()<<endl ;
-
-    cFile.close();
-}
-
-//----------------------------------------------------
 void CPhoto::DoDebug( const QString& szDebug)
 {
     QMessageBox box ;
@@ -224,31 +281,21 @@ void CPhoto::DoDebug( const QString& szDebug)
     box.exec() ;
 }
 
-
 //----------------------------------------------------
-void CPhoto::LoadList(  const QString& szFile)
+void CPhoto::ShowList(  const QString& szFile)
 {
-    QString szTmp ;
-    QString szMyFile ;
+    int     n ;
+    QString szIt ;
 
-    szMyFile = szFile.isEmpty() ? HISTORY_FILE : szFile ;
+    m_pConf->LoadList( szFile);
 
-    QFile   cFile( szMyFile) ;
+    for ( n = 0 ; n < m_pConf->GetItemCount() ; n ++) {
+        szIt = m_pConf->GetListItem( n) ;
+        ui->ImgList->addItem( szIt);
+    }
 
-    if ( ! cFile.open(QIODevice::ReadOnly | QIODevice::Text))
-         return;
-
-     QTextStream in( &cFile) ;
-
-     while ( ! in.atEnd()) {
-         szTmp = in.readLine() ;
-         ui->ImgList->addItem( szTmp) ;
-         m_lszList.append( szTmp) ;
-     }
-
-     cFile.close();
-
-     on_BtnRight_clicked();
+    m_nCurr = -1 ;
+    on_BtnRight_clicked();
 }
 
 //----------------------------------------------------
@@ -274,13 +321,18 @@ void CPhoto::SeeNextImg()
     ui->ImgList->setCurrentRow( m_nCurr);
 
     ShowPhoto( false) ;
+
+    if ( m_pTimer->isActive()) {
+        m_pTimer->stop();
+        m_pTimer->start();
+    }
 }
 
 //----------------------------------------------------
 void CPhoto::on_BtnLeft_clicked()
 {
     if ( m_bShiftPressed)
-        MoveCurrUp() ;
+        OnMoveCurrUp() ;
     else
         SeePrevImg() ;
 }
@@ -289,7 +341,7 @@ void CPhoto::on_BtnLeft_clicked()
 void CPhoto::on_BtnRight_clicked()
 {
     if ( m_bShiftPressed)
-        MoveCurrDown();
+        OnMoveCurrDown();
     else
         SeeNextImg();
 }
@@ -297,16 +349,19 @@ void CPhoto::on_BtnRight_clicked()
 //----------------------------------------------------
 void CPhoto::DeleteAll()
 {
-    m_lszList.clear();
+    m_pConf->ClearList() ;
     ui->ImgList->clear();
-    WriteList();
+    m_pConf->WriteList();
     ui->ImgView->ResetView();
 }
 
 //----------------------------------------------------
 void CPhoto::DeleteSingle()
 {
-    ui->ImgList->takeItem( m_nCurr);
+    QListWidgetItem* pItem ;
+
+    pItem = ui->ImgList->takeItem( m_nCurr);
+    m_pConf->RemoveFromList( pItem->text());
 
     if ( m_nCurr == ui->ImgList->count())
         m_nCurr -- ;
@@ -348,17 +403,37 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
 
         case Qt::Key_F1 :
         ShowAboutDlg() ;
+        break ;
+
+        case Qt::Key_F :
+        SwitchFullScreen() ;
+        break ;
+
+        case Qt::Key_Escape :
+        if ( m_bFullScreen)
+            SwitchFullScreen();
+        break ;
+
+        case Qt::Key_Control :
+        m_bCtrlPressed = true ;
+        break ;
+
+        case Qt::Key_Q :
+        if ( m_bCtrlPressed)
+            on_BtnExit_clicked();
+        break ;
     }
 }
 
 //----------------------------------------------------
 void CPhoto::keyReleaseEvent( QKeyEvent* e)
 {
-    if ( e->key() != Qt::Key_Shift)
-        return ;
-    m_bShiftPressed = false ;
-    ui->ImgView->SetShiftPressed( false);
-
+    if ( e->key() == Qt::Key_Shift) {
+        m_bShiftPressed = false ;
+        ui->ImgView->SetShiftPressed( false);
+    }
+    else if ( e->key() == Qt::Key_Control)
+        m_bCtrlPressed = false ;
 }
 
 //----------------------------------------------------
@@ -386,9 +461,9 @@ void CPhoto::on_BtnSave_clicked()
 
     szFilters = "List (*.txt)" ;
     szFile    = QFileDialog::getSaveFileName( this, "Save File",
-                             m_szLastDir, szFilters) ;
+                             m_pConf->GetLastDir(), szFilters) ;
 
-    WriteList( szFile);
+    m_pConf->WriteList( szFile);
 }
 
 //----------------------------------------------------
@@ -454,6 +529,12 @@ void CPhoto::ShowContextMenu( const QPoint& pos)
 }
 
 //----------------------------------------------------
+void CPhoto::ShowSlideShowMenu( const QPoint& pos)
+{
+    m_SlideShowMenu.exec( pos) ;
+}
+
+//----------------------------------------------------
 bool CPhoto::IsPosOnView( const QPoint& pos)
 {
     QRect  cViewRect ;
@@ -466,8 +547,6 @@ bool CPhoto::IsPosOnView( const QPoint& pos)
     return cViewRect.intersects( cPosRect) ;
 }
 
-
-
 //----------------------------------------------------
 void CPhoto::mousePressEvent( QMouseEvent* e)
 {
@@ -478,18 +557,23 @@ void CPhoto::mousePressEvent( QMouseEvent* e)
     if ( ! IsPosOnView( pos))
         return ;
 
-
     if ( e->type() == QEvent::MouseButtonPress) {
-        if ( e->button() == Qt::RightButton)
-            ShowContextMenu( QPoint( e->globalX(), e->globalY()));
+        if ( e->button() == Qt::RightButton) {
+            QPoint ptGlob ;
+            ptGlob.setX( e->globalX());
+            ptGlob.setY( e->globalY());
+            if ( ! m_bFullScreen)
+                ShowContextMenu( ptGlob);
+            else
+                ShowSlideShowMenu( ptGlob) ;
+        }
         else if ( e->button() == Qt::LeftButton)
             ui->ImgView->StartZoomRect( pos);
     }
 }
 
-
 //----------------------------------------------------
-void CPhoto::MoveCurrUp()
+void CPhoto::OnMoveCurrUp()
 {
     int              nCurrRow ;
     QListWidgetItem* pItemCurr ;
@@ -504,10 +588,11 @@ void CPhoto::MoveCurrUp()
 
     m_nCurr = nCurrRow ;
     ui->ImgList->setCurrentRow( m_nCurr);
+    m_bOrdChanged = true ;
 }
 
 //----------------------------------------------------
-void CPhoto::MoveCurrDown()
+void CPhoto::OnMoveCurrDown()
 {
     int              nCurrRow ;
     QListWidgetItem* pItemCurr ;
@@ -522,11 +607,113 @@ void CPhoto::MoveCurrDown()
 
     m_nCurr = nCurrRow ;
     ui->ImgList->setCurrentRow( m_nCurr);
+    m_bOrdChanged = true ;
 }
 
 //----------------------------------------------------
-void CPhoto::ZoomAll()
+void CPhoto::OnZoomAll()
 {
     ui->ImgView->ZoomAll();
 }
 
+//----------------------------------------------------
+void CPhoto::RefreshList()
+{
+    int n ;
+
+    m_pConf->ClearList();
+
+    for ( n = 0 ;  n < ui->ImgList->count() ; n ++ )
+        m_pConf->AddToList( ui->ImgList->item( n)->text());
+}
+
+//----------------------------------------------------
+void CPhoto::OnConfig()
+{
+    m_pConf->ShowSettingsDlg() ;
+}
+
+//----------------------------------------------------
+void CPhoto::SwitchFullScreen()
+{
+    int   nIdx ;
+    QSize DlgSize ;
+    QSize SceneSize ;
+
+    if ( ! m_bFullScreen) {
+
+
+        for ( nIdx = 1 ;  nIdx <= RIGHT_BUTTON ;  nIdx ++)
+            ui->RightButtons->button( nIdx)->hide();
+
+        for ( nIdx = 1 ;  nIdx <= LEFT_BUTTON ;  nIdx ++)
+            ui->LeftButtons->button( nIdx)->hide();
+
+        ui->ImgList->hide();
+
+        DlgSize   = size() ;
+        SceneSize = ui->ImgView->size() ;
+        m_DiffSize.setWidth( DlgSize.width() - SceneSize.width());
+        m_DiffSize.setHeight( DlgSize.height() - SceneSize.height());
+
+        showFullScreen();
+
+        ui->ImgView->move( 0, 0);
+        ui->ImgView->resize( size()) ;
+    }
+    else {
+
+        for ( nIdx = 1 ;  nIdx <= RIGHT_BUTTON ;  nIdx ++)
+            ui->RightButtons->button( nIdx)->show();
+
+        for ( nIdx = 1 ;  nIdx <= LEFT_BUTTON ;  nIdx ++)
+            ui->LeftButtons->button( nIdx)->show();
+
+
+        showNormal();
+
+        ui->ImgList->show();
+
+        DlgSize = size() ;
+        SceneSize.setWidth( DlgSize.width() - m_DiffSize.width());
+        SceneSize.setHeight( DlgSize.height() - m_DiffSize.height());
+        ui->ImgView->move( SCENE_OFFS, SCENE_OFFS) ;
+        ui->ImgView->resize( SceneSize);
+
+        if ( m_pTimer->isActive())
+            m_pTimer->stop();
+    }
+
+    m_bFullScreen = ! m_bFullScreen ;
+}
+
+//----------------------------------------------------
+void CPhoto::OnStartSlideShow()
+{
+    m_pStartSlideShowAct->setEnabled( false);
+    m_pEndSlideShowAct->setEnabled( true);
+    m_pPauseSlideShowAct->setEnabled( true);
+
+    m_nCurr = -1 ;
+    on_BtnRight_clicked();
+    m_pTimer->setInterval( m_pConf->GetSeconds() * 1000);
+    m_pTimer->start();
+}
+
+//----------------------------------------------------
+void CPhoto::OnEndSlideShow()
+{
+    m_pPauseSlideShowAct->setEnabled( false);
+    m_pEndSlideShowAct->setEnabled( false);
+    m_pStartSlideShowAct->setEnabled( true);
+    m_pTimer->stop();
+}
+
+//----------------------------------------------------
+void CPhoto::OnPauseSlideShow()
+{
+    if ( m_pTimer->isActive())
+        m_pTimer->stop();
+    else
+        m_pTimer->start();
+}
