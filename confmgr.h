@@ -42,6 +42,7 @@ public:
     void            ShowSettingsDlg() ;
     QColor          GetColor( void)   { return m_Color ; } ;
     int             GetSeconds( void) { return m_nSec ; } ;
+    bool            GetHelpFromFile( QString* pszHelp) ;
 
 private :
     void            LoadSettings() ;

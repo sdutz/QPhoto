@@ -37,13 +37,18 @@ PhotoView::PhotoView(QWidget *parent) :
     setScene( m_pScene);
     m_bDrag      = false ;
     m_pRect      = NULL ;
+    m_pHelpText  = NULL ;
 }
 
 //----------------------------------------------------
 PhotoView::~PhotoView()
 {
+    if ( m_pHelpText != NULL)
+        m_pScene->removeItem( m_pHelpText);
+
     if ( m_pScene != NULL)
         delete m_pScene ;
+
 }
 
 //----------------------------------------------------
@@ -182,4 +187,28 @@ void PhotoView::EndZoomRect()
     m_pScene->removeItem( ( QGraphicsItem*) m_pRect);
     m_pRect = NULL ;
     m_pScene->invalidate();
+}
+
+//----------------------------------------------------
+void PhotoView::ShowHelp( bool bShow)
+{
+    QFont font ;
+
+    font.setBold( true);
+    font.setItalic( true);
+    font.setPointSize( 20);
+
+    if ( bShow) {
+        if ( m_pHelpText == NULL) {
+            QString szHelp ;
+            m_pConf->GetHelpFromFile( &szHelp) ;
+            m_pHelpText = m_pScene->addText( szHelp, font) ;
+            m_pHelpText->setDefaultTextColor( m_pConf->GetColor());
+            m_pHelpText->setOpacity( 0.5);
+        }
+        else
+            m_pHelpText->show();
+    }
+    else if ( ! bShow  &&  m_pHelpText != NULL)
+        m_pHelpText->hide();
 }

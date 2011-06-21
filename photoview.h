@@ -37,6 +37,7 @@ public:
     void     StartZoomRect(   const QPoint& pos) ;
     void     SetShiftPressed( bool bPress) ;
     void     SetConfMgr(      ConfMgr* pConf) { m_pConf = pConf ; } ;
+    void     ShowHelp(        bool bShow) ;
 
 private:
 
@@ -58,6 +59,7 @@ private:
     QWidget*            m_pParent ;
     QGraphicsScene*     m_pScene ;
     QGraphicsRectItem*  m_pRect ;
+    QGraphicsTextItem*  m_pHelpText ;
     ConfMgr*            m_pConf ;
 };
 

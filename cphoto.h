@@ -84,6 +84,7 @@ private slots:
     void OnEndSlideShow() ;
     void OnPauseSlideShow() ;
     void SwitchFullScreen() ;
+    void OnHelp() ;
 
 private:
     Ui::CPhoto      *ui;
@@ -91,6 +92,7 @@ private:
     bool            m_bOrdChanged ;
     bool            m_bFullScreen ;
     bool            m_bCtrlPressed ;
+    bool            m_bShowHelp ;
     int             m_nCurr ;
     QString         m_szFileName ;
     QAction*        m_pMoveUpAct ;

@@ -44,7 +44,7 @@ CPhoto::CPhoto(QWidget *parent) :
     m_nCurr         = -1 ;
     m_bOrdChanged   = false ;
     m_bFullScreen   = false ;
-   // TODO recuperare la cartella dei documenti!
+    m_bShowHelp     = false ;
     m_bShiftPressed = false ;
     m_bCtrlPressed  = false ;
     setMinimumSize( MIN_WIDTH, MIN_HEIGHT);
@@ -159,6 +159,7 @@ void CPhoto::BuildContextMenu()
     m_ContextMenu.addAction( m_pZoomAllAct) ;
     m_ContextMenu.addAction( m_pConfigAct) ;
     m_ContextMenu.addAction( m_pShowFullScreen) ;
+    m_ContextMenu.addAction( m_pStartSlideShowAct) ;
 }
 
 //----------------------------------------------------
@@ -391,9 +392,9 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
         case Qt::Key_Minus:
         on_BtnMinus_clicked(); ;
         break ;
-        on_BtnDel_clicked() ;
-        case Qt::Key_Delete:
 
+        case Qt::Key_Delete:
+        on_BtnDel_clicked() ;
         break ;
 
         case Qt::Key_Shift:
@@ -410,7 +411,9 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
         break ;
 
         case Qt::Key_Escape :
-        if ( m_bFullScreen)
+        if ( m_bShowHelp)
+            OnHelp();
+        else if ( m_bFullScreen)
             SwitchFullScreen();
         break ;
 
@@ -421,6 +424,18 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
         case Qt::Key_Q :
         if ( m_bCtrlPressed)
             on_BtnExit_clicked();
+        break ;
+
+        case Qt::Key_A :
+        OnZoomAll();
+        break ;
+
+        case  Qt::Key_L :
+        on_BtnOpen_clicked();
+        break ;
+
+        case Qt::Key_H :
+        OnHelp();
         break ;
     }
 }
@@ -434,6 +449,13 @@ void CPhoto::keyReleaseEvent( QKeyEvent* e)
     }
     else if ( e->key() == Qt::Key_Control)
         m_bCtrlPressed = false ;
+}
+
+
+//----------------------------------------------------
+void CPhoto::OnHelp() {
+    m_bShowHelp = ! m_bShowHelp ;
+    ui->ImgView->ShowHelp( m_bShowHelp);
 }
 
 //----------------------------------------------------
@@ -690,6 +712,9 @@ void CPhoto::SwitchFullScreen()
 //----------------------------------------------------
 void CPhoto::OnStartSlideShow()
 {
+    if ( ! m_bFullScreen)
+        SwitchFullScreen();
+
     m_pStartSlideShowAct->setEnabled( false);
     m_pEndSlideShowAct->setEnabled( true);
     m_pPauseSlideShowAct->setEnabled( true);

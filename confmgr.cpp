@@ -24,6 +24,7 @@
 
 //----------------------------------------------------
 #define HISTORY_FILE       "history.txt"
+#define HELP_FILE_ENG      "help-eng.txt"
 #define LAST_DIR           "LastDir"
 #define COLOR              "Color"
 #define SLIDESHOWSEC       "SlideShowSec"
@@ -183,4 +184,26 @@ void ConfMgr::ShowSettingsDlg()
         m_Color = cDlg.GetColor() ;
         m_nSec  = cDlg.GetSeconds() ;
     }
+}
+
+//----------------------------------------------------
+bool ConfMgr::GetHelpFromFile( QString* pszHelp)
+{
+    QFile       file( HELP_FILE_ENG) ;
+    QByteArray  pByte ;
+
+    if ( pszHelp == NULL)
+        return false ;
+
+    if ( ! file.open( QIODevice::ReadOnly | QIODevice::Text))
+        return false ;
+
+    pByte = file.readAll() ;
+
+    QTextStream stream( pByte, QIODevice::ReadOnly) ;
+
+    *pszHelp = stream.readAll() ;
+    file.close();
+
+    return true ;
 }
