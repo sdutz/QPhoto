@@ -24,6 +24,7 @@
 #include <QSettings>
 #include <QStringList>
 #include <QColor>
+#include <QFont>
 
 class ConfMgr
 {
@@ -41,8 +42,12 @@ public:
     int             GetItemCount( void) ;
     void            ShowSettingsDlg() ;
     QColor          GetColor( void)   { return m_Color ; } ;
+    QFont           GetFont(  void)   { return m_cFont ; } ;
     int             GetSeconds( void) { return m_nSec ; } ;
     bool            GetHelpFromFile( QString* pszHelp) ;
+    QString         GetLog( ) ;
+    bool            WriteLog( const QString szLog) ;
+    bool            ResetLog() ;
 
 private :
     void            LoadSettings() ;
@@ -52,6 +57,7 @@ private :
     QString         m_szLastDir ;
     QStringList     m_lszList ;
     QColor          m_Color ;
+    QFont           m_cFont ;
     int             m_nSec ;
 };
 

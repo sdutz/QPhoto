@@ -21,6 +21,7 @@
 #define PHOTOVIEW_H
 
 #include <QGraphicsView>
+#include <QTimer>
 #include "confmgr.h"
 
 class PhotoView : public QGraphicsView
@@ -38,10 +39,12 @@ public:
     void     SetShiftPressed( bool bPress) ;
     void     SetConfMgr(      ConfMgr* pConf) { m_pConf = pConf ; } ;
     void     ShowHelp(        bool bShow) ;
+    void     SetFullScreen( bool bFullScreen) ;
 
 private:
 
     void     EndZoomRect() ;
+    void     SetCurrTitleOnScene() ;
 
 signals:
 
@@ -49,6 +52,7 @@ public slots:
     void     mouseMoveEvent(    QMouseEvent* e);
     void     mouseReleaseEvent( QMouseEvent* e);
     void     wheelEvent(        QWheelEvent* e);
+    void     DecreaseAlfa() ;
 
 private:
     QPixmap             m_cImage ;
@@ -60,7 +64,10 @@ private:
     QGraphicsScene*     m_pScene ;
     QGraphicsRectItem*  m_pRect ;
     QGraphicsTextItem*  m_pHelpText ;
+    QGraphicsTextItem*  m_pCurrImgTitle ;
+    bool                m_bFullScreen ;
     ConfMgr*            m_pConf ;
+    QTimer*             m_pTimer ;
 };
 
 #endif // PHOTOVIEW_H

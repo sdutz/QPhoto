@@ -40,6 +40,7 @@ CPhoto::CPhoto(QWidget *parent) :
     ui(new Ui::CPhoto)
 {
     ui->setupUi(this);
+    setModal( false);
     m_szFileName    = "" ;
     m_nCurr         = -1 ;
     m_bOrdChanged   = false ;
@@ -52,7 +53,7 @@ CPhoto::CPhoto(QWidget *parent) :
     SetIds();
     CreateActions();
     BuildContextMenu();
-    BuildSlideShowMenu();
+    BuildSlideShowMenu();   
     ShowList();
     SetToolTips() ;
     ui->ImgView->SetConfMgr( m_pConf);
@@ -107,6 +108,13 @@ void CPhoto::SetIds()
     ui->LeftButtons->setId( ui->BtnSave, 1);
     ui->LeftButtons->setId( ui->BtnDel, 2);
     ui->LeftButtons->setId( ui->BtnOpen,  3);
+}
+
+//----------------------------------------------------
+void CPhoto::InitLogDlg()
+{
+    m_cErrDlg.SetMgr( m_pConf) ;
+    m_cErrDlg.setModal( false);
 }
 
 //----------------------------------------------------
@@ -234,6 +242,10 @@ bool CPhoto::ShowPhoto( bool bToAddToList)
             ui->ImgList->addItem( m_szFileName) ;
         }
     }
+    else {
+        m_szLog = "Cannot open" + m_szFileName ;
+        OnShowLog();
+    }
 
     return true ;
 }
@@ -241,6 +253,8 @@ bool CPhoto::ShowPhoto( bool bToAddToList)
 //----------------------------------------------------
 void CPhoto::on_BtnExit_clicked()
 {
+    m_cErrDlg.close() ;
+
     if ( m_bOrdChanged)
         RefreshList() ;
     m_pConf->WriteList();
@@ -436,6 +450,14 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
 
         case Qt::Key_H :
         OnHelp();
+        break ;
+
+        case Qt::Key_S :
+        OnStartSlideShow();
+        break ;
+
+        case Qt::Key_E :
+        OnShowLog() ;
         break ;
     }
 }
@@ -682,6 +704,7 @@ void CPhoto::SwitchFullScreen()
 
         ui->ImgView->move( 0, 0);
         ui->ImgView->resize( size()) ;
+        ui->ImgView->SetFullScreen( true);
     }
     else {
 
@@ -701,6 +724,7 @@ void CPhoto::SwitchFullScreen()
         SceneSize.setHeight( DlgSize.height() - m_DiffSize.height());
         ui->ImgView->move( SCENE_OFFS, SCENE_OFFS) ;
         ui->ImgView->resize( SceneSize);
+        ui->ImgView->SetFullScreen( false);
 
         if ( m_pTimer->isActive())
             m_pTimer->stop();
@@ -741,4 +765,22 @@ void CPhoto::OnPauseSlideShow()
         m_pTimer->stop();
     else
         m_pTimer->start();
+}
+
+//----------------------------------------------------
+void CPhoto::OnShowLog()
+{
+    QPoint pos ;
+    QSize  size ;
+    QRect  rect ;
+
+    pos  = ui->ImgList->pos() ;
+    size = ui->ImgList->size() ;
+
+    rect.setTopLeft( pos);
+    rect.setSize( size);
+
+    m_cErrDlg.DoShow( rect, m_szLog) ;
+
+    m_szLog.clear();
 }

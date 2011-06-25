@@ -31,24 +31,25 @@
 PhotoView::PhotoView(QWidget *parent) :
     QGraphicsView(parent)
 {
-    m_pParent    = parent ;
-    m_dScale     = 1. ;
-    m_pScene     = new QGraphicsScene( this) ;
+    m_pParent       = parent ;
+    m_dScale        = 1. ;
+    m_pScene        = new QGraphicsScene( this) ;
     setScene( m_pScene);
-    m_bDrag      = false ;
-    m_pRect      = NULL ;
-    m_pHelpText  = NULL ;
+    m_bDrag         = false ;
+    m_pRect         = NULL ;
+    m_pHelpText     = NULL ;
+    m_pCurrImgTitle = NULL ;
+    m_bFullScreen   = false ;
+
+    m_pTimer = new QTimer( this) ;
+    connect( m_pTimer, SIGNAL( timeout()), this, SLOT( DecreaseAlfa())) ;
 }
 
 //----------------------------------------------------
 PhotoView::~PhotoView()
 {
-    if ( m_pHelpText != NULL)
-        m_pScene->removeItem( m_pHelpText);
-
     if ( m_pScene != NULL)
         delete m_pScene ;
-
 }
 
 //----------------------------------------------------
@@ -61,6 +62,7 @@ void PhotoView::mouseReleaseEvent( QMouseEvent* e)
     }
 }
 
+//----------------------------------------------------
 void PhotoView::SetShiftPressed( bool bPress)
 {
     m_bShift = bPress ;
@@ -127,12 +129,15 @@ PhotoView::ShowPhoto( const QString& szFile)
 
     ResetView();
 
-    m_cImage.load( szFile) ;
+    bRet = m_cImage.load( szFile) ;
 
-    bRet = m_pScene->addPixmap( m_cImage) ;
+    bRet = bRet  &&  m_pScene->addPixmap( m_cImage) ;
 
     if ( bRet)
         setToolTip( szFile) ;
+
+    if ( m_bFullScreen)
+        SetCurrTitleOnScene() ;
 
     return bRet ;
 }
@@ -192,17 +197,12 @@ void PhotoView::EndZoomRect()
 //----------------------------------------------------
 void PhotoView::ShowHelp( bool bShow)
 {
-    QFont font ;
-
-    font.setBold( true);
-    font.setItalic( true);
-    font.setPointSize( 20);
 
     if ( bShow) {
         if ( m_pHelpText == NULL) {
             QString szHelp ;
             m_pConf->GetHelpFromFile( &szHelp) ;
-            m_pHelpText = m_pScene->addText( szHelp, font) ;
+            m_pHelpText = m_pScene->addText( szHelp, m_pConf->GetFont()) ;
             m_pHelpText->setDefaultTextColor( m_pConf->GetColor());
             m_pHelpText->setOpacity( 0.5);
         }
@@ -211,4 +211,43 @@ void PhotoView::ShowHelp( bool bShow)
     }
     else if ( ! bShow  &&  m_pHelpText != NULL)
         m_pHelpText->hide();
+}
+
+
+//----------------------------------------------------
+void PhotoView::SetCurrTitleOnScene()
+{
+
+    m_pCurrImgTitle = m_pScene->addText( toolTip(), m_pConf->GetFont()) ;
+    m_pCurrImgTitle->setDefaultTextColor( m_pConf->GetColor());
+    m_pCurrImgTitle->show();
+    m_pTimer->stop();
+    m_pTimer->setInterval( m_pConf->GetSeconds() * 50);
+    m_pTimer->start() ;
+}
+
+//----------------------------------------------------
+void PhotoView::SetFullScreen( bool bFullScreen)
+{
+
+    if ( ! bFullScreen  &&  m_pCurrImgTitle != NULL)
+        m_pScene->removeItem( m_pCurrImgTitle);
+    else if ( bFullScreen)
+        SetCurrTitleOnScene();
+
+    m_bFullScreen = bFullScreen ;
+}
+
+//----------------------------------------------------
+void PhotoView::DecreaseAlfa()
+{
+    float fOpacity ;
+
+    fOpacity = m_pCurrImgTitle->opacity() - 0.1 ;
+    if ( fOpacity < 0.1) {
+        m_pCurrImgTitle->hide();
+        m_pTimer->stop();
+    }
+    else
+        m_pCurrImgTitle->setOpacity( fOpacity) ;
 }

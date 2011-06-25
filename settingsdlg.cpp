@@ -19,6 +19,7 @@
 #include "settingsdlg.h"
 #include "ui_settingsdlg.h"
 #include <QColorDialog>
+#include <QFontDialog>
 
 #define MIN_SEC 1
 #define MAX_SEC 30
@@ -89,4 +90,16 @@ void SettingsDlg::SetInitSeconds( int nSec)
 void SettingsDlg::on_spinSec_valueChanged(int )
 {
     m_nSeconds = ui->spinSec->value() ;
+}
+
+//----------------------------------------------------
+void SettingsDlg::on_Font_Btn_clicked()
+{
+    bool         bOk ;
+    QFontDialog  cDlg ;
+    QFont        tmpFont ;
+
+    tmpFont = cDlg.getFont( &bOk, m_cFont) ;
+    if( bOk)
+        m_cFont = tmpFont ;
 }

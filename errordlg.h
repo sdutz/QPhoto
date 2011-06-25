@@ -16,47 +16,37 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SETTINGSDLG_H
-#define SETTINGSDLG_H
+#ifndef ERRORDLG_H
+#define ERRORDLG_H
 
 #include <QDialog>
+#include "confmgr.h"
 
 namespace Ui {
-    class SettingsDlg;
+    class ErrorDlg;
 }
 
-class SettingsDlg : public QDialog
+class ErrorDlg : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit SettingsDlg(QWidget *parent = 0);
-    ~SettingsDlg();
-    void     SetInitColor( const QColor& color) ;
-    void     SetInitFont( const QFont& font) { m_cFont = font ; } ;
-    void     SetInitSeconds( int nSec) ;
-    QColor   GetColor()   { return m_Color ; } ;
-    QFont    GetFont()    { return m_cFont ; } ;
-    int      GetSeconds() { return m_nSeconds ; } ;
+    explicit ErrorDlg(QWidget *parent = 0);
+    void     DoShow( const QRect& cRect, const QString& szLog = "") ;
+    bool     SetMgr( ConfMgr* pConf) ;
 
-private :
-    void UpdateColorButton() ;
+    ~ErrorDlg();
 
 private slots:
+    void on_ClearBtn_clicked();
 
-    void on_Color_Btn_clicked();
+    void on_CloseBtn_clicked();
 
-    void on_Default_Btn_clicked();
 
-    void on_spinSec_valueChanged(int );
-
-    void on_Font_Btn_clicked();
 
 private:
-    Ui::SettingsDlg *ui;
-    QColor          m_Color ;
-    QFont           m_cFont ;
-    int             m_nSeconds ;
+    Ui::ErrorDlg *ui;
+    ConfMgr*     m_pConf ;
 };
 
-#endif // SETTINGSDLG_H
+#endif // ERRORDLG_H

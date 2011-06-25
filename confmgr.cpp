@@ -25,8 +25,10 @@
 //----------------------------------------------------
 #define HISTORY_FILE       "history.txt"
 #define HELP_FILE_ENG      "help-eng.txt"
+#define LOG_FILE           "log.txt"
 #define LAST_DIR           "LastDir"
 #define COLOR              "Color"
+#define FONT               "Font"
 #define SLIDESHOWSEC       "SlideShowSec"
 
 
@@ -151,15 +153,22 @@ void ConfMgr::LoadSettings()
     QSettings cSet ;
     QString   szBlack ;
     QString   szColor ;
+    QString   szFont ;
     QColor    DefColor ;
+    QFont     DefFont ;
 
-    DefColor = Qt::black ;
-    szBlack  = DefColor.name() ;
+    DefColor  = Qt::black ;
+    szBlack   = DefColor.name() ;
+
+    DefFont.toString() ;
 
     m_szLastDir = cSet.value( LAST_DIR, "").toString() ;
     szColor     = cSet.value( COLOR, szBlack).toString() ;
     m_Color.setNamedColor( szColor);
     m_nSec      = cSet.value( SLIDESHOWSEC, 5).toInt() ;
+
+    szFont      = cSet.value( FONT, DefFont.toString()).toString() ;
+    m_cFont.fromString( szFont) ;
 }
 
 //----------------------------------------------------
@@ -170,6 +179,7 @@ void ConfMgr::WriteSettings()
     cSet.setValue( LAST_DIR, m_szLastDir);
     cSet.setValue( COLOR, m_Color.name()) ;
     cSet.setValue( SLIDESHOWSEC, m_nSec);
+    cSet.setValue( FONT, m_cFont.toString());
 }
 
 //----------------------------------------------------
@@ -179,10 +189,12 @@ void ConfMgr::ShowSettingsDlg()
 
     cDlg.SetInitColor( m_Color) ;
     cDlg.SetInitSeconds( m_nSec) ;
+    cDlg.SetInitFont( m_cFont);
 
     if ( cDlg.exec() == QDialog::Accepted) {
         m_Color = cDlg.GetColor() ;
         m_nSec  = cDlg.GetSeconds() ;
+        m_cFont = cDlg.GetFont() ;
     }
 }
 
@@ -206,4 +218,54 @@ bool ConfMgr::GetHelpFromFile( QString* pszHelp)
     file.close();
 
     return true ;
+}
+
+//----------------------------------------------------
+QString ConfMgr::GetLog( )
+{
+    QFile cFile( LOG_FILE) ;
+
+    if ( ! cFile.open( QIODevice::ReadOnly | QIODevice::Text))
+        return "" ;
+
+    QByteArray  pByte ;
+
+    pByte = cFile.readAll() ;
+
+    QTextStream stream( pByte, QIODevice::ReadOnly) ;
+
+    QString szRet = stream.readAll() ;
+    cFile.close();
+
+    return szRet ;
+}
+
+//----------------------------------------------------
+bool ConfMgr::WriteLog( const QString szLog)
+{
+    QFile cFile( LOG_FILE) ;
+
+    if ( ! cFile.open( QIODevice::WriteOnly | QIODevice::Text))
+        return false ;
+
+    if ( szLog.isEmpty())
+        cFile.write( "") ;
+
+    else {
+        QByteArray pByte ;
+        pByte.append( szLog) ;
+
+        cFile.write( pByte) ;
+
+    }
+
+    cFile.close() ;
+
+    return true ;
+}
+
+//----------------------------------------------------
+bool ConfMgr::ResetLog()
+{
+    return WriteLog( "") ;
 }

@@ -25,6 +25,7 @@
 #include <QListWidgetItem>
 #include <QMenu>
 #include "confmgr.h"
+#include "errordlg.h"
 
 namespace Ui {
     class CPhoto;
@@ -49,7 +50,7 @@ private :
     void SetIds();
     void ResetView();
     void ShowAboutDlg() ;
-    void ShowContextMenu( const QPoint& pos);
+    void ShowContextMenu(   const QPoint& pos);
     void ShowSlideShowMenu( const QPoint& pos);
     void CreateActions() ;
     void BuildContextMenu() ;
@@ -61,6 +62,7 @@ private :
     void SetToolTips() ;
     void RefreshList() ;
     void DeleteAction() ;
+    void InitLogDlg() ;
 
 private slots:
     void on_BtnOpen_clicked();
@@ -85,6 +87,7 @@ private slots:
     void OnPauseSlideShow() ;
     void SwitchFullScreen() ;
     void OnHelp() ;
+    void OnShowLog() ;
 
 private:
     Ui::CPhoto      *ui;
@@ -95,6 +98,7 @@ private:
     bool            m_bShowHelp ;
     int             m_nCurr ;
     QString         m_szFileName ;
+    QString         m_szLog ;
     QAction*        m_pMoveUpAct ;
     QAction*        m_pMoveDownAct ;
     QAction*        m_pZoomAllAct ;
@@ -107,6 +111,7 @@ private:
     QMenu           m_ContextMenu ;
     QMenu           m_SlideShowMenu ;
     QSize           m_DiffSize ;
+    ErrorDlg        m_cErrDlg ;
     ConfMgr*        m_pConf ;
     QTimer*         m_pTimer ;
 
