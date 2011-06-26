@@ -54,9 +54,9 @@ CPhoto::CPhoto(QWidget *parent) :
     CreateActions();
     BuildContextMenu();
     BuildSlideShowMenu();   
+    ui->ImgView->SetConfMgr( m_pConf);
     ShowList();
     SetToolTips() ;
-    ui->ImgView->SetConfMgr( m_pConf);
 }
 
 //----------------------------------------------------
@@ -367,7 +367,7 @@ void CPhoto::DeleteAll()
     m_pConf->ClearList() ;
     ui->ImgList->clear();
     m_pConf->WriteList();
-    ui->ImgView->ResetView();
+    ui->ImgView->ResetView( true);
 }
 
 //----------------------------------------------------
@@ -458,6 +458,16 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
 
         case Qt::Key_E :
         OnShowLog() ;
+        break ;
+
+        case Qt::Key_Home :
+        if ( m_bFullScreen)
+            GoToStartEnd( true);
+        break ;
+
+        case Qt::Key_End :
+        if( m_bFullScreen)
+            GoToStartEnd( false);
         break ;
     }
 }
@@ -736,6 +746,8 @@ void CPhoto::SwitchFullScreen()
 //----------------------------------------------------
 void CPhoto::OnStartSlideShow()
 {
+    int nSec ;
+
     if ( ! m_bFullScreen)
         SwitchFullScreen();
 
@@ -745,15 +757,18 @@ void CPhoto::OnStartSlideShow()
 
     m_nCurr = -1 ;
     on_BtnRight_clicked();
-    m_pTimer->setInterval( m_pConf->GetSeconds() * 1000);
+    m_pConf->GetIntProp( PROP_INT_SEC, &nSec) ;
+    ui->ImgView->SetSlideShow( true);
+    m_pTimer->setInterval( nSec * 1000);
     m_pTimer->start();
 }
 
 //----------------------------------------------------
 void CPhoto::OnEndSlideShow()
 {
+    ui->ImgView->SetSlideShow(        false);
     m_pPauseSlideShowAct->setEnabled( false);
-    m_pEndSlideShowAct->setEnabled( false);
+    m_pEndSlideShowAct->setEnabled(   false);
     m_pStartSlideShowAct->setEnabled( true);
     m_pTimer->stop();
 }
@@ -783,4 +798,15 @@ void CPhoto::OnShowLog()
     m_cErrDlg.DoShow( rect, m_szLog) ;
 
     m_szLog.clear();
+}
+
+//----------------------------------------------------
+void CPhoto::GoToStartEnd( bool bStart)
+{
+    if ( bStart)
+        m_nCurr = -1 ;
+    else
+        m_nCurr = ui->ImgList->count() - 2 ;
+
+    on_BtnRight_clicked();
 }

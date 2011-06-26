@@ -63,6 +63,7 @@ private :
     void RefreshList() ;
     void DeleteAction() ;
     void InitLogDlg() ;
+    void GoToStartEnd( bool bStart) ;
 
 private slots:
     void on_BtnOpen_clicked();

@@ -30,6 +30,7 @@
 #define COLOR              "Color"
 #define FONT               "Font"
 #define SLIDESHOWSEC       "SlideShowSec"
+#define FADETYPE           "Fade Type"
 
 
 //----------------------------------------------------
@@ -38,6 +39,7 @@ ConfMgr::ConfMgr()
     LoadSettings() ;
 }
 
+//----------------------------------------------------
 ConfMgr::~ConfMgr()
 {
     WriteSettings();
@@ -160,15 +162,11 @@ void ConfMgr::LoadSettings()
     DefColor  = Qt::black ;
     szBlack   = DefColor.name() ;
 
-    DefFont.toString() ;
-
     m_szLastDir = cSet.value( LAST_DIR, "").toString() ;
-    szColor     = cSet.value( COLOR, szBlack).toString() ;
-    m_Color.setNamedColor( szColor);
-    m_nSec      = cSet.value( SLIDESHOWSEC, 5).toInt() ;
-
-    szFont      = cSet.value( FONT, DefFont.toString()).toString() ;
-    m_cFont.fromString( szFont) ;
+    m_aIntProp[ PROP_INT_SEC]   = cSet.value( SLIDESHOWSEC, 5).toInt() ;
+    m_aIntProp[ PROP_INT_FADE]  = cSet.value( FADETYPE, 0).toInt() ;
+    m_aStrProp[ PROP_STR_COLOR] = cSet.value( COLOR, szBlack).toString() ;
+    m_aStrProp[ PROP_STR_FONT]  = cSet.value( FONT, DefFont.toString()).toString() ;
 }
 
 //----------------------------------------------------
@@ -177,24 +175,31 @@ void ConfMgr::WriteSettings()
     QSettings cSet ;
 
     cSet.setValue( LAST_DIR, m_szLastDir);
-    cSet.setValue( COLOR, m_Color.name()) ;
-    cSet.setValue( SLIDESHOWSEC, m_nSec);
-    cSet.setValue( FONT, m_cFont.toString());
+    cSet.setValue( SLIDESHOWSEC, m_aIntProp[ PROP_INT_SEC]);
+    cSet.setValue( FADETYPE, m_aIntProp[ PROP_INT_FADE]);
+    cSet.setValue( COLOR, m_aStrProp[PROP_STR_COLOR]) ;
+    cSet.setValue( FONT, m_aStrProp[PROP_STR_FONT]);
 }
 
 //----------------------------------------------------
 void ConfMgr::ShowSettingsDlg()
 {
-    SettingsDlg cDlg ;
+    SettingsDlg    cDlg ;
+    QPhotoSettings sets ;
 
-    cDlg.SetInitColor( m_Color) ;
-    cDlg.SetInitSeconds( m_nSec) ;
-    cDlg.SetInitFont( m_cFont);
+    sets.nSec      = m_aIntProp[ PROP_INT_SEC] ;
+    sets.nFadeType = m_aIntProp[ PROP_INT_FADE] ;
+    sets.szColor   = m_aStrProp[ PROP_STR_COLOR] ;
+    sets.szFont    = m_aStrProp[ PROP_STR_FONT] ;
+
+    cDlg.SetInitSettings( sets);
 
     if ( cDlg.exec() == QDialog::Accepted) {
-        m_Color = cDlg.GetColor() ;
-        m_nSec  = cDlg.GetSeconds() ;
-        m_cFont = cDlg.GetFont() ;
+        sets = cDlg.GetSettings() ;
+        m_aIntProp[ PROP_INT_SEC]   = sets.nSec ;
+        m_aIntProp[ PROP_INT_FADE]  = sets.nFadeType ;
+        m_aStrProp[ PROP_STR_COLOR] = sets.szColor ;
+        m_aStrProp[ PROP_STR_FONT]  = sets.szFont ;
     }
 }
 
@@ -269,3 +274,23 @@ bool ConfMgr::ResetLog()
 {
     return WriteLog( "") ;
 }
+
+//----------------------------------------------------
+bool ConfMgr::GetStrProp( int nProp, QString* pVal)
+{
+
+    if ( nProp < 0  ||  nProp >= NUM_STR_PROP)
+        return false ;
+    *pVal = m_aStrProp[nProp] ;
+    return true ;
+}
+
+//----------------------------------------------------
+bool ConfMgr::GetIntProp( int nProp, int* pVal)
+{
+    if ( nProp < 0  ||  nProp >= NUM_INT_PROP)
+        return false ;
+    *pVal = m_aIntProp[nProp] ;
+    return true ;
+}
+

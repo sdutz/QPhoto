@@ -26,6 +26,20 @@
 #include <QColor>
 #include <QFont>
 
+#define NUM_STR_PROP 2
+#define NUM_INT_PROP 2
+
+#define PROP_STR_COLOR 0
+#define PROP_STR_FONT  1
+#define PROP_INT_SEC   0
+#define PROP_INT_FADE  1
+
+#define FADE_NONE        0
+#define FADE_ONSLIDESHOW 1
+#define FADE_ALWAYS      2
+
+
+
 class ConfMgr
 {
 public:
@@ -41,9 +55,8 @@ public:
     QString         GetListItem(  int n) ;
     int             GetItemCount( void) ;
     void            ShowSettingsDlg() ;
-    QColor          GetColor( void)   { return m_Color ; } ;
-    QFont           GetFont(  void)   { return m_cFont ; } ;
-    int             GetSeconds( void) { return m_nSec ; } ;
+    bool            GetStrProp( int nProp, QString* pVal) ;
+    bool            GetIntProp( int nProp, int* pVal) ;
     bool            GetHelpFromFile( QString* pszHelp) ;
     QString         GetLog( ) ;
     bool            WriteLog( const QString szLog) ;
@@ -56,9 +69,8 @@ private :
 private :
     QString         m_szLastDir ;
     QStringList     m_lszList ;
-    QColor          m_Color ;
-    QFont           m_cFont ;
-    int             m_nSec ;
+    QString          m_aStrProp[NUM_STR_PROP] ;
+    int              m_aIntProp[NUM_INT_PROP] ;
 };
 
 #endif // CONFMGR_H

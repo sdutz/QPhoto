@@ -34,17 +34,20 @@ public:
     void     ZoomOut() ;
     void     ZoomIn() ;
     void     ZoomAll() ;
-    void     ResetView() ;
+    void     ResetView(       bool bClearAll) ;
     void     StartZoomRect(   const QPoint& pos) ;
-    void     SetShiftPressed( bool bPress) ;
+    void     SetShiftPressed( bool bPress)    { m_bShift = bPress ; } ;
     void     SetConfMgr(      ConfMgr* pConf) { m_pConf = pConf ; } ;
     void     ShowHelp(        bool bShow) ;
-    void     SetFullScreen( bool bFullScreen) ;
+    void     SetFullScreen(   bool bFullScreen) ;
+    void     SetSlideShow(    bool bSlideShow) { m_bSlideShow = bSlideShow ; } ;
 
 private:
 
     void     EndZoomRect() ;
     void     SetCurrTitleOnScene() ;
+    QFont    GetFontFromConfig() ;
+    QColor   GetColorFromConfig() ;
 
 signals:
 
@@ -53,21 +56,26 @@ public slots:
     void     mouseReleaseEvent( QMouseEvent* e);
     void     wheelEvent(        QWheelEvent* e);
     void     DecreaseAlfa() ;
+    void     DoFadeInOut() ;
 
 private:
-    QPixmap             m_cImage ;
-    QPointF             m_Pt ;
-    bool                m_bDrag ;
-    bool                m_bShift ;
-    float               m_dScale ;
-    QWidget*            m_pParent ;
-    QGraphicsScene*     m_pScene ;
-    QGraphicsRectItem*  m_pRect ;
-    QGraphicsTextItem*  m_pHelpText ;
-    QGraphicsTextItem*  m_pCurrImgTitle ;
-    bool                m_bFullScreen ;
-    ConfMgr*            m_pConf ;
-    QTimer*             m_pTimer ;
+    QPixmap              m_cImage ;
+    QPointF              m_Pt ;
+    bool                 m_bDrag ;
+    bool                 m_bShift ;
+    bool                 m_bSlideShow ;
+    float                m_dScale ;
+    QWidget*             m_pParent ;
+    QGraphicsScene*      m_pScene ;
+    QGraphicsRectItem*   m_pRect ;
+    QGraphicsTextItem*   m_pHelpText ;
+    QGraphicsTextItem*   m_pCurrImgTitle ;
+    QGraphicsPixmapItem* m_pPrevImg ;
+    QGraphicsPixmapItem* m_pCurrImg ;
+    bool                 m_bFullScreen ;
+    ConfMgr*             m_pConf ;
+    QTimer*              m_pTextTimer ;
+    QTimer*              m_pFadeTimer ;
 };
 
 #endif // PHOTOVIEW_H

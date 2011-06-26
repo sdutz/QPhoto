@@ -30,8 +30,11 @@ SettingsDlg::SettingsDlg(QWidget *parent) :
     ui(new Ui::SettingsDlg)
 {
 
-    m_Color = Qt::black ;
     ui->setupUi(this);
+    ui->FadeCmbBox->addItem( "None");
+    ui->FadeCmbBox->addItem( "On SlideShow");
+    ui->FadeCmbBox->addItem( "Always");
+    setWindowTitle( "Settings dialog");
 }
 
 
@@ -45,8 +48,14 @@ SettingsDlg::~SettingsDlg()
 void SettingsDlg::UpdateColorButton()
 {
     QString szStyle ;
+    QColor  color ;
 
-    szStyle = QString( "* { background-color: rgb(%1,%2,%3)}").arg( m_Color.red()).arg(m_Color.green()).arg(m_Color.blue()) ;
+    color.setNamedColor( m_sets.szColor);
+    if ( ! color.isValid())
+        color = Qt::black ;
+
+
+    szStyle = QString( "* { background-color: rgb(%1,%2,%3)}").arg( color.red()).arg( color.green()).arg( color.blue()) ;
     ui->Color_Btn->setStyleSheet( szStyle);
 }
 
@@ -55,11 +64,15 @@ void SettingsDlg::UpdateColorButton()
 void SettingsDlg::on_Color_Btn_clicked()
 {
     QColorDialog cDlg ;
-    QColor       cTmp ;
+    QColor       cNewColor ;
+    QColor       cOldColor ;
 
-    cTmp = cDlg.getColor( m_Color) ;
-    if ( cTmp.isValid()) {
-        m_Color = cTmp ;
+    cOldColor.setNamedColor( m_sets.szColor);
+    if( ! cOldColor.isValid())
+        cOldColor = Qt::black ;
+    cNewColor = cDlg.getColor( cOldColor) ;
+    if ( cNewColor.isValid()) {
+        m_sets.szColor = cNewColor.name() ;
         UpdateColorButton();
     }
 }
@@ -67,29 +80,25 @@ void SettingsDlg::on_Color_Btn_clicked()
 //----------------------------------------------------
 void SettingsDlg::on_Default_Btn_clicked()
 {
-    m_Color = Qt::black ;
-}
+    QColor black ;
+    QFont  font  ;
 
-//----------------------------------------------------
-void SettingsDlg::SetInitColor( const QColor& color)
-{
-    if ( color.isValid())
-        m_Color = color ;
+    m_sets.szColor = black.name() ;
+    m_sets.szFont  = font.toString() ;
+    m_sets.nSec    = 5 ;
+    ui->spinSec->setValue( 5);
+    m_sets.nFadeType = FADE_NONE ;
+    ui->FadeCmbBox->setCurrentIndex( 0);
+
     UpdateColorButton();
-}
 
-//----------------------------------------------------
-void SettingsDlg::SetInitSeconds( int nSec)
-{
-    ui->spinSec->setValue(   nSec);
-    ui->spinSec->setMinimum( MIN_SEC);
-    ui->spinSec->setMaximum( MAX_SEC);
+
 }
 
 //----------------------------------------------------
 void SettingsDlg::on_spinSec_valueChanged(int )
 {
-    m_nSeconds = ui->spinSec->value() ;
+    m_sets.nSec = ui->spinSec->value() ;
 }
 
 //----------------------------------------------------
@@ -97,9 +106,31 @@ void SettingsDlg::on_Font_Btn_clicked()
 {
     bool         bOk ;
     QFontDialog  cDlg ;
-    QFont        tmpFont ;
+    QFont        NewFont ;
+    QFont        OldFont ;
 
-    tmpFont = cDlg.getFont( &bOk, m_cFont) ;
+
+    OldFont.fromString( m_sets.szFont) ;
+    NewFont = cDlg.getFont( &bOk, OldFont) ;
     if( bOk)
-        m_cFont = tmpFont ;
+        m_sets.szFont = NewFont.toString() ;
+}
+
+//----------------------------------------------------
+void SettingsDlg::SetInitSettings( const QPhotoSettings& sets)
+{
+    m_sets = sets ;
+    ui->spinSec->setValue(   m_sets.nSec);
+    ui->spinSec->setMinimum( MIN_SEC);
+    ui->spinSec->setMaximum( MAX_SEC);
+
+    ui->FadeCmbBox->setCurrentIndex( m_sets.nFadeType);
+
+    UpdateColorButton();
+}
+
+//---------------------------------------------------
+void SettingsDlg::on_FadeCmbBox_currentIndexChanged(int index)
+{
+    m_sets.nFadeType = index ;
 }

@@ -20,6 +20,14 @@
 #define SETTINGSDLG_H
 
 #include <QDialog>
+#include "confmgr.h"
+
+struct QPhotoSettings {
+    int     nSec ;
+    int     nFadeType ;
+    QString szFont ;
+    QString szColor ;
+};
 
 namespace Ui {
     class SettingsDlg;
@@ -32,12 +40,8 @@ class SettingsDlg : public QDialog
 public:
     explicit SettingsDlg(QWidget *parent = 0);
     ~SettingsDlg();
-    void     SetInitColor( const QColor& color) ;
-    void     SetInitFont( const QFont& font) { m_cFont = font ; } ;
-    void     SetInitSeconds( int nSec) ;
-    QColor   GetColor()   { return m_Color ; } ;
-    QFont    GetFont()    { return m_cFont ; } ;
-    int      GetSeconds() { return m_nSeconds ; } ;
+    void SetInitSettings( const QPhotoSettings& sets) ;
+    QPhotoSettings GetSettings( void) { return m_sets ; } ;
 
 private :
     void UpdateColorButton() ;
@@ -52,11 +56,11 @@ private slots:
 
     void on_Font_Btn_clicked();
 
+    void on_FadeCmbBox_currentIndexChanged(int index);
+
 private:
     Ui::SettingsDlg *ui;
-    QColor          m_Color ;
-    QFont           m_cFont ;
-    int             m_nSeconds ;
+    QPhotoSettings  m_sets ;
 };
 
 #endif // SETTINGSDLG_H

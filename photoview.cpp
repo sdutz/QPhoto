@@ -25,6 +25,7 @@
 #define SCALE_FACTOR_MINUS 0.9
 #define SCALE_FACTOR_PLUS  1.1
 #define SCALE_FACTOR       0.1
+#define OPACITY_FACTOR     0.1
 
 
 //----------------------------------------------------
@@ -39,10 +40,14 @@ PhotoView::PhotoView(QWidget *parent) :
     m_pRect         = NULL ;
     m_pHelpText     = NULL ;
     m_pCurrImgTitle = NULL ;
+    m_pPrevImg      = NULL ;
+    m_pCurrImg      = NULL ;
     m_bFullScreen   = false ;
-
-    m_pTimer = new QTimer( this) ;
-    connect( m_pTimer, SIGNAL( timeout()), this, SLOT( DecreaseAlfa())) ;
+    m_bSlideShow    = false ;
+    m_pTextTimer    = new QTimer( this) ;
+    m_pFadeTimer    = new QTimer( this) ;
+    connect( m_pTextTimer, SIGNAL( timeout()), this, SLOT( DecreaseAlfa())) ;
+    connect( m_pFadeTimer, SIGNAL( timeout()), this, SLOT( DoFadeInOut())) ;
 }
 
 //----------------------------------------------------
@@ -50,6 +55,10 @@ PhotoView::~PhotoView()
 {
     if ( m_pScene != NULL)
         delete m_pScene ;
+    if ( m_pTextTimer != NULL)
+        delete m_pTextTimer ;
+    if ( m_pFadeTimer != NULL)
+        delete m_pFadeTimer ;
 }
 
 //----------------------------------------------------
@@ -60,12 +69,6 @@ void PhotoView::mouseReleaseEvent( QMouseEvent* e)
         if ( e->button() == Qt::LeftButton  &&  m_bDrag)
             EndZoomRect();
     }
-}
-
-//----------------------------------------------------
-void PhotoView::SetShiftPressed( bool bPress)
-{
-    m_bShift = bPress ;
 }
 
 //----------------------------------------------------
@@ -88,7 +91,7 @@ void PhotoView::mouseMoveEvent( QMouseEvent* e)
     if ( m_pRect != NULL)
         m_pScene->removeItem( ( QGraphicsItem*) m_pRect) ;
 
-    pen.setColor( m_pConf->GetColor());
+    pen.setColor( GetColorFromConfig());
 
     m_pRect = m_pScene->addRect( m_Pt.x(), m_Pt.y(), nWidth, nHeight, pen) ;
 }
@@ -108,7 +111,7 @@ void PhotoView::wheelEvent( QWheelEvent* e)
 }
 
 //----------------------------------------------------
-void PhotoView::ResetView()
+void PhotoView::ResetView( bool bClearAll)
 {
     float diff ;
 
@@ -117,8 +120,11 @@ void PhotoView::ResetView()
         scale( diff, diff);
         m_dScale = 1. ;
     }
-    m_pScene->clear();
+
     centerOn(0, 0);
+
+    if ( bClearAll)
+        m_pScene->clear();
 }
 
 //----------------------------------------------------
@@ -126,18 +132,37 @@ bool
 PhotoView::ShowPhoto( const QString& szFile)
 {
     bool bRet ;
+    bool bDoFade ;
+    int  nSec ;
+    int  nFadeType ;
 
-    ResetView();
+    m_pConf->GetIntProp( PROP_INT_FADE, &nFadeType) ;
+
+    ResetView( nFadeType == FADE_NONE);
 
     bRet = m_cImage.load( szFile) ;
 
-    bRet = bRet  &&  m_pScene->addPixmap( m_cImage) ;
+    if ( m_pCurrImg != NULL)
+        m_pPrevImg = m_pCurrImg ;
+
+    m_pCurrImg = m_pScene->addPixmap( m_cImage) ;
 
     if ( bRet)
         setToolTip( szFile) ;
 
     if ( m_bFullScreen)
         SetCurrTitleOnScene() ;
+
+    bDoFade = nFadeType == FADE_ALWAYS  ||
+              ( nFadeType == FADE_ONSLIDESHOW  &&  m_bSlideShow) ;
+
+    if ( bDoFade) {
+        m_pCurrImg->setOpacity( 0.);
+        m_pConf->GetIntProp( PROP_INT_SEC, &nSec) ;
+        m_pFadeTimer->stop() ;
+        m_pFadeTimer->setInterval( nSec * 10) ;
+        m_pFadeTimer->start();
+    }
 
     return bRet ;
 }
@@ -202,8 +227,8 @@ void PhotoView::ShowHelp( bool bShow)
         if ( m_pHelpText == NULL) {
             QString szHelp ;
             m_pConf->GetHelpFromFile( &szHelp) ;
-            m_pHelpText = m_pScene->addText( szHelp, m_pConf->GetFont()) ;
-            m_pHelpText->setDefaultTextColor( m_pConf->GetColor());
+            m_pHelpText = m_pScene->addText( szHelp, GetFontFromConfig()) ;
+            m_pHelpText->setDefaultTextColor( GetColorFromConfig());
             m_pHelpText->setOpacity( 0.5);
         }
         else
@@ -217,13 +242,15 @@ void PhotoView::ShowHelp( bool bShow)
 //----------------------------------------------------
 void PhotoView::SetCurrTitleOnScene()
 {
+    int nSec ;
 
-    m_pCurrImgTitle = m_pScene->addText( toolTip(), m_pConf->GetFont()) ;
-    m_pCurrImgTitle->setDefaultTextColor( m_pConf->GetColor());
+    m_pConf->GetIntProp( PROP_INT_SEC, &nSec) ;
+    m_pCurrImgTitle = m_pScene->addText( toolTip(), GetFontFromConfig()) ;
+    m_pCurrImgTitle->setDefaultTextColor( GetColorFromConfig());
     m_pCurrImgTitle->show();
-    m_pTimer->stop();
-    m_pTimer->setInterval( m_pConf->GetSeconds() * 50);
-    m_pTimer->start() ;
+    m_pTextTimer->stop();
+    m_pTextTimer->setInterval( nSec * 50);
+    m_pTextTimer->start() ;
 }
 
 //----------------------------------------------------
@@ -243,11 +270,63 @@ void PhotoView::DecreaseAlfa()
 {
     float fOpacity ;
 
-    fOpacity = m_pCurrImgTitle->opacity() - 0.1 ;
-    if ( fOpacity < 0.1) {
+    fOpacity = m_pCurrImgTitle->opacity() - OPACITY_FACTOR ;
+    if ( fOpacity < OPACITY_FACTOR) {
         m_pCurrImgTitle->hide();
-        m_pTimer->stop();
+        m_pTextTimer->stop();
     }
     else
         m_pCurrImgTitle->setOpacity( fOpacity) ;
+}
+
+//----------------------------------------------------
+void PhotoView::DoFadeInOut()
+{
+    float fOpacity ;
+
+    if ( m_pPrevImg != NULL) {
+        fOpacity = m_pPrevImg->opacity() - OPACITY_FACTOR ;
+        m_pPrevImg->setOpacity( fOpacity);
+    }
+
+
+    fOpacity = m_pCurrImg->opacity() + OPACITY_FACTOR ;
+
+    if ( fOpacity > 1 - OPACITY_FACTOR) {
+        if ( m_pPrevImg != NULL)
+            m_pPrevImg->hide();
+        m_pFadeTimer->stop();
+        m_pCurrImg->setOpacity( 1.);
+    }
+    else
+        m_pCurrImg->setOpacity( fOpacity);
+
+}
+
+//----------------------------------------------------
+QFont PhotoView::GetFontFromConfig()
+{
+    QFont   font ;
+    QString szFont ;
+
+    if ( ! m_pConf->GetStrProp( PROP_STR_FONT, &szFont) )
+        return QFont() ;
+
+    font.fromString( szFont) ;
+    return font ;
+}
+
+//----------------------------------------------------
+QColor PhotoView::GetColorFromConfig()
+{
+    QColor  color ;
+    QString szColor ;
+
+    if ( ! m_pConf->GetStrProp( PROP_STR_COLOR, &szColor))
+        return Qt::black ;
+    color.setNamedColor( szColor);
+    if ( ! color.isValid())
+        return Qt::black ;
+
+    return color ;
 }
