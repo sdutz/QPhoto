@@ -18,8 +18,11 @@
 
 
 #include "photoview.h"
+#include "cphoto.h"
 #include <QMouseEvent>
 #include <QGraphicsRectItem>
+#include <QUrl>
+#include <QGraphicsSceneDragDropEvent>
 
 //----------------------------------------------------
 #define SCALE_FACTOR_MINUS 0.9
@@ -44,6 +47,7 @@ PhotoView::PhotoView(QWidget *parent) :
     m_pCurrImg      = NULL ;
     m_bFullScreen   = false ;
     m_bSlideShow    = false ;
+    setAcceptDrops( true);
     m_pTextTimer    = new QTimer( this) ;
     m_pFadeTimer    = new QTimer( this) ;
     connect( m_pTextTimer, SIGNAL( timeout()), this, SLOT( DecreaseAlfa())) ;
@@ -80,8 +84,10 @@ void PhotoView::mouseMoveEvent( QMouseEvent* e)
     QPen    pen ;
     QBrush  brush ;
 
-    if ( ! m_bDrag)
+    if ( ! m_bDrag) {
+        if ( e->button() == Qt::LeftButton)
         return ;
+    }
 
     ptP = mapToScene( e->pos()) ;
 
@@ -294,7 +300,7 @@ void PhotoView::DoFadeInOut()
 
     if ( fOpacity > 1 - OPACITY_FACTOR) {
         if ( m_pPrevImg != NULL)
-            m_pPrevImg->hide();
+            m_pScene->removeItem( m_pPrevImg);
         m_pFadeTimer->stop();
         m_pCurrImg->setOpacity( 1.);
     }
@@ -329,4 +335,36 @@ QColor PhotoView::GetColorFromConfig()
         return Qt::black ;
 
     return color ;
+}
+
+//----------------------------------------------------
+void PhotoView::dragEnterEvent( QDragEnterEvent *event)
+{
+    event->acceptProposedAction();
+}
+
+//----------------------------------------------------
+void PhotoView::dragLeaveEvent(   QDragLeaveEvent *event)
+{
+    event->accept();
+}
+
+//----------------------------------------------------
+void PhotoView::dropEvent( QDropEvent *event)
+{
+    const QMimeData* pData ;
+
+    pData = event->mimeData() ;
+
+    if ( ! pData->hasUrls())
+        return ;
+
+    QUrl url = pData->urls().at(0) ;
+    (( CPhoto*) m_pParent)->on_ImgDropped( url.toLocalFile());
+}
+
+//----------------------------------------------------
+void PhotoView::dragMoveEvent( QDragMoveEvent *event)
+{
+    event->acceptProposedAction();
 }

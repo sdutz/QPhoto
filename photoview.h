@@ -22,6 +22,7 @@
 
 #include <QGraphicsView>
 #include <QTimer>
+#include <QMimeData>
 #include "confmgr.h"
 
 class PhotoView : public QGraphicsView
@@ -42,6 +43,13 @@ public:
     void     SetFullScreen(   bool bFullScreen) ;
     void     SetSlideShow(    bool bSlideShow) { m_bSlideShow = bSlideShow ; } ;
 
+protected:
+    void    dragEnterEvent(   QDragEnterEvent *event);
+    void    dropEvent(        QDropEvent *event);
+    void    dragLeaveEvent(   QDragLeaveEvent *event);
+    void    dragMoveEvent(    QDragMoveEvent *event);
+
+
 private:
 
     void     EndZoomRect() ;
@@ -50,6 +58,7 @@ private:
     QColor   GetColorFromConfig() ;
 
 signals:
+
 
 public slots:
     void     mouseMoveEvent(    QMouseEvent* e);

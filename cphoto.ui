@@ -19,6 +19,9 @@
     <height>764</height>
    </size>
   </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>CPhoto</string>
   </property>
@@ -51,7 +54,7 @@
   <widget class="QPushButton" name="BtnExit">
    <property name="geometry">
     <rect>
-     <x>690</x>
+     <x>700</x>
      <y>720</y>
      <width>94</width>
      <height>31</height>
@@ -69,7 +72,7 @@
     <rect>
      <x>120</x>
      <y>680</y>
-     <width>521</width>
+     <width>531</width>
      <height>71</height>
     </rect>
    </property>
@@ -77,7 +80,7 @@
   <widget class="QPushButton" name="BtnPlus">
    <property name="geometry">
     <rect>
-     <x>650</x>
+     <x>660</x>
      <y>680</y>
      <width>32</width>
      <height>32</height>
@@ -93,7 +96,7 @@
   <widget class="QPushButton" name="BtnMinus">
    <property name="geometry">
     <rect>
-     <x>650</x>
+     <x>660</x>
      <y>720</y>
      <width>32</width>
      <height>32</height>
@@ -109,7 +112,7 @@
   <widget class="QPushButton" name="BtnLeft">
    <property name="geometry">
     <rect>
-     <x>690</x>
+     <x>700</x>
      <y>680</y>
      <width>41</width>
      <height>32</height>
@@ -125,7 +128,7 @@
   <widget class="QPushButton" name="BtnRight">
    <property name="geometry">
     <rect>
-     <x>740</x>
+     <x>750</x>
      <y>680</y>
      <width>41</width>
      <height>32</height>

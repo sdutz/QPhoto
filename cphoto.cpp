@@ -22,6 +22,7 @@
 #include <QTextStream>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QUrl>
 #include <QMessageBox>
 #include "aboutdlg.h"
 
@@ -53,10 +54,11 @@ CPhoto::CPhoto(QWidget *parent) :
     SetIds();
     CreateActions();
     BuildContextMenu();
-    BuildSlideShowMenu();   
+    BuildSlideShowMenu();
     ui->ImgView->SetConfMgr( m_pConf);
     ShowList();
     SetToolTips() ;
+    setAcceptDrops( true);
 }
 
 //----------------------------------------------------
@@ -159,6 +161,15 @@ void CPhoto::CreateActions()
     connect( m_pTimer, SIGNAL( timeout()), this, SLOT( on_BtnRight_clicked())) ;
 }
 
+
+//----------------------------------------------------
+void CPhoto::on_ImgDropped( const QString& szFile)
+{
+    m_szFileName = szFile ;
+    LoadImage();
+}
+
+
 //----------------------------------------------------
 void CPhoto::BuildContextMenu()
 {
@@ -188,8 +199,10 @@ void CPhoto::on_BtnOpen_clicked()
 {
     if ( m_bShiftPressed)
         LoadFile() ;
-    else
+    else {
+        GetImageUrl();
         LoadImage() ;
+    }
 }
 
 //----------------------------------------------------
@@ -212,7 +225,7 @@ void CPhoto::LoadFile()
 }
 
 //----------------------------------------------------
-void CPhoto::LoadImage()
+void CPhoto::GetImageUrl()
 {
     QString szFilters ;
 
@@ -221,12 +234,17 @@ void CPhoto::LoadImage()
     m_szFileName = QFileDialog::getOpenFileName( this, "Open File",
                    m_pConf->GetLastDir(), szFilters) ;
 
+}
+
+//----------------------------------------------------
+void CPhoto::LoadImage()
+{
     if( m_szFileName.isEmpty())
        return ;
 
     ShowPhoto( true) ;
     m_nCurr = ui->ImgList->count() - 1 ;
-    ui->ImgList->setCurrentRow( m_nCurr);
+    ui->ImgList->setCurrentRow( m_nCurr) ;
 }
 
 //----------------------------------------------------
@@ -429,7 +447,7 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
             OnHelp();
         else if ( m_bFullScreen)
             SwitchFullScreen();
-        break ;
+        break ;   
 
         case Qt::Key_Control :
         m_bCtrlPressed = true ;
@@ -736,8 +754,10 @@ void CPhoto::SwitchFullScreen()
         ui->ImgView->resize( SceneSize);
         ui->ImgView->SetFullScreen( false);
 
-        if ( m_pTimer->isActive())
+        if ( m_pTimer->isActive()) {
             m_pTimer->stop();
+            OnEndSlideShow();
+        }
     }
 
     m_bFullScreen = ! m_bFullScreen ;
@@ -754,6 +774,7 @@ void CPhoto::OnStartSlideShow()
     m_pStartSlideShowAct->setEnabled( false);
     m_pEndSlideShowAct->setEnabled( true);
     m_pPauseSlideShowAct->setEnabled( true);
+    m_pExitFullScreen->setEnabled( false);
 
     m_nCurr = -1 ;
     on_BtnRight_clicked();
@@ -770,6 +791,8 @@ void CPhoto::OnEndSlideShow()
     m_pPauseSlideShowAct->setEnabled( false);
     m_pEndSlideShowAct->setEnabled(   false);
     m_pStartSlideShowAct->setEnabled( true);
+    m_pExitFullScreen->setEnabled( true);
+
     m_pTimer->stop();
 }
 
@@ -810,3 +833,4 @@ void CPhoto::GoToStartEnd( bool bStart)
 
     on_BtnRight_clicked();
 }
+

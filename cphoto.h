@@ -38,6 +38,8 @@ class CPhoto : public QDialog
 public:
     explicit CPhoto(QWidget *parent = 0);
     ~CPhoto();
+    void     on_ImgDropped( const QString& szFile) ;
+
 
 private :
     bool ShowPhoto( bool bToAddToList) ;
@@ -45,6 +47,7 @@ private :
     void DeleteSingle();
     void DeleteAll();
     void LoadImage();
+    void GetImageUrl() ;
     void LoadFile();
     void UpdateLayoutAfterResize( int nXMove, int nYMove) ;
     void SetIds();
