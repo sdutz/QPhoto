@@ -82,12 +82,10 @@ void PhotoView::mouseMoveEvent( QMouseEvent* e)
     int     nHeight ;
     QPointF ptP ;
     QPen    pen ;
-    QBrush  brush ;
+    QRect   rect ;
 
-    if ( ! m_bDrag) {
-        if ( e->button() == Qt::LeftButton)
+    if ( ! m_bDrag)
         return ;
-    }
 
     ptP = mapToScene( e->pos()) ;
 
@@ -99,7 +97,27 @@ void PhotoView::mouseMoveEvent( QMouseEvent* e)
 
     pen.setColor( GetColorFromConfig());
 
-    m_pRect = m_pScene->addRect( m_Pt.x(), m_Pt.y(), nWidth, nHeight, pen) ;
+    if ( nWidth > 0  &&  nHeight > 0) {
+        rect.setX( m_Pt.x());
+        rect.setY( m_Pt.y());
+    }
+    else if ( nWidth < 0  &&  nHeight < 0) {
+        rect.setX( ptP.x());
+        rect.setY( ptP.y());
+    }
+    else if ( nWidth < 0) {
+        rect.setX( ptP.x());
+        rect.setY( m_Pt.y());
+    }
+    else if ( nHeight < 0) {
+        rect.setX( m_Pt.x());
+        rect.setY( ptP.y());
+    }
+
+    rect.setWidth( abs( nWidth));
+    rect.setHeight( abs( nHeight));
+
+    m_pRect = m_pScene->addRect( rect, pen) ;
 }
 
 //----------------------------------------------------
@@ -306,7 +324,6 @@ void PhotoView::DoFadeInOut()
     }
     else
         m_pCurrImg->setOpacity( fOpacity);
-
 }
 
 //----------------------------------------------------

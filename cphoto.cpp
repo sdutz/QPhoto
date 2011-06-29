@@ -33,6 +33,7 @@
 #define LEFT_BUTTON        3
 #define RIGHT_BUTTON       5
 #define SCENE_OFFS         20
+#define QPHOTO             "QPhoto"
 
 
 //----------------------------------------------------
@@ -42,6 +43,7 @@ CPhoto::CPhoto(QWidget *parent) :
 {
     ui->setupUi(this);
     setModal( false);
+    setWindowTitle( QPHOTO);
     m_szFileName    = "" ;
     m_nCurr         = -1 ;
     m_bOrdChanged   = false ;
@@ -254,7 +256,10 @@ bool CPhoto::ShowPhoto( bool bToAddToList)
         return false ;
 
     if ( ui->ImgView->ShowPhoto( m_szFileName)) {
-        setWindowTitle( m_szFileName);
+        QString title ;
+        title = QPHOTO ;
+        title += ":  " + m_szFileName ;
+        setWindowTitle( title);
         if( bToAddToList  &&  ! m_pConf->FindInList( m_szFileName)) {
             m_pConf->AddToList( m_szFileName);
             ui->ImgList->addItem( m_szFileName) ;
@@ -328,7 +333,7 @@ void CPhoto::ShowList(  const QString& szFile)
     }
 
     m_nCurr = -1 ;
-    on_BtnRight_clicked();
+    SeeNextImg();
 }
 
 //----------------------------------------------------
@@ -341,6 +346,7 @@ void CPhoto::SeePrevImg()
     m_szFileName = ui->ImgList->item(m_nCurr)->text() ;
     ui->ImgList->setCurrentRow( m_nCurr);
     ShowPhoto( false) ;
+    ui->ImgView->ZoomAll();
 }
 
 //----------------------------------------------------
@@ -386,6 +392,7 @@ void CPhoto::DeleteAll()
     ui->ImgList->clear();
     m_pConf->WriteList();
     ui->ImgView->ResetView( true);
+    setWindowTitle( QPHOTO);
 }
 
 //----------------------------------------------------
