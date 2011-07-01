@@ -34,6 +34,7 @@
 #define RIGHT_BUTTON       5
 #define SCENE_OFFS         20
 #define QPHOTO             "QPhoto"
+#define PIX_OFFS           1
 
 
 //----------------------------------------------------
@@ -60,6 +61,7 @@ CPhoto::CPhoto(QWidget *parent) :
     ui->ImgView->SetConfMgr( m_pConf);
     ShowList();
     SetToolTips() ;
+    SetBtnIcons() ;
     setAcceptDrops( true);
 }
 
@@ -101,6 +103,57 @@ void CPhoto::DeleteAction()
 }
 
 //----------------------------------------------------
+void CPhoto::GetPixBtnSize( const QSize& btnSize, QSize* pPixSize)
+{
+    int nMin ;
+
+    nMin = qMin( btnSize.width(), btnSize.height()) - PIX_OFFS ;
+    pPixSize->setHeight( nMin);
+    pPixSize->setWidth( nMin);
+
+}
+
+//----------------------------------------------------
+void CPhoto::SetBtnIcons( void)
+{
+    QIcon   icon ;
+    QSize   pixSize ;
+
+
+    GetPixBtnSize( ui->BtnLeft->size(), &pixSize) ;
+    icon.addFile( "icons/arrow_left.png", pixSize) ;
+    ui->BtnLeft->setIcon( icon);
+
+    GetPixBtnSize( ui->BtnRight->size(), &pixSize) ;
+    icon.addFile( "icons/arrow_right.png", pixSize) ;
+    ui->BtnRight->setIcon( icon);
+
+    GetPixBtnSize( ui->BtnMinus->size(), &pixSize) ;
+    icon.addFile( "icons/zoom_out.png", pixSize) ;
+    ui->BtnMinus->setIcon( icon);
+
+    GetPixBtnSize( ui->BtnPlus->size(), &pixSize) ;
+    icon.addFile( "icons/zoom_in.png", pixSize) ;
+    ui->BtnPlus->setIcon( icon);
+
+    GetPixBtnSize( ui->BtnDel->size(), &pixSize) ;
+    icon.addFile( "icons/picture_delete.png", pixSize) ;
+    ui->BtnDel->setIcon( icon);
+
+    GetPixBtnSize( ui->BtnSave->size(), &pixSize) ;
+    icon.addFile( "icons/picture_save.png", pixSize) ;
+    ui->BtnSave->setIcon( icon);
+
+    GetPixBtnSize( ui->BtnOpen->size(), &pixSize) ;
+    icon.addFile( "icons/picture_add.png", pixSize) ;
+    ui->BtnOpen->setIcon( icon);
+
+    GetPixBtnSize( ui->BtnExit->size(), &pixSize) ;
+    icon.addFile( "icons/cross.png", pixSize) ;
+    ui->BtnExit->setIcon( icon);    
+}
+
+//----------------------------------------------------
 void CPhoto::SetIds()
 {
     ui->RightButtons->setId( ui->BtnPlus, 1) ;
@@ -132,31 +185,51 @@ void CPhoto::SetToolTips()
 //----------------------------------------------------
 void CPhoto::CreateActions()
 {
+    QIcon icon ;
+
     m_pMoveUpAct = new QAction( "MoveUp", this) ;
+    icon.addFile( "icons/arrow_up.png") ;
+    m_pMoveUpAct->setIcon( icon);
     connect( m_pMoveUpAct, SIGNAL( triggered()), this, SLOT( OnMoveCurrUp())) ;
 
     m_pMoveDownAct = new QAction( "MoveDown", this) ;
+    icon.addFile( "icons/arrow_down.png") ;
+    m_pMoveDownAct->setIcon( icon);
     connect( m_pMoveDownAct, SIGNAL( triggered()), this, SLOT( OnMoveCurrDown())) ;
 
     m_pZoomAllAct = new QAction( "ZoomAll", this) ;
+    icon.addFile( "icons/zoom.png") ;
+    m_pZoomAllAct->setIcon( icon);
     connect( m_pZoomAllAct, SIGNAL( triggered()), this, SLOT( OnZoomAll())) ;
 
     m_pConfigAct = new QAction( "Config", this) ;
+    icon.addFile( "icons/wrench.png") ;
+    m_pConfigAct->setIcon( icon);
     connect( m_pConfigAct, SIGNAL( triggered()), this, SLOT( OnConfig())) ;
 
     m_pStartSlideShowAct = new QAction( "Start SlideShow", this) ;
+    icon.addFile( "icons/control_play_blue.png") ;
+    m_pStartSlideShowAct->setIcon( icon);
     connect( m_pStartSlideShowAct, SIGNAL( triggered()), this, SLOT( OnStartSlideShow())) ;
 
     m_pEndSlideShowAct = new QAction( "End SlideShow", this) ;
+    icon.addFile( "icons/control_stop_blue.png") ;
+    m_pEndSlideShowAct->setIcon( icon);
     connect( m_pEndSlideShowAct, SIGNAL( triggered()), this, SLOT( OnEndSlideShow())) ;
 
     m_pPauseSlideShowAct = new QAction( "Pause SlideShow", this) ;
+    icon.addFile( "icons/control_pause_blue.png") ;
+    m_pPauseSlideShowAct->setIcon( icon);
     connect( m_pPauseSlideShowAct, SIGNAL( triggered()), this, SLOT( OnPauseSlideShow())) ;
 
     m_pShowFullScreen = new QAction( "Show Fullscreen", this) ;
+    icon.addFile( "icons/monitor.png") ;
+    m_pShowFullScreen->setIcon( icon);
     connect( m_pShowFullScreen, SIGNAL( triggered()), this, SLOT( SwitchFullScreen())) ;
 
     m_pExitFullScreen = new QAction( "Exit Fullscreen", this) ;
+    icon.addFile( "icons/monitor_go.png") ;
+    m_pExitFullScreen->setIcon( icon);
     connect( m_pExitFullScreen, SIGNAL( triggered()), this, SLOT( SwitchFullScreen())) ;
 
     m_pTimer = new QTimer( this) ;

@@ -66,7 +66,9 @@ private :
     void RefreshList() ;
     void DeleteAction() ;
     void InitLogDlg() ;
+    void SetBtnIcons( void) ;
     void GoToStartEnd( bool bStart) ;
+    void GetPixBtnSize( const QSize& btnSize, QSize* pPixSize) ;
 
 private slots:
     void on_BtnOpen_clicked();
