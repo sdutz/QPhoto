@@ -39,6 +39,8 @@ public:
     explicit CPhoto(QWidget *parent = 0);
     ~CPhoto();
     void     on_ImgDropped( const QString& szFile) ;
+    void     EndDrag() ;
+    QSize    GetSceneSize() ;
 
 
 private :
@@ -61,14 +63,12 @@ private :
     void SeePrevImg() ;
     void SeeNextImg() ;
     bool IsPosOnView(     const QPoint& pos) ;
-    void DoDebug(         const QString& szDebug) ;
     void SetToolTips() ;
     void RefreshList() ;
     void DeleteAction() ;
     void InitLogDlg() ;
     void SetBtnIcons( void) ;
     void GoToStartEnd( bool bStart) ;
-    void GetPixBtnSize( const QSize& btnSize, QSize* pPixSize) ;
 
 private slots:
     void on_BtnOpen_clicked();
@@ -94,6 +94,8 @@ private slots:
     void SwitchFullScreen() ;
     void OnHelp() ;
     void OnShowLog() ;
+
+    void on_BtnConfig_clicked();
 
 private:
     Ui::CPhoto      *ui;

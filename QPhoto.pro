@@ -16,14 +16,16 @@ SOURCES += main.cpp\
     photoview.cpp \
     confmgr.cpp \
     settingsdlg.cpp \
-    errordlg.cpp
+    errordlg.cpp \
+    util.cpp
 
 HEADERS  += cphoto.h \
     aboutdlg.h \
     photoview.h \
     confmgr.h \
     settingsdlg.h \
-    errordlg.h
+    errordlg.h \
+    util.h
 
 FORMS    += cphoto.ui \
     aboutdlg.ui \

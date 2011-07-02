@@ -45,6 +45,7 @@ public:
 
 private :
     void UpdateColorButton() ;
+    void InitButton() ;
 
 private slots:
 

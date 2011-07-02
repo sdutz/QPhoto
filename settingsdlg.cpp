@@ -20,6 +20,7 @@
 #include "ui_settingsdlg.h"
 #include <QColorDialog>
 #include <QFontDialog>
+#include "util.h"
 
 #define MIN_SEC 1
 #define MAX_SEC 30
@@ -35,6 +36,7 @@ SettingsDlg::SettingsDlg(QWidget *parent) :
     ui->FadeCmbBox->addItem( "On SlideShow");
     ui->FadeCmbBox->addItem( "Always");
     setWindowTitle( "Settings dialog");
+    InitButton() ;
 }
 
 
@@ -43,6 +45,19 @@ SettingsDlg::~SettingsDlg()
 {
     delete ui;
 }
+
+
+//----------------------------------------------------
+void SettingsDlg::InitButton()
+{
+    QIcon icon ;
+    QSize pixSize ;
+
+    GetPixBtnSize( ui->Font_Btn->size(), &pixSize) ;
+    icon.addFile( "icons/font.png", pixSize);
+    ui->Font_Btn->setIcon( icon);
+}
+
 
 //----------------------------------------------------
 void SettingsDlg::UpdateColorButton()

@@ -23,18 +23,17 @@
 #include <QKeyEvent>
 #include <QTimer>
 #include <QUrl>
-#include <QMessageBox>
 #include "aboutdlg.h"
+#include "util.h"
 
 
 //----------------------------------------------------
 #define MIN_WIDTH          814
 #define MIN_HEIGHT         764
-#define LEFT_BUTTON        3
+#define LEFT_BUTTON        5
 #define RIGHT_BUTTON       5
 #define SCENE_OFFS         20
 #define QPHOTO             "QPhoto"
-#define PIX_OFFS           1
 
 
 //----------------------------------------------------
@@ -59,6 +58,7 @@ CPhoto::CPhoto(QWidget *parent) :
     BuildContextMenu();
     BuildSlideShowMenu();
     ui->ImgView->SetConfMgr( m_pConf);
+    ui->ImgView->PrepareSlideshowItems() ;
     ShowList();
     SetToolTips() ;
     SetBtnIcons() ;
@@ -103,17 +103,6 @@ void CPhoto::DeleteAction()
 }
 
 //----------------------------------------------------
-void CPhoto::GetPixBtnSize( const QSize& btnSize, QSize* pPixSize)
-{
-    int nMin ;
-
-    nMin = qMin( btnSize.width(), btnSize.height()) - PIX_OFFS ;
-    pPixSize->setHeight( nMin);
-    pPixSize->setWidth( nMin);
-
-}
-
-//----------------------------------------------------
 void CPhoto::SetBtnIcons( void)
 {
     QIcon   icon ;
@@ -144,13 +133,21 @@ void CPhoto::SetBtnIcons( void)
     icon.addFile( "icons/picture_save.png", pixSize) ;
     ui->BtnSave->setIcon( icon);
 
+    GetPixBtnSize( ui->BtnConfig->size(), &pixSize) ;
+    icon.addFile( "icons/wrench.png", pixSize) ;
+    ui->BtnConfig->setIcon( icon);
+
+    GetPixBtnSize( ui->BtnLibrary->size(), &pixSize) ;
+    icon.addFile( "icons/database.png", pixSize) ;
+    ui->BtnLibrary->setIcon( icon);
+
     GetPixBtnSize( ui->BtnOpen->size(), &pixSize) ;
     icon.addFile( "icons/picture_add.png", pixSize) ;
     ui->BtnOpen->setIcon( icon);
 
     GetPixBtnSize( ui->BtnExit->size(), &pixSize) ;
     icon.addFile( "icons/cross.png", pixSize) ;
-    ui->BtnExit->setIcon( icon);    
+    ui->BtnExit->setIcon( icon);
 }
 
 //----------------------------------------------------
@@ -165,6 +162,8 @@ void CPhoto::SetIds()
     ui->LeftButtons->setId( ui->BtnSave, 1);
     ui->LeftButtons->setId( ui->BtnDel, 2);
     ui->LeftButtons->setId( ui->BtnOpen,  3);
+    ui->LeftButtons->setId( ui->BtnLibrary, 4);
+    ui->LeftButtons->setId( ui->BtnConfig, 5);
 }
 
 //----------------------------------------------------
@@ -384,13 +383,6 @@ void CPhoto::on_BtnPlus_clicked()
     ui->ImgView->ZoomIn();
 }
 
-//----------------------------------------------------
-void CPhoto::DoDebug( const QString& szDebug)
-{
-    QMessageBox box ;
-    box.setText( szDebug);
-    box.exec() ;
-}
 
 //----------------------------------------------------
 void CPhoto::ShowList(  const QString& szFile)
@@ -464,7 +456,7 @@ void CPhoto::DeleteAll()
     m_pConf->ClearList() ;
     ui->ImgList->clear();
     m_pConf->WriteList();
-    ui->ImgView->ResetView( true);
+    ui->ImgView->ResetView();
     setWindowTitle( QPHOTO);
 }
 
@@ -566,6 +558,10 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
         case Qt::Key_End :
         if( m_bFullScreen)
             GoToStartEnd( false);
+        break ;
+
+        case Qt::Key_Pause :
+        OnPauseSlideShow();
         break ;
     }
 }
@@ -719,8 +715,10 @@ void CPhoto::mousePressEvent( QMouseEvent* e)
             else
                 ShowSlideShowMenu( ptGlob) ;
         }
-        else if ( e->button() == Qt::LeftButton)
+        else if ( e->button() == Qt::LeftButton) {
             ui->ImgView->StartZoomRect( pos);
+            setCursor( Qt::CrossCursor);
+        }
     }
 }
 
@@ -766,6 +764,13 @@ void CPhoto::OnMoveCurrDown()
 void CPhoto::OnZoomAll()
 {
     ui->ImgView->ZoomAll();
+}
+
+
+//----------------------------------------------------
+void CPhoto::EndDrag( void)
+{
+    setCursor( Qt::ArrowCursor);
 }
 
 //----------------------------------------------------
@@ -862,6 +867,7 @@ void CPhoto::OnStartSlideShow()
     ui->ImgView->SetSlideShow( true);
     m_pTimer->setInterval( nSec * 1000);
     m_pTimer->start();
+    ui->ImgView->DrawPlay();
 }
 
 //----------------------------------------------------
@@ -879,10 +885,15 @@ void CPhoto::OnEndSlideShow()
 //----------------------------------------------------
 void CPhoto::OnPauseSlideShow()
 {
-    if ( m_pTimer->isActive())
+    if ( m_pTimer->isActive()) {
         m_pTimer->stop();
-    else
+        ui->ImgView->DrawPause();
+    }
+    else {
+        SeeNextImg();
         m_pTimer->start();
+        ui->ImgView->DrawPlay();
+    }
 }
 
 //----------------------------------------------------
@@ -914,3 +925,14 @@ void CPhoto::GoToStartEnd( bool bStart)
     on_BtnRight_clicked();
 }
 
+//----------------------------------------------------
+void CPhoto::on_BtnConfig_clicked()
+{
+    OnConfig();
+}
+
+//----------------------------------------------------
+QSize  CPhoto::GetSceneSize()
+{
+    return ui->ImgView->size() ;
+}

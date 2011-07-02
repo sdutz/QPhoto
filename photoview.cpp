@@ -18,7 +18,6 @@
 
 
 #include "photoview.h"
-#include "cphoto.h"
 #include <QMouseEvent>
 #include <QGraphicsRectItem>
 #include <QUrl>
@@ -35,23 +34,27 @@
 PhotoView::PhotoView(QWidget *parent) :
     QGraphicsView(parent)
 {
-    m_pParent       = parent ;
-    m_dScale        = 1. ;
-    m_pScene        = new QGraphicsScene( this) ;
+    m_pParent        = ( CPhoto*) parent ;
+    m_dScale         = 1. ;
+    m_pScene         = new QGraphicsScene( this) ;
     setScene( m_pScene);
-    m_bDrag         = false ;
-    m_pRect         = NULL ;
-    m_pHelpText     = NULL ;
-    m_pCurrImgTitle = NULL ;
-    m_pPrevImg      = NULL ;
-    m_pCurrImg      = NULL ;
-    m_bFullScreen   = false ;
-    m_bSlideShow    = false ;
+    m_bDrag          = false ;
+    m_pRect          = NULL ;
+    m_pHelpText      = NULL ;
+    m_pCurrImgTitle  = NULL ;
+    m_pPrevImg       = NULL ;
+    m_pCurrImg       = NULL ;
+    m_pauseGrp       = NULL ;
+    m_pTria          = NULL ;
+    m_bFullScreen    = false ;
+    m_bSlideShow     = false ;
     setAcceptDrops( true);
-    m_pTextTimer    = new QTimer( this) ;
-    m_pFadeTimer    = new QTimer( this) ;
+    m_pTextTimer     = new QTimer( this) ;
+    m_pFadeTimer     = new QTimer( this) ;
+    m_pControlsTimer = new QTimer( this) ;
     connect( m_pTextTimer, SIGNAL( timeout()), this, SLOT( DecreaseAlfa())) ;
     connect( m_pFadeTimer, SIGNAL( timeout()), this, SLOT( DoFadeInOut())) ;
+    connect( m_pControlsTimer, SIGNAL( timeout()), this, SLOT( DoControlsFadeOut())) ;
 }
 
 //----------------------------------------------------
@@ -63,6 +66,8 @@ PhotoView::~PhotoView()
         delete m_pTextTimer ;
     if ( m_pFadeTimer != NULL)
         delete m_pFadeTimer ;
+    if ( m_pControlsTimer != NULL)
+        delete m_pControlsTimer ;
 }
 
 //----------------------------------------------------
@@ -70,10 +75,89 @@ void PhotoView::mouseReleaseEvent( QMouseEvent* e)
 {
 
     if ( e->type() == QEvent::MouseButtonRelease) {
-        if ( e->button() == Qt::LeftButton  &&  m_bDrag)
-            EndZoomRect();
+        if ( e->button() == Qt::LeftButton  &&  m_bDrag) {
+            EndZoomRect();        
+            m_pParent->EndDrag();
+        }
     }
 }
+
+//----------------------------------------------------
+void PhotoView::PrepareSlideshowItems()
+{
+    QPen                   pen ;
+    QBrush                 brush ;
+    QList< QGraphicsItem*> list ;
+    QVector< QPoint>       points ;
+    QRect     rect1(0, 0, 20, 60 ) ;
+    QRect     rect2(40, 0, 20, 60 ) ;
+
+    pen.setColor( GetColorFromConfig());
+    brush.setColor( GetColorFromConfig());
+    brush.setStyle( Qt::SolidPattern);
+    list.append( m_pScene->addRect( rect1, pen, brush)) ;
+    list.append( m_pScene->addRect( rect2, pen, brush)) ;
+    m_pauseGrp = m_pScene->createItemGroup( list) ;
+    m_pauseGrp->setVisible( false);
+
+    points.append( QPoint( 0,0));
+    points.append( QPoint( 50, 50));
+    points.append( QPoint( 0, 100));
+    QPolygon  poly( points) ;
+    m_pTria = m_pScene->addPolygon( poly, pen, brush) ;
+    m_pTria->setVisible( false);
+}
+
+//----------------------------------------------------
+void PhotoView::DrawPlay()
+{
+    QSize   sceneSize ;
+    QSizeF  grpSize ;
+    QPointF pos ;
+
+
+    sceneSize = m_pParent->GetSceneSize() ;
+    grpSize   = m_pTria->boundingRect().size();
+    pos.setX( sceneSize.width() * 0.5 - grpSize.width() * 0.5);
+    pos.setY( sceneSize.height() * 0.5 - grpSize.height() * 0.5);
+
+    m_pTria->setPos( pos);
+    m_pTria->setVisible( true);
+    StartControlsTimer();
+}
+
+
+//----------------------------------------------------
+void PhotoView::StartControlsTimer()
+{
+    int nSec ;
+
+    m_pConf->GetIntProp( PROP_INT_SEC, &nSec) ;
+
+    if ( m_pControlsTimer->isActive())
+        m_pControlsTimer->stop();
+    m_pControlsTimer->setInterval( nSec * 50);
+    m_pControlsTimer->start();
+}
+
+//----------------------------------------------------
+void PhotoView::DrawPause()
+{
+    QSize   sceneSize ;
+    QSizeF  grpSize ;
+    QPointF pos ;
+
+
+    sceneSize = m_pParent->GetSceneSize() ;
+    grpSize   = m_pauseGrp->boundingRect().size() ;
+    pos.setX( sceneSize.width() * 0.5 - grpSize.width() * 0.5);
+    pos.setY( sceneSize.height() * 0.5 - grpSize.height() * 0.5);
+
+    m_pauseGrp->setPos( pos);
+    m_pauseGrp->setVisible( true);
+    StartControlsTimer();
+}
+
 
 //----------------------------------------------------
 void PhotoView::mouseMoveEvent( QMouseEvent* e)
@@ -135,7 +219,7 @@ void PhotoView::wheelEvent( QWheelEvent* e)
 }
 
 //----------------------------------------------------
-void PhotoView::ResetView( bool bClearAll)
+void PhotoView::ResetView()
 {
     float diff ;
 
@@ -146,9 +230,6 @@ void PhotoView::ResetView( bool bClearAll)
     }
 
     centerOn(0, 0);
-
-    if ( bClearAll)
-        m_pScene->clear();
 }
 
 //----------------------------------------------------
@@ -162,12 +243,15 @@ PhotoView::ShowPhoto( const QString& szFile)
 
     m_pConf->GetIntProp( PROP_INT_FADE, &nFadeType) ;
 
-    ResetView( nFadeType == FADE_NONE);
-
-    bRet = m_cImage.load( szFile) ;
+    ResetView();
 
     if ( m_pCurrImg != NULL)
         m_pPrevImg = m_pCurrImg ;
+
+    if ( nFadeType == FADE_NONE)
+        m_pScene->removeItem( m_pPrevImg);
+
+    bRet = m_cImage.load( szFile) ;
 
     m_pCurrImg = m_pScene->addPixmap( m_cImage) ;
 
@@ -327,6 +411,27 @@ void PhotoView::DoFadeInOut()
 }
 
 //----------------------------------------------------
+void PhotoView::DoControlsFadeOut()
+{
+    float          fOpacity ;
+    QGraphicsItem* pItem ;
+
+    if ( m_pTria->isVisible())
+        pItem = m_pTria ;
+    else
+        pItem = m_pauseGrp ;
+
+    fOpacity = pItem->opacity() - OPACITY_FACTOR ;
+    if ( fOpacity < OPACITY_FACTOR) {
+        pItem->setVisible( false);
+        m_pControlsTimer->stop();
+    }
+    else
+        pItem->setOpacity( fOpacity);
+}
+
+
+//----------------------------------------------------
 QFont PhotoView::GetFontFromConfig()
 {
     QFont   font ;
@@ -377,11 +482,11 @@ void PhotoView::dropEvent( QDropEvent *event)
         return ;
 
     QUrl url = pData->urls().at(0) ;
-    (( CPhoto*) m_pParent)->on_ImgDropped( url.toLocalFile());
+    m_pParent->on_ImgDropped( url.toLocalFile());
 }
 
 //----------------------------------------------------
 void PhotoView::dragMoveEvent( QDragMoveEvent *event)
 {
     event->acceptProposedAction();
-}
+}    

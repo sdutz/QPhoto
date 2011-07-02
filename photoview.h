@@ -24,6 +24,7 @@
 #include <QTimer>
 #include <QMimeData>
 #include "confmgr.h"
+#include "cphoto.h"
 
 class PhotoView : public QGraphicsView
 {
@@ -35,13 +36,16 @@ public:
     void     ZoomOut() ;
     void     ZoomIn() ;
     void     ZoomAll() ;
-    void     ResetView(       bool bClearAll) ;
+    void     ResetView() ;
     void     StartZoomRect(   const QPoint& pos) ;
     void     SetShiftPressed( bool bPress)    { m_bShift = bPress ; } ;
     void     SetConfMgr(      ConfMgr* pConf) { m_pConf = pConf ; } ;
     void     ShowHelp(        bool bShow) ;
     void     SetFullScreen(   bool bFullScreen) ;
     void     SetSlideShow(    bool bSlideShow) { m_bSlideShow = bSlideShow ; } ;
+    void     DrawPause() ;
+    void     DrawPlay() ;
+    void     PrepareSlideshowItems() ;
 
 protected:
     void    dragEnterEvent(   QDragEnterEvent *event);
@@ -56,6 +60,7 @@ private:
     void     SetCurrTitleOnScene() ;
     QFont    GetFontFromConfig() ;
     QColor   GetColorFromConfig() ;
+    void     StartControlsTimer() ;
 
 signals:
 
@@ -66,25 +71,29 @@ public slots:
     void     wheelEvent(        QWheelEvent* e);
     void     DecreaseAlfa() ;
     void     DoFadeInOut() ;
+    void     DoControlsFadeOut();
 
 private:
-    QPixmap              m_cImage ;
-    QPointF              m_Pt ;
-    bool                 m_bDrag ;
-    bool                 m_bShift ;
-    bool                 m_bSlideShow ;
-    float                m_dScale ;
-    QWidget*             m_pParent ;
-    QGraphicsScene*      m_pScene ;
-    QGraphicsRectItem*   m_pRect ;
-    QGraphicsTextItem*   m_pHelpText ;
-    QGraphicsTextItem*   m_pCurrImgTitle ;
-    QGraphicsPixmapItem* m_pPrevImg ;
-    QGraphicsPixmapItem* m_pCurrImg ;
-    bool                 m_bFullScreen ;
-    ConfMgr*             m_pConf ;
-    QTimer*              m_pTextTimer ;
-    QTimer*              m_pFadeTimer ;
+    QPixmap               m_cImage ;
+    QPointF               m_Pt ;
+    bool                  m_bDrag ;
+    bool                  m_bShift ;
+    bool                  m_bSlideShow ;
+    float                 m_dScale ;
+    CPhoto*               m_pParent ;
+    QGraphicsScene*       m_pScene ;
+    QGraphicsRectItem*    m_pRect ;
+    QGraphicsTextItem*    m_pHelpText ;
+    QGraphicsTextItem*    m_pCurrImgTitle ;
+    QGraphicsPixmapItem*  m_pPrevImg ;
+    QGraphicsPixmapItem*  m_pCurrImg ;
+    QGraphicsItemGroup*   m_pauseGrp ;
+    QGraphicsPolygonItem* m_pTria ;
+    bool                  m_bFullScreen ;
+    ConfMgr*              m_pConf ;
+    QTimer*               m_pTextTimer ;
+    QTimer*               m_pFadeTimer ;
+    QTimer*               m_pControlsTimer ;
 };
 
 #endif // PHOTOVIEW_H

@@ -70,9 +70,9 @@
   <widget class="QListWidget" name="ImgList">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>160</x>
      <y>680</y>
-     <width>531</width>
+     <width>491</width>
      <height>71</height>
     </rect>
    </property>
@@ -172,6 +172,32 @@
    <attribute name="buttonGroup">
     <string>LeftButtons</string>
    </attribute>
+  </widget>
+  <widget class="QPushButton" name="BtnConfig">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>720</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="BtnLibrary">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>680</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
