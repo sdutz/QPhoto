@@ -36,7 +36,7 @@ public:
     void     ZoomOut() ;
     void     ZoomIn() ;
     void     ZoomAll() ;
-    void     ResetView() ;
+    void     ResetView(       bool bClearAll = false) ;
     void     StartZoomRect(   const QPoint& pos) ;
     void     SetShiftPressed( bool bPress)    { m_bShift = bPress ; } ;
     void     SetConfMgr(      ConfMgr* pConf) { m_pConf = pConf ; } ;

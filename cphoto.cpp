@@ -456,7 +456,7 @@ void CPhoto::DeleteAll()
     m_pConf->ClearList() ;
     ui->ImgList->clear();
     m_pConf->WriteList();
-    ui->ImgView->ResetView();
+    ui->ImgView->ResetView( true);
     setWindowTitle( QPHOTO);
 }
 

@@ -219,7 +219,7 @@ void PhotoView::wheelEvent( QWheelEvent* e)
 }
 
 //----------------------------------------------------
-void PhotoView::ResetView()
+void PhotoView::ResetView( bool bClearAll)
 {
     float diff ;
 
@@ -230,6 +230,9 @@ void PhotoView::ResetView()
     }
 
     centerOn(0, 0);
+
+    if ( bClearAll)
+        m_pScene->clear();
 }
 
 //----------------------------------------------------
