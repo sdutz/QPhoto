@@ -29,6 +29,7 @@
 #define LAST_DIR           "LastDir"
 #define COLOR              "Color"
 #define FONT               "Font"
+#define SONGS              "Songs"
 #define SLIDESHOWSEC       "SlideShowSec"
 #define FADETYPE           "Fade Type"
 
@@ -156,6 +157,7 @@ void ConfMgr::LoadSettings()
     QString   szBlack ;
     QString   szColor ;
     QString   szFont ;
+    QString   szSongs ;
     QColor    DefColor ;
     QFont     DefFont ;
 
@@ -167,6 +169,7 @@ void ConfMgr::LoadSettings()
     m_aIntProp[ PROP_INT_FADE]  = cSet.value( FADETYPE, 0).toInt() ;
     m_aStrProp[ PROP_STR_COLOR] = cSet.value( COLOR, szBlack).toString() ;
     m_aStrProp[ PROP_STR_FONT]  = cSet.value( FONT, DefFont.toString()).toString() ;
+    m_aStrProp[ PROP_STR_SONGS] = cSet.value( SONGS, "").toString() ;
 }
 
 //----------------------------------------------------
@@ -179,6 +182,7 @@ void ConfMgr::WriteSettings()
     cSet.setValue( FADETYPE, m_aIntProp[ PROP_INT_FADE]);
     cSet.setValue( COLOR, m_aStrProp[PROP_STR_COLOR]) ;
     cSet.setValue( FONT, m_aStrProp[PROP_STR_FONT]);
+    cSet.setValue( SONGS, m_aStrProp[PROP_STR_SONGS]);
 }
 
 //----------------------------------------------------
@@ -191,6 +195,7 @@ void ConfMgr::ShowSettingsDlg()
     sets.nFadeType = m_aIntProp[ PROP_INT_FADE] ;
     sets.szColor   = m_aStrProp[ PROP_STR_COLOR] ;
     sets.szFont    = m_aStrProp[ PROP_STR_FONT] ;
+    sets.szSongs   = m_aStrProp[ PROP_STR_SONGS] ;
 
     cDlg.SetInitSettings( sets);
 
@@ -200,6 +205,7 @@ void ConfMgr::ShowSettingsDlg()
         m_aIntProp[ PROP_INT_FADE]  = sets.nFadeType ;
         m_aStrProp[ PROP_STR_COLOR] = sets.szColor ;
         m_aStrProp[ PROP_STR_FONT]  = sets.szFont ;
+        m_aStrProp[ PROP_STR_SONGS] = sets.szSongs ;
     }
 }
 

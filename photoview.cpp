@@ -231,8 +231,10 @@ void PhotoView::ResetView( bool bClearAll)
 
     centerOn(0, 0);
 
-    if ( bClearAll)
+    if ( bClearAll) {
         m_pScene->clear();
+        PrepareSlideshowItems();
+    }
 }
 
 //----------------------------------------------------
@@ -298,6 +300,9 @@ void PhotoView::ZoomAll()
 {
     QSize ImgSize ;
 
+    if ( m_pPrevImg == NULL)
+        return ;
+
     ImgSize = m_cImage.size() ;
 
     fitInView( 0, 0, ImgSize.width(), ImgSize.height(), Qt::KeepAspectRatio);
@@ -321,7 +326,8 @@ void PhotoView::EndZoomRect()
 
     cRect   = m_pRect->rect() ;
 
-    fitInView( cRect.topLeft().x(), cRect.topLeft().y(),
+    if( cRect.width() > 10 && cRect.height() > 10)
+        fitInView( cRect.topLeft().x(), cRect.topLeft().y(),
                cRect.width(), cRect.height(), Qt::KeepAspectRatio);
 
     m_bDrag = false ;
@@ -484,8 +490,13 @@ void PhotoView::dropEvent( QDropEvent *event)
     if ( ! pData->hasUrls())
         return ;
 
-    QUrl url = pData->urls().at(0) ;
-    m_pParent->on_ImgDropped( url.toLocalFile());
+    int  n ;
+    QUrl url ;
+
+    for ( n = 0 ;  n < pData->urls().count() ;  n ++) {
+        url = pData->urls().at(n) ;
+        m_pParent->on_ImgDropped( url.toLocalFile(), n == pData->urls().count() - 1);
+    }
 }
 
 //----------------------------------------------------

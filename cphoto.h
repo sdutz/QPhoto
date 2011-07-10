@@ -26,6 +26,7 @@
 #include <QMenu>
 #include "confmgr.h"
 #include "errordlg.h"
+#include "Phonon/MediaObject"
 
 namespace Ui {
     class CPhoto;
@@ -38,18 +39,18 @@ class CPhoto : public QDialog
 public:
     explicit CPhoto(QWidget *parent = 0);
     ~CPhoto();
-    void     on_ImgDropped( const QString& szFile) ;
+    void     on_ImgDropped( const QString& szFile, bool bShow) ;
     void     EndDrag() ;
     QSize    GetSceneSize() ;
 
 
 private :
-    bool ShowPhoto( bool bToAddToList) ;
+    bool ShowPhoto( bool bToAddToList, bool bShow = true) ;
     void ShowList(  const QString& szFile = "") ;
     void DeleteSingle();
     void DeleteAll();
-    void LoadImage();
-    void GetImageUrl() ;
+    void LoadImage( bool bShow = true);
+    void LoadImages() ;
     void LoadFile();
     void UpdateLayoutAfterResize( int nXMove, int nYMove) ;
     void SetIds();
@@ -67,8 +68,9 @@ private :
     void RefreshList() ;
     void DeleteAction() ;
     void InitLogDlg() ;
-    void SetBtnIcons( void) ;
+    void SetBtnIcons() ;
     void GoToStartEnd( bool bStart) ;
+    void InitPlayer() ;
 
 private slots:
     void on_BtnOpen_clicked();
@@ -97,31 +99,34 @@ private slots:
 
     void on_BtnConfig_clicked();
 
+    void on_BtnLibrary_clicked();
+
 private:
-    Ui::CPhoto      *ui;
-    bool            m_bShiftPressed ;
-    bool            m_bOrdChanged ;
-    bool            m_bFullScreen ;
-    bool            m_bCtrlPressed ;
-    bool            m_bShowHelp ;
-    int             m_nCurr ;
-    QString         m_szFileName ;
-    QString         m_szLog ;
-    QAction*        m_pMoveUpAct ;
-    QAction*        m_pMoveDownAct ;
-    QAction*        m_pZoomAllAct ;
-    QAction*        m_pConfigAct ;
-    QAction*        m_pStartSlideShowAct ;
-    QAction*        m_pEndSlideShowAct ;
-    QAction*        m_pPauseSlideShowAct ;
-    QAction*        m_pShowFullScreen ;
-    QAction*        m_pExitFullScreen ;
-    QMenu           m_ContextMenu ;
-    QMenu           m_SlideShowMenu ;
-    QSize           m_DiffSize ;
-    ErrorDlg        m_cErrDlg ;
-    ConfMgr*        m_pConf ;
-    QTimer*         m_pTimer ;
+    Ui::CPhoto*          ui;
+    bool                 m_bShiftPressed ;
+    bool                 m_bOrdChanged ;
+    bool                 m_bFullScreen ;
+    bool                 m_bCtrlPressed ;
+    bool                 m_bShowHelp ;
+    int                  m_nCurr ;
+    QString              m_szFileName ;
+    QString              m_szLog ;
+    QAction*             m_pMoveUpAct ;
+    QAction*             m_pMoveDownAct ;
+    QAction*             m_pZoomAllAct ;
+    QAction*             m_pConfigAct ;
+    QAction*             m_pStartSlideShowAct ;
+    QAction*             m_pEndSlideShowAct ;
+    QAction*             m_pPauseSlideShowAct ;
+    QAction*             m_pShowFullScreen ;
+    QAction*             m_pExitFullScreen ;
+    QMenu                m_ContextMenu ;
+    QMenu                m_SlideShowMenu ;
+    QSize                m_DiffSize ;
+    ErrorDlg             m_cErrDlg ;
+    ConfMgr*             m_pConf ;
+    QTimer*              m_pTimer ;
+    Phonon::MediaObject* m_player ;
 
 };
 

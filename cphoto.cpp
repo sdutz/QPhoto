@@ -51,6 +51,7 @@ CPhoto::CPhoto(QWidget *parent) :
     m_bShowHelp     = false ;
     m_bShiftPressed = false ;
     m_bCtrlPressed  = false ;
+    m_player        = NULL ;
     setMinimumSize( MIN_WIDTH, MIN_HEIGHT);
     m_pConf = new ConfMgr() ;
     SetIds();
@@ -63,6 +64,8 @@ CPhoto::CPhoto(QWidget *parent) :
     SetToolTips() ;
     SetBtnIcons() ;
     setAcceptDrops( true);
+    InitPlayer();
+ui->BtnLibrary->setEnabled( false);
 }
 
 //----------------------------------------------------
@@ -76,7 +79,16 @@ CPhoto::~CPhoto()
     if ( m_pTimer != NULL)
         delete m_pTimer ;
 
+    if ( m_player != NULL)
+        delete m_player ;
+
     delete ui;
+}
+
+//----------------------------------------------------
+void CPhoto::InitPlayer()
+{
+    m_player  = Phonon::createPlayer( Phonon::MusicCategory) ;
 }
 
 //----------------------------------------------------
@@ -103,7 +115,7 @@ void CPhoto::DeleteAction()
 }
 
 //----------------------------------------------------
-void CPhoto::SetBtnIcons( void)
+void CPhoto::SetBtnIcons()
 {
     QIcon   icon ;
     QSize   pixSize ;
@@ -237,10 +249,10 @@ void CPhoto::CreateActions()
 
 
 //----------------------------------------------------
-void CPhoto::on_ImgDropped( const QString& szFile)
+void CPhoto::on_ImgDropped( const QString& szFile, bool bShow)
 {
     m_szFileName = szFile ;
-    LoadImage();
+    LoadImage( bShow) ;
 }
 
 
@@ -273,10 +285,8 @@ void CPhoto::on_BtnOpen_clicked()
 {
     if ( m_bShiftPressed)
         LoadFile() ;
-    else {
-        GetImageUrl();
-        LoadImage() ;
-    }
+    else
+        LoadImages();
 }
 
 //----------------------------------------------------
@@ -299,35 +309,43 @@ void CPhoto::LoadFile()
 }
 
 //----------------------------------------------------
-void CPhoto::GetImageUrl()
+void CPhoto::LoadImages()
 {
-    QString szFilters ;
+    int         n ;
+    QString     szFilters ;
+    QStringList lszList ;
 
 
     szFilters    = "Images (*.jpeg *.jpg)" ;
-    m_szFileName = QFileDialog::getOpenFileName( this, "Open File",
+    lszList      = QFileDialog::getOpenFileNames( this, "Open Files",
                    m_pConf->GetLastDir(), szFilters) ;
+
+    for( n = 0 ;  n < lszList.count() ;  n ++) {
+        m_szFileName = lszList.at(n) ;
+        LoadImage( n == lszList.count() - 1);
+    }
+
 
 }
 
 //----------------------------------------------------
-void CPhoto::LoadImage()
+void CPhoto::LoadImage( bool bShow)
 {
     if( m_szFileName.isEmpty())
        return ;
 
-    ShowPhoto( true) ;
+    ShowPhoto( true, bShow) ;
     m_nCurr = ui->ImgList->count() - 1 ;
     ui->ImgList->setCurrentRow( m_nCurr) ;
 }
 
 //----------------------------------------------------
-bool CPhoto::ShowPhoto( bool bToAddToList)
+bool CPhoto::ShowPhoto( bool bToAddToList, bool bShow)
 {
     if ( m_szFileName.isEmpty())
         return false ;
 
-    if ( ui->ImgView->ShowPhoto( m_szFileName)) {
+    if ( ! bShow  ||  ui->ImgView->ShowPhoto( m_szFileName)) {
         QString title ;
         title = QPHOTO ;
         title += ":  " + m_szFileName ;
@@ -430,6 +448,7 @@ void CPhoto::SeeNextImg()
         m_pTimer->stop();
         m_pTimer->start();
     }
+    ui->ImgView->ZoomAll();
 }
 
 //----------------------------------------------------
@@ -465,11 +484,18 @@ void CPhoto::DeleteSingle()
 {
     QListWidgetItem* pItem ;
 
+    if ( m_nCurr < 0)
+        return ;
+
     pItem = ui->ImgList->takeItem( m_nCurr);
     m_pConf->RemoveFromList( pItem->text());
 
     if ( m_nCurr == ui->ImgList->count())
         m_nCurr -- ;
+    if ( m_nCurr < 0) {
+        ui->ImgView->ResetView( true);
+        return ;
+    }
     ui->ImgList->setCurrentRow( m_nCurr);
     m_szFileName = ui->ImgList->item( m_nCurr)->text() ;
     if( ! m_szFileName.isEmpty())
@@ -558,6 +584,17 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
         case Qt::Key_End :
         if( m_bFullScreen)
             GoToStartEnd( false);
+        break ;
+
+        case Qt::Key_C :
+        OnConfig();
+        break ;
+
+        case Qt::Key_M :
+        if ( m_player->state() == Phonon::PausedState)
+            m_player->play();
+        else
+            m_player->pause();
         break ;
 
         case Qt::Key_Pause :
@@ -851,7 +888,10 @@ void CPhoto::SwitchFullScreen()
 //----------------------------------------------------
 void CPhoto::OnStartSlideShow()
 {
-    int nSec ;
+    QString     szSongs ;
+    QStringList lszPlayList ;
+    int         nSec ;
+    int         n ;
 
     if ( ! m_bFullScreen)
         SwitchFullScreen();
@@ -868,6 +908,14 @@ void CPhoto::OnStartSlideShow()
     m_pTimer->setInterval( nSec * 1000);
     m_pTimer->start();
     ui->ImgView->DrawPlay();
+
+    m_pConf->GetStrProp( PROP_STR_SONGS, &szSongs) ;
+    lszPlayList = szSongs.split( ";") ;
+    m_player->clearQueue();
+    for ( n = 0 ;  n < lszPlayList.count() ;  n ++)
+        m_player->enqueue( Phonon::MediaSource( lszPlayList.at(n)));
+
+    m_player->play();
 }
 
 //----------------------------------------------------
@@ -880,6 +928,7 @@ void CPhoto::OnEndSlideShow()
     m_pExitFullScreen->setEnabled( true);
 
     m_pTimer->stop();
+    m_player->stop();
 }
 
 //----------------------------------------------------
@@ -888,12 +937,15 @@ void CPhoto::OnPauseSlideShow()
     if ( m_pTimer->isActive()) {
         m_pTimer->stop();
         ui->ImgView->DrawPause();
+        m_player->pause();
     }
     else {
         SeeNextImg();
         m_pTimer->start();
         ui->ImgView->DrawPlay();
+        m_player->play();
     }
+
 }
 
 //----------------------------------------------------
@@ -935,4 +987,10 @@ void CPhoto::on_BtnConfig_clicked()
 QSize  CPhoto::GetSceneSize()
 {
     return ui->ImgView->size() ;
+}
+
+//----------------------------------------------------
+void CPhoto::on_BtnLibrary_clicked()
+{
+
 }

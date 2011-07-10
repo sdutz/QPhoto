@@ -21,6 +21,7 @@
 #include <QColorDialog>
 #include <QFontDialog>
 #include "util.h"
+#include "musicmgr.h"
 
 #define MIN_SEC 1
 #define MAX_SEC 30
@@ -36,6 +37,8 @@ SettingsDlg::SettingsDlg(QWidget *parent) :
     ui->FadeCmbBox->addItem( "On SlideShow");
     ui->FadeCmbBox->addItem( "Always");
     setWindowTitle( "Settings dialog");
+    setMinimumSize( width(), height());
+    setMaximumSize( width(), height());
     InitButton() ;
 }
 
@@ -56,6 +59,10 @@ void SettingsDlg::InitButton()
     GetPixBtnSize( ui->Font_Btn->size(), &pixSize) ;
     icon.addFile( "icons/font.png", pixSize);
     ui->Font_Btn->setIcon( icon);
+
+    GetPixBtnSize( ui->Music_Btn->size(), &pixSize) ;
+    icon.addFile( "icons/music.png", pixSize);
+    ui->Music_Btn->setIcon( icon);
 }
 
 
@@ -106,8 +113,6 @@ void SettingsDlg::on_Default_Btn_clicked()
     ui->FadeCmbBox->setCurrentIndex( 0);
 
     UpdateColorButton();
-
-
 }
 
 //----------------------------------------------------
@@ -148,4 +153,16 @@ void SettingsDlg::SetInitSettings( const QPhotoSettings& sets)
 void SettingsDlg::on_FadeCmbBox_currentIndexChanged(int index)
 {
     m_sets.nFadeType = index ;
+}
+
+//---------------------------------------------------
+void SettingsDlg::on_Music_Btn_clicked()
+{
+    MusicMgr mmgr ;
+
+    mmgr.SetInitList( m_sets.szSongs);
+
+    if ( mmgr.exec() == QDialog::Accepted) {
+        mmgr.GetList( &m_sets.szSongs);
+    }
 }

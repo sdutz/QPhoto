@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>283</width>
-    <height>243</height>
+    <height>292</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>200</y>
+     <y>250</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -33,7 +33,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>200</y>
+     <y>250</y>
      <width>91</width>
      <height>24</height>
     </rect>
@@ -134,6 +134,32 @@
    </property>
    <property name="text">
     <string>Fade type</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Music_Btn">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>200</y>
+     <width>112</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>200</y>
+     <width>157</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Music Manager</string>
    </property>
   </widget>
  </widget>

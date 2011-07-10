@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       +=  phonon
 
 TARGET = QPhoto
 TEMPLATE = app
@@ -17,7 +18,8 @@ SOURCES += main.cpp\
     confmgr.cpp \
     settingsdlg.cpp \
     errordlg.cpp \
-    util.cpp
+    util.cpp \
+    musicmgr.cpp
 
 HEADERS  += cphoto.h \
     aboutdlg.h \
@@ -25,9 +27,11 @@ HEADERS  += cphoto.h \
     confmgr.h \
     settingsdlg.h \
     errordlg.h \
-    util.h
+    util.h \
+    musicmgr.h
 
 FORMS    += cphoto.ui \
     aboutdlg.ui \
     settingsdlg.ui \
-    errordlg.ui
+    errordlg.ui \
+    musicmgr.ui
