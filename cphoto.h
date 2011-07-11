@@ -26,6 +26,7 @@
 #include <QMenu>
 #include "confmgr.h"
 #include "errordlg.h"
+#include <QTranslator>
 #include "Phonon/MediaObject"
 
 namespace Ui {
@@ -71,6 +72,9 @@ private :
     void SetBtnIcons() ;
     void GoToStartEnd( bool bStart) ;
     void InitPlayer() ;
+    void InitLang() ;
+    void ChangeLang( int nLang) ;
+    QString GetLang( int nLang) ;
 
 private slots:
     void on_BtnOpen_clicked();
@@ -127,6 +131,7 @@ private:
     ConfMgr*             m_pConf ;
     QTimer*              m_pTimer ;
     Phonon::MediaObject* m_player ;
+    QTranslator          m_cTranslator ;
 
 };
 

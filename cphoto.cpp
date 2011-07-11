@@ -54,6 +54,7 @@ CPhoto::CPhoto(QWidget *parent) :
     m_player        = NULL ;
     setMinimumSize( MIN_WIDTH, MIN_HEIGHT);
     m_pConf = new ConfMgr() ;
+    InitLang() ;
     SetIds();
     CreateActions();
     BuildContextMenu();
@@ -83,6 +84,46 @@ CPhoto::~CPhoto()
         delete m_player ;
 
     delete ui;
+}
+
+//----------------------------------------------------
+void CPhoto::InitLang()
+{
+    int     nLang ;
+    QString szLangFile ;
+
+    m_pConf->GetIntProp( PROP_INT_LANG, &nLang) ;
+
+    szLangFile = "QPhoto_" ;
+    szLangFile += GetLang( nLang) ;
+
+    m_cTranslator.load( szLangFile) ;
+
+    QCoreApplication::installTranslator( &m_cTranslator) ;
+}
+
+//----------------------------------------------------
+QString CPhoto::GetLang( int nLang)
+{
+    if ( nLang == ENGLISH)
+        return "en" ;
+    else
+        return "it" ;
+}
+
+//----------------------------------------------------
+void CPhoto::ChangeLang( int nLang)
+{
+    QString szLangFile ;
+
+    QCoreApplication::removeTranslator( &m_cTranslator) ;
+
+    szLangFile = "QPhoto_" ;
+    szLangFile += GetLang( nLang) ;
+
+    m_cTranslator.load( szLangFile) ;
+
+    QCoreApplication::installTranslator( &m_cTranslator) ;
 }
 
 //----------------------------------------------------
@@ -198,12 +239,12 @@ void CPhoto::CreateActions()
 {
     QIcon icon ;
 
-    m_pMoveUpAct = new QAction( "MoveUp", this) ;
+    m_pMoveUpAct = new QAction( tr("MoveUp"), this) ;
     icon.addFile( "icons/arrow_up.png") ;
     m_pMoveUpAct->setIcon( icon);
     connect( m_pMoveUpAct, SIGNAL( triggered()), this, SLOT( OnMoveCurrUp())) ;
 
-    m_pMoveDownAct = new QAction( "MoveDown", this) ;
+    m_pMoveDownAct = new QAction( tr("MoveDown"), this) ;
     icon.addFile( "icons/arrow_down.png") ;
     m_pMoveDownAct->setIcon( icon);
     connect( m_pMoveDownAct, SIGNAL( triggered()), this, SLOT( OnMoveCurrDown())) ;
@@ -824,7 +865,17 @@ void CPhoto::RefreshList()
 //----------------------------------------------------
 void CPhoto::OnConfig()
 {
+    int nOldLang ;
+    int nNewLang ;
+
+    m_pConf->GetIntProp( PROP_INT_LANG, &nOldLang) ;
+
     m_pConf->ShowSettingsDlg() ;
+
+    m_pConf->GetIntProp( PROP_INT_LANG, &nNewLang) ;
+
+    if( nNewLang != nOldLang)
+        ChangeLang( nNewLang);
 }
 
 //----------------------------------------------------

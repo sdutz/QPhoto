@@ -35,3 +35,6 @@ FORMS    += cphoto.ui \
     settingsdlg.ui \
     errordlg.ui \
     musicmgr.ui
+
+TRANSLATIONS += QPhoto_it.ts \
+     QPhoto_en.ts

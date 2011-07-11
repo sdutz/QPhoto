@@ -27,7 +27,8 @@
 #include <QFont>
 
 #define NUM_STR_PROP 3
-#define NUM_INT_PROP 2
+#define NUM_INT_PROP 3
+
 
 #define PROP_STR_COLOR 0
 #define PROP_STR_FONT  1
@@ -35,10 +36,14 @@
 
 #define PROP_INT_SEC   0
 #define PROP_INT_FADE  1
+#define PROP_INT_LANG  2
 
 #define FADE_NONE        0
 #define FADE_ONSLIDESHOW 1
 #define FADE_ALWAYS      2
+
+#define ENGLISH 0
+#define ITALIAN 1
 
 
 

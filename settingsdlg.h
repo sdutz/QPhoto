@@ -25,6 +25,7 @@
 struct QPhotoSettings {
     int     nSec ;
     int     nFadeType ;
+    int     nLang ;
     QString szFont ;
     QString szColor ;
     QString szSongs ;
@@ -61,6 +62,8 @@ private slots:
     void on_FadeCmbBox_currentIndexChanged(int index);
 
     void on_Music_Btn_clicked();
+
+    void on_LangCmbBox_currentIndexChanged(int index);
 
 private:
     Ui::SettingsDlg *ui;

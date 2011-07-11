@@ -36,6 +36,10 @@ SettingsDlg::SettingsDlg(QWidget *parent) :
     ui->FadeCmbBox->addItem( "None");
     ui->FadeCmbBox->addItem( "On SlideShow");
     ui->FadeCmbBox->addItem( "Always");
+
+    ui->LangCmbBox->addItem( "English");
+    ui->LangCmbBox->addItem( "Italian");
+
     setWindowTitle( "Settings dialog");
     setMinimumSize( width(), height());
     setMaximumSize( width(), height());
@@ -63,6 +67,8 @@ void SettingsDlg::InitButton()
     GetPixBtnSize( ui->Music_Btn->size(), &pixSize) ;
     icon.addFile( "icons/music.png", pixSize);
     ui->Music_Btn->setIcon( icon);
+
+    ui->label_color->setText( tr( "Choose Color"));
 }
 
 
@@ -110,7 +116,9 @@ void SettingsDlg::on_Default_Btn_clicked()
     m_sets.nSec    = 5 ;
     ui->spinSec->setValue( 5);
     m_sets.nFadeType = FADE_NONE ;
-    ui->FadeCmbBox->setCurrentIndex( 0);
+    ui->FadeCmbBox->setCurrentIndex( FADE_NONE);
+    m_sets.nLang = ENGLISH ;
+    ui->LangCmbBox->setCurrentIndex( ENGLISH);
 
     UpdateColorButton();
 }
@@ -145,6 +153,7 @@ void SettingsDlg::SetInitSettings( const QPhotoSettings& sets)
     ui->spinSec->setMaximum( MAX_SEC);
 
     ui->FadeCmbBox->setCurrentIndex( m_sets.nFadeType);
+    ui->LangCmbBox->setCurrentIndex( m_sets.nLang);
 
     UpdateColorButton();
 }
@@ -165,4 +174,10 @@ void SettingsDlg::on_Music_Btn_clicked()
     if ( mmgr.exec() == QDialog::Accepted) {
         mmgr.GetList( &m_sets.szSongs);
     }
+}
+
+//---------------------------------------------------
+void SettingsDlg::on_LangCmbBox_currentIndexChanged(int index)
+{
+    m_sets.nLang = index ;
 }

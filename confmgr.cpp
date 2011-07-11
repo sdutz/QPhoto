@@ -30,6 +30,7 @@
 #define COLOR              "Color"
 #define FONT               "Font"
 #define SONGS              "Songs"
+#define LANG               "Lang"
 #define SLIDESHOWSEC       "SlideShowSec"
 #define FADETYPE           "Fade Type"
 
@@ -155,9 +156,6 @@ void ConfMgr::LoadSettings()
 {
     QSettings cSet ;
     QString   szBlack ;
-    QString   szColor ;
-    QString   szFont ;
-    QString   szSongs ;
     QColor    DefColor ;
     QFont     DefFont ;
 
@@ -167,6 +165,7 @@ void ConfMgr::LoadSettings()
     m_szLastDir = cSet.value( LAST_DIR, "").toString() ;
     m_aIntProp[ PROP_INT_SEC]   = cSet.value( SLIDESHOWSEC, 5).toInt() ;
     m_aIntProp[ PROP_INT_FADE]  = cSet.value( FADETYPE, 0).toInt() ;
+    m_aIntProp[ PROP_INT_LANG]  = cSet.value( LANG, ENGLISH).toInt() ;
     m_aStrProp[ PROP_STR_COLOR] = cSet.value( COLOR, szBlack).toString() ;
     m_aStrProp[ PROP_STR_FONT]  = cSet.value( FONT, DefFont.toString()).toString() ;
     m_aStrProp[ PROP_STR_SONGS] = cSet.value( SONGS, "").toString() ;
@@ -180,6 +179,7 @@ void ConfMgr::WriteSettings()
     cSet.setValue( LAST_DIR, m_szLastDir);
     cSet.setValue( SLIDESHOWSEC, m_aIntProp[ PROP_INT_SEC]);
     cSet.setValue( FADETYPE, m_aIntProp[ PROP_INT_FADE]);
+    cSet.setValue( LANG, m_aIntProp[ PROP_INT_LANG]);
     cSet.setValue( COLOR, m_aStrProp[PROP_STR_COLOR]) ;
     cSet.setValue( FONT, m_aStrProp[PROP_STR_FONT]);
     cSet.setValue( SONGS, m_aStrProp[PROP_STR_SONGS]);
@@ -193,6 +193,7 @@ void ConfMgr::ShowSettingsDlg()
 
     sets.nSec      = m_aIntProp[ PROP_INT_SEC] ;
     sets.nFadeType = m_aIntProp[ PROP_INT_FADE] ;
+    sets.nLang     = m_aIntProp[ PROP_INT_LANG] ;
     sets.szColor   = m_aStrProp[ PROP_STR_COLOR] ;
     sets.szFont    = m_aStrProp[ PROP_STR_FONT] ;
     sets.szSongs   = m_aStrProp[ PROP_STR_SONGS] ;
@@ -203,6 +204,7 @@ void ConfMgr::ShowSettingsDlg()
         sets = cDlg.GetSettings() ;
         m_aIntProp[ PROP_INT_SEC]   = sets.nSec ;
         m_aIntProp[ PROP_INT_FADE]  = sets.nFadeType ;
+        m_aIntProp[ PROP_INT_LANG]  = sets.nLang ;
         m_aStrProp[ PROP_STR_COLOR] = sets.szColor ;
         m_aStrProp[ PROP_STR_FONT]  = sets.szFont ;
         m_aStrProp[ PROP_STR_SONGS] = sets.szSongs ;
