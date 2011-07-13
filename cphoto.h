@@ -65,7 +65,6 @@ private :
     void SeePrevImg() ;
     void SeeNextImg() ;
     bool IsPosOnView(     const QPoint& pos) ;
-    void SetToolTips() ;
     void RefreshList() ;
     void DeleteAction() ;
     void InitLogDlg() ;
@@ -75,6 +74,7 @@ private :
     void InitLang() ;
     void ChangeLang( int nLang) ;
     QString GetLang( int nLang) ;
+    void RetranslateDialog() ;
 
 private slots:
     void on_BtnOpen_clicked();

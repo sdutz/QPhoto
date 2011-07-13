@@ -62,10 +62,11 @@ CPhoto::CPhoto(QWidget *parent) :
     ui->ImgView->SetConfMgr( m_pConf);
     ui->ImgView->PrepareSlideshowItems() ;
     ShowList();
-    SetToolTips() ;
     SetBtnIcons() ;
     setAcceptDrops( true);
     InitPlayer();
+    RetranslateDialog();
+
 ui->BtnLibrary->setEnabled( false);
 }
 
@@ -124,6 +125,8 @@ void CPhoto::ChangeLang( int nLang)
     m_cTranslator.load( szLangFile) ;
 
     QCoreApplication::installTranslator( &m_cTranslator) ;
+
+    RetranslateDialog();
 }
 
 //----------------------------------------------------
@@ -227,59 +230,51 @@ void CPhoto::InitLogDlg()
 }
 
 //----------------------------------------------------
-void CPhoto::SetToolTips()
-{
-   // Todo Completare i tooltip con tutti gli elementi del dialogo
-    ui->BtnExit->setToolTip( "Exit");
-    ui->BtnOpen->setToolTip( "Open");
-}
-
-//----------------------------------------------------
 void CPhoto::CreateActions()
 {
     QIcon icon ;
 
-    m_pMoveUpAct = new QAction( tr("MoveUp"), this) ;
+    m_pMoveUpAct = new QAction( "", this) ;
     icon.addFile( "icons/arrow_up.png") ;
     m_pMoveUpAct->setIcon( icon);
     connect( m_pMoveUpAct, SIGNAL( triggered()), this, SLOT( OnMoveCurrUp())) ;
 
-    m_pMoveDownAct = new QAction( tr("MoveDown"), this) ;
+    m_pMoveDownAct = new QAction( "", this) ;
     icon.addFile( "icons/arrow_down.png") ;
     m_pMoveDownAct->setIcon( icon);
     connect( m_pMoveDownAct, SIGNAL( triggered()), this, SLOT( OnMoveCurrDown())) ;
 
-    m_pZoomAllAct = new QAction( "ZoomAll", this) ;
+    m_pZoomAllAct = new QAction( "", this) ;
     icon.addFile( "icons/zoom.png") ;
     m_pZoomAllAct->setIcon( icon);
     connect( m_pZoomAllAct, SIGNAL( triggered()), this, SLOT( OnZoomAll())) ;
 
-    m_pConfigAct = new QAction( "Config", this) ;
+    m_pConfigAct = new QAction( "", this) ;
     icon.addFile( "icons/wrench.png") ;
     m_pConfigAct->setIcon( icon);
     connect( m_pConfigAct, SIGNAL( triggered()), this, SLOT( OnConfig())) ;
 
-    m_pStartSlideShowAct = new QAction( "Start SlideShow", this) ;
+    m_pStartSlideShowAct = new QAction( "", this) ;
     icon.addFile( "icons/control_play_blue.png") ;
     m_pStartSlideShowAct->setIcon( icon);
     connect( m_pStartSlideShowAct, SIGNAL( triggered()), this, SLOT( OnStartSlideShow())) ;
 
-    m_pEndSlideShowAct = new QAction( "End SlideShow", this) ;
+    m_pEndSlideShowAct = new QAction( "", this) ;
     icon.addFile( "icons/control_stop_blue.png") ;
     m_pEndSlideShowAct->setIcon( icon);
     connect( m_pEndSlideShowAct, SIGNAL( triggered()), this, SLOT( OnEndSlideShow())) ;
 
-    m_pPauseSlideShowAct = new QAction( "Pause SlideShow", this) ;
+    m_pPauseSlideShowAct = new QAction( "", this) ;
     icon.addFile( "icons/control_pause_blue.png") ;
     m_pPauseSlideShowAct->setIcon( icon);
     connect( m_pPauseSlideShowAct, SIGNAL( triggered()), this, SLOT( OnPauseSlideShow())) ;
 
-    m_pShowFullScreen = new QAction( "Show Fullscreen", this) ;
+    m_pShowFullScreen = new QAction( "", this) ;
     icon.addFile( "icons/monitor.png") ;
     m_pShowFullScreen->setIcon( icon);
     connect( m_pShowFullScreen, SIGNAL( triggered()), this, SLOT( SwitchFullScreen())) ;
 
-    m_pExitFullScreen = new QAction( "Exit Fullscreen", this) ;
+    m_pExitFullScreen = new QAction( "", this) ;
     icon.addFile( "icons/monitor_go.png") ;
     m_pExitFullScreen->setIcon( icon);
     connect( m_pExitFullScreen, SIGNAL( triggered()), this, SLOT( SwitchFullScreen())) ;
@@ -288,6 +283,31 @@ void CPhoto::CreateActions()
     connect( m_pTimer, SIGNAL( timeout()), this, SLOT( on_BtnRight_clicked())) ;
 }
 
+//----------------------------------------------------
+void CPhoto::RetranslateDialog()
+{
+    m_pMoveUpAct->setText( tr( "Move Up"));
+    m_pMoveDownAct->setText( tr( "Move Down" ));
+    m_pStartSlideShowAct->setText( tr( "Start SlideShow")) ;
+    m_pZoomAllAct->setText( tr( "Zoom All"));
+    m_pShowFullScreen->setText( tr( "Show Fullscreen"));
+    m_pExitFullScreen->setText( tr(" Exit Fullscreen"));
+    m_pEndSlideShowAct->setText( tr( "End SlideShow"));
+    m_pPauseSlideShowAct->setText( tr( "Pause SlideShow"));
+    m_pConfigAct->setText( tr( "Settings"));
+
+
+    ui->BtnConfig->setToolTip( tr( "Settings"));
+    ui->BtnDel->setToolTip( tr( "Delete"));
+    ui->BtnExit->setToolTip( tr( "Exit"));
+    ui->BtnOpen->setToolTip( tr( "Open"));
+    ui->BtnSave->setToolTip( tr( "Save"));
+    ui->BtnMinus->setToolTip( tr( "Zoom Out"));
+    ui->BtnPlus->setToolTip( tr( "Zoom in"));
+    ui->BtnLeft->setToolTip( tr( "See Previous Image"));
+    ui->BtnRight->setToolTip( tr( "See Next Image"));
+
+}
 
 //----------------------------------------------------
 void CPhoto::on_ImgDropped( const QString& szFile, bool bShow)
@@ -337,7 +357,7 @@ void CPhoto::LoadFile()
     QString szFilters ;
 
     szFilters       = "List (*.txt)" ;
-    szFile          = QFileDialog::getOpenFileName( this, "Open File",
+    szFile          = QFileDialog::getOpenFileName( this, tr( "Open List"),
                       m_pConf->GetLastDir(), szFilters) ;
 
     if ( szFile.isEmpty())
@@ -358,7 +378,7 @@ void CPhoto::LoadImages()
 
 
     szFilters    = "Images (*.jpeg *.jpg)" ;
-    lszList      = QFileDialog::getOpenFileNames( this, "Open Files",
+    lszList      = QFileDialog::getOpenFileNames( this, tr( "Open Images"),
                    m_pConf->GetLastDir(), szFilters) ;
 
     for( n = 0 ;  n < lszList.count() ;  n ++) {

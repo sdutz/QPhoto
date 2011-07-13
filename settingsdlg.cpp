@@ -33,14 +33,14 @@ SettingsDlg::SettingsDlg(QWidget *parent) :
 {
 
     ui->setupUi(this);
-    ui->FadeCmbBox->addItem( "None");
-    ui->FadeCmbBox->addItem( "On SlideShow");
-    ui->FadeCmbBox->addItem( "Always");
+    ui->FadeCmbBox->addItem( tr( "None"));
+    ui->FadeCmbBox->addItem( tr( "On SlideShow"));
+    ui->FadeCmbBox->addItem( tr( "Always"));
 
     ui->LangCmbBox->addItem( "English");
     ui->LangCmbBox->addItem( "Italian");
 
-    setWindowTitle( "Settings dialog");
+    setWindowTitle( tr( "Settings dialog"));
     setMinimumSize( width(), height());
     setMaximumSize( width(), height());
     InitButton() ;
@@ -69,6 +69,10 @@ void SettingsDlg::InitButton()
     ui->Music_Btn->setIcon( icon);
 
     ui->label_color->setText( tr( "Choose Color"));
+    ui->label_fade->setText( tr( "Fade type"));
+    ui->label_font->setText(( tr( "Choose Font")));
+    ui->label_lang->setText( tr( "Choose Language"));
+    ui->Default_Btn->setText( tr( "Default"));
 }
 
 
