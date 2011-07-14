@@ -3,6 +3,7 @@
 #include "util.h"
 #include <QFileDialog>
 #include <QKeyEvent>
+#include <QUrl>
 
 
 //----------------------------------------------------
