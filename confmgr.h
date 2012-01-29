@@ -26,13 +26,15 @@
 #include <QColor>
 #include <QFont>
 
-#define NUM_STR_PROP 3
+#define NUM_STR_PROP 5
 #define NUM_INT_PROP 3
 
 
-#define PROP_STR_COLOR 0
-#define PROP_STR_FONT  1
-#define PROP_STR_SONGS 2
+#define PROP_STR_COLOR         0
+#define PROP_STR_FONT          1
+#define PROP_STR_SONGS         2
+#define PROP_STR_LAST_DIR      3
+#define PROP_STR_LAST_DIR_LIST 4
 
 #define PROP_INT_SEC   0
 #define PROP_INT_FADE  1
@@ -57,7 +59,6 @@ public:
     bool            FindInList(     const QString& szFile, int* pnIdx = NULL) ;
     void            AddToList(      const QString& szFile) ;
     void            RemoveFromList( const QString& szFile) ;
-    inline QString  GetLastDir() {  return m_szLastDir ; } ;
     void            ClearList() ;
     QString         GetListItem(  int n) ;
     int             GetItemCount( void) ;
@@ -74,7 +75,6 @@ private :
     void            WriteSettings() ;
 
 private :
-    QString         m_szLastDir ;
     QStringList     m_lszList ;
     QString         m_aStrProp[NUM_STR_PROP] ;
     int             m_aIntProp[NUM_INT_PROP] ;

@@ -27,6 +27,7 @@
 #define HELP_FILE_ENG      "help-eng.txt"
 #define LOG_FILE           "log.txt"
 #define LAST_DIR           "LastDir"
+#define LAST_DIR_LIST      "LastDirList"
 #define COLOR              "Color"
 #define FONT               "Font"
 #define SONGS              "Songs"
@@ -50,11 +51,13 @@ ConfMgr::~ConfMgr()
 //----------------------------------------------------
 void ConfMgr::WriteList( const QString& szFile)
 {
-    int     n ;
+    int     nIdx ;
     int     nItems ;
     QString szMyFile ;
 
     szMyFile = szFile.isEmpty() ? HISTORY_FILE : szFile ;
+    nIdx     = szFile.lastIndexOf( "\\") ;
+    m_aStrProp[ PROP_STR_LAST_DIR_LIST] = nIdx > 0 ? szFile.left( nIdx) : "" ;
 
     QFile cFile( szMyFile) ;
 
@@ -65,8 +68,8 @@ void ConfMgr::WriteList( const QString& szFile)
 
     QTextStream out( &cFile) ;
 
-    for( n = 0 ;  n < nItems ;  n ++)
-        out<<m_lszList.at(n)<<endl ;
+    for( nIdx = 0 ;  nIdx < nItems ;  nIdx ++)
+        out<<m_lszList.at( nIdx)<<endl ;
 
     cFile.close();
 }
@@ -119,7 +122,7 @@ void ConfMgr::AddToList( const QString& szFile)
     int nIdx ;
 
     nIdx         = szFile.lastIndexOf( "\\") ;
-    m_szLastDir  = szFile.left( nIdx) ;
+    m_aStrProp[ PROP_STR_LAST_DIR] = szFile.left( nIdx) ;
     m_lszList.append( szFile) ;
 }
 
@@ -162,13 +165,14 @@ void ConfMgr::LoadSettings()
     DefColor  = Qt::black ;
     szBlack   = DefColor.name() ;
 
-    m_szLastDir = cSet.value( LAST_DIR, "").toString() ;
     m_aIntProp[ PROP_INT_SEC]   = cSet.value( SLIDESHOWSEC, 5).toInt() ;
     m_aIntProp[ PROP_INT_FADE]  = cSet.value( FADETYPE, 0).toInt() ;
     m_aIntProp[ PROP_INT_LANG]  = cSet.value( LANG, ENGLISH).toInt() ;
     m_aStrProp[ PROP_STR_COLOR] = cSet.value( COLOR, szBlack).toString() ;
     m_aStrProp[ PROP_STR_FONT]  = cSet.value( FONT, DefFont.toString()).toString() ;
     m_aStrProp[ PROP_STR_SONGS] = cSet.value( SONGS, "").toString() ;
+    m_aStrProp[ PROP_STR_LAST_DIR]      = cSet.value( LAST_DIR, "").toString() ;
+    m_aStrProp[ PROP_STR_LAST_DIR_LIST] = cSet.value( LAST_DIR_LIST, "").toString() ;
 }
 
 //----------------------------------------------------
@@ -176,13 +180,14 @@ void ConfMgr::WriteSettings()
 {
     QSettings cSet ;
 
-    cSet.setValue( LAST_DIR, m_szLastDir);
     cSet.setValue( SLIDESHOWSEC, m_aIntProp[ PROP_INT_SEC]);
     cSet.setValue( FADETYPE, m_aIntProp[ PROP_INT_FADE]);
     cSet.setValue( LANG, m_aIntProp[ PROP_INT_LANG]);
     cSet.setValue( COLOR, m_aStrProp[PROP_STR_COLOR]) ;
     cSet.setValue( FONT, m_aStrProp[PROP_STR_FONT]);
     cSet.setValue( SONGS, m_aStrProp[PROP_STR_SONGS]);
+    cSet.setValue( LAST_DIR, m_aStrProp[ PROP_STR_LAST_DIR]);
+    cSet.setValue( LAST_DIR_LIST, m_aStrProp[ PROP_STR_LAST_DIR_LIST]);
 }
 
 //----------------------------------------------------
@@ -289,7 +294,9 @@ bool ConfMgr::GetStrProp( int nProp, QString* pVal)
 
     if ( nProp < 0  ||  nProp >= NUM_STR_PROP)
         return false ;
+
     *pVal = m_aStrProp[nProp] ;
+
     return true ;
 }
 
@@ -298,7 +305,9 @@ bool ConfMgr::GetIntProp( int nProp, int* pVal)
 {
     if ( nProp < 0  ||  nProp >= NUM_INT_PROP)
         return false ;
+
     *pVal = m_aIntProp[nProp] ;
+
     return true ;
 }
 

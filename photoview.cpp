@@ -73,6 +73,13 @@ PhotoView::~PhotoView()
 
 
 //----------------------------------------------------
+bool
+PhotoView::IsFading()
+{
+    return m_pFadeTimer->isActive() ;
+}
+
+//----------------------------------------------------
 void PhotoView::PrepareSlideshowItems()
 {
     QPen                   pen ;

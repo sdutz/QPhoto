@@ -60,6 +60,7 @@ private :
     void ShowContextMenu(   const QPoint& pos);
     void ShowSlideShowMenu( const QPoint& pos);
     void CreateActions() ;
+    void CreateTimers() ;
     void BuildContextMenu() ;
     void BuildSlideShowMenu() ;
     void SeePrevImg() ;
@@ -67,6 +68,7 @@ private :
     bool IsPosOnView(     const QPoint& pos) ;
     void RefreshList() ;
     void DeleteAction() ;
+    void DeleteTimers() ;
     void InitLogDlg() ;
     void SetBtnIcons() ;
     void GoToStartEnd( bool bStart) ;
@@ -84,7 +86,8 @@ private slots:
     void on_BtnPlus_clicked();
     void on_BtnLeft_clicked();
     void on_BtnRight_clicked();
-    void on_IniLoad();
+    void OnIniLoad();
+    void OnFullSw() ;
     void keyPressEvent (  QKeyEvent * e ) ;
     void keyReleaseEvent( QKeyEvent* e);
     void mousePressEvent( QMouseEvent* e);
@@ -101,9 +104,7 @@ private slots:
     void SwitchFullScreen() ;
     void OnHelp() ;
     void OnShowLog() ;
-
     void on_BtnConfig_clicked();
-
     void on_BtnLibrary_clicked();
 
 private:
@@ -132,6 +133,7 @@ private:
     ConfMgr*             m_pConf ;
     QTimer*              m_pTimer ;
     QTimer*              m_pLoadIniTimer ;
+    QTimer*              m_pFullScreenTimer ;
     Phonon::MediaObject* m_player ;
     QTranslator          m_cTranslator ;
 

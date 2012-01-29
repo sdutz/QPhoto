@@ -58,6 +58,7 @@ CPhoto::CPhoto(QWidget *parent) :
     InitLang() ;
     SetIds();
     CreateActions();
+    CreateTimers() ;
     BuildContextMenu();
     BuildSlideShowMenu();
     ui->ImgView->SetConfMgr( m_pConf);
@@ -66,8 +67,7 @@ CPhoto::CPhoto(QWidget *parent) :
     setAcceptDrops( true);
     InitPlayer();
     RetranslateDialog();
-    m_pLoadIniTimer->setInterval( MSEC_INI_LOAD) ;
-    m_pLoadIniTimer->start() ;
+
 ui->BtnLibrary->setEnabled( false);
 }
 
@@ -75,18 +75,13 @@ ui->BtnLibrary->setEnabled( false);
 CPhoto::~CPhoto()
 {
     DeleteAction() ;
+    DeleteTimers() ;
 
     if ( m_pConf != NULL)
         delete m_pConf ;
 
-    if ( m_pTimer != NULL)
-        delete m_pTimer ;
-
     if ( m_player != NULL)
         delete m_player ;
-
-    if ( m_pLoadIniTimer != NULL)
-        delete m_pLoadIniTimer ;
 
     delete ui;
 }
@@ -141,6 +136,20 @@ void CPhoto::InitPlayer()
 }
 
 //----------------------------------------------------
+void CPhoto::DeleteTimers()
+{
+
+    if ( m_pTimer != NULL)
+        delete m_pTimer ;
+
+    if ( m_pLoadIniTimer != NULL)
+        delete m_pLoadIniTimer ;
+
+    if ( m_pFullScreenTimer != NULL)
+        delete m_pFullScreenTimer ;
+}
+
+//----------------------------------------------------
 void CPhoto::DeleteAction()
 {
     if ( m_pMoveUpAct != NULL)
@@ -162,6 +171,8 @@ void CPhoto::DeleteAction()
     if ( m_pExitFullScreen != NULL)
         delete m_pExitFullScreen ;
 }
+
+
 
 //----------------------------------------------------
 void CPhoto::SetBtnIcons()
@@ -235,6 +246,23 @@ void CPhoto::InitLogDlg()
 }
 
 //----------------------------------------------------
+void CPhoto::CreateTimers()
+{
+
+    m_pTimer = new QTimer( this) ;
+    connect( m_pTimer, SIGNAL( timeout()), this, SLOT( on_BtnRight_clicked())) ;
+
+    m_pLoadIniTimer = new QTimer( this) ;
+    connect( m_pLoadIniTimer, SIGNAL( timeout()), this, SLOT( OnIniLoad())) ;
+
+    m_pFullScreenTimer = new QTimer( this) ;
+    connect( m_pFullScreenTimer, SIGNAL( timeout()), this, SLOT( OnFullSw())) ;
+
+    m_pLoadIniTimer->setInterval( MSEC_INI_LOAD) ;
+    m_pLoadIniTimer->start() ;
+}
+
+//----------------------------------------------------
 void CPhoto::CreateActions()
 {
     QIcon icon ;
@@ -283,13 +311,6 @@ void CPhoto::CreateActions()
     icon.addFile( "icons/monitor_go.png") ;
     m_pExitFullScreen->setIcon( icon);
     connect( m_pExitFullScreen, SIGNAL( triggered()), this, SLOT( SwitchFullScreen())) ;
-
-    m_pTimer = new QTimer( this) ;
-    connect( m_pTimer, SIGNAL( timeout()), this, SLOT( on_BtnRight_clicked())) ;
-
-
-    m_pLoadIniTimer = new QTimer( this) ;
-    connect( m_pLoadIniTimer, SIGNAL( timeout()), this, SLOT( on_IniLoad())) ;
 }
 
 //----------------------------------------------------
@@ -326,12 +347,18 @@ void CPhoto::on_ImgDropped( const QString& szFile, bool bShow)
 }
 
 //----------------------------------------------------
-void CPhoto::on_IniLoad()
+void CPhoto::OnIniLoad()
 {
     ShowList();
     m_pLoadIniTimer->stop();
 }
 
+//----------------------------------------------------
+void CPhoto::OnFullSw()
+{
+    ui->ImgView->ZoomAll();
+    m_pFullScreenTimer->stop();
+}
 
 //----------------------------------------------------
 void CPhoto::BuildContextMenu()
@@ -369,12 +396,13 @@ void CPhoto::on_BtnOpen_clicked()
 //----------------------------------------------------
 void CPhoto::LoadFile()
 {
+    QString szLastDir ;
     QString szFile ;
     QString szFilters ;
 
-    szFilters       = "List (*.txt)" ;
-    szFile          = QFileDialog::getOpenFileName( this, tr( "Open List"),
-                      m_pConf->GetLastDir(), szFilters) ;
+    szFilters = "List (*.txt)" ;
+    m_pConf->GetStrProp( PROP_STR_LAST_DIR_LIST, &szLastDir) ;
+    szFile    = QFileDialog::getOpenFileName( this, tr( "Open List"), szLastDir, szFilters) ;
 
     if ( szFile.isEmpty())
         return ;
@@ -389,13 +417,14 @@ void CPhoto::LoadFile()
 void CPhoto::LoadImages()
 {
     int         n ;
+    QString     szLastDir ;
     QString     szFilters ;
     QStringList lszList ;
 
 
-    szFilters    = "Images (*.jpeg *.jpg)" ;
-    lszList      = QFileDialog::getOpenFileNames( this, tr( "Open Images"),
-                   m_pConf->GetLastDir(), szFilters) ;
+    szFilters = "Images (*.jpeg *.jpg)" ;
+    m_pConf->GetStrProp( PROP_STR_LAST_DIR, &szLastDir) ;
+    lszList   = QFileDialog::getOpenFileNames( this, tr( "Open Images"), szLastDir, szFilters) ;
 
     for( n = 0 ;  n < lszList.count() ;  n ++) {
         m_szFileName = lszList.at(n) ;
@@ -500,6 +529,9 @@ void CPhoto::SeePrevImg()
     if ( m_nCurr == 0)
         return ;
 
+    if  ( ui->ImgView->IsFading())
+        return ;
+
     m_nCurr -- ;
     m_szFileName = ui->ImgList->item(m_nCurr)->text() ;
     ui->ImgList->setCurrentRow( m_nCurr);
@@ -512,6 +544,9 @@ void CPhoto::SeePrevImg()
 void CPhoto::SeeNextImg()
 {
     if ( m_nCurr == ui->ImgList->count() - 1)
+        return ;
+
+    if  ( ui->ImgView->IsFading())
         return ;
 
     m_nCurr ++ ;
@@ -719,11 +754,12 @@ void CPhoto::on_BtnDel_clicked()
 void CPhoto::on_BtnSave_clicked()
 {
     QString szFile ;
+    QString szLastDir ;
     QString szFilters ;
 
     szFilters = "List (*.txt)" ;
-    szFile    = QFileDialog::getSaveFileName( this, "Save File",
-                             m_pConf->GetLastDir(), szFilters) ;
+    m_pConf->GetStrProp( PROP_STR_LAST_DIR_LIST, &szLastDir) ;
+    szFile    = QFileDialog::getSaveFileName( this, "Save File", szLastDir, szFilters) ;
 
     m_pConf->WriteList( szFile);
 }
@@ -970,6 +1006,8 @@ void CPhoto::SwitchFullScreen()
     }
 
     m_bFullScreen = ! m_bFullScreen ;
+    m_pFullScreenTimer->setInterval( MSEC_INI_LOAD);
+    m_pFullScreenTimer->start();
 }
 
 //----------------------------------------------------

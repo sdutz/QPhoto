@@ -46,6 +46,7 @@ public:
     void     DrawPause() ;
     void     DrawPlay() ;
     void     PrepareSlideshowItems() ;
+    bool     IsFading() ;
 
 protected:
     void    dragEnterEvent(   QDragEnterEvent *event);
