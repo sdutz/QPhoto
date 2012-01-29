@@ -27,7 +27,7 @@
 #include "confmgr.h"
 #include "errordlg.h"
 #include <QTranslator>
-#include "Phonon/MediaObject"
+#include "Phonon"
 
 namespace Ui {
     class CPhoto;
@@ -84,6 +84,7 @@ private slots:
     void on_BtnPlus_clicked();
     void on_BtnLeft_clicked();
     void on_BtnRight_clicked();
+    void on_IniLoad();
     void keyPressEvent (  QKeyEvent * e ) ;
     void keyReleaseEvent( QKeyEvent* e);
     void mousePressEvent( QMouseEvent* e);
@@ -130,6 +131,7 @@ private:
     ErrorDlg             m_cErrDlg ;
     ConfMgr*             m_pConf ;
     QTimer*              m_pTimer ;
+    QTimer*              m_pLoadIniTimer ;
     Phonon::MediaObject* m_player ;
     QTranslator          m_cTranslator ;
 

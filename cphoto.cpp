@@ -34,6 +34,7 @@
 #define RIGHT_BUTTON       5
 #define SCENE_OFFS         20
 #define QPHOTO             "QPhoto"
+#define MSEC_INI_LOAD      100
 
 
 //----------------------------------------------------
@@ -61,12 +62,12 @@ CPhoto::CPhoto(QWidget *parent) :
     BuildSlideShowMenu();
     ui->ImgView->SetConfMgr( m_pConf);
     ui->ImgView->PrepareSlideshowItems() ;
-    ShowList();
     SetBtnIcons() ;
     setAcceptDrops( true);
     InitPlayer();
     RetranslateDialog();
-
+    m_pLoadIniTimer->setInterval( MSEC_INI_LOAD) ;
+    m_pLoadIniTimer->start() ;
 ui->BtnLibrary->setEnabled( false);
 }
 
@@ -83,6 +84,9 @@ CPhoto::~CPhoto()
 
     if ( m_player != NULL)
         delete m_player ;
+
+    if ( m_pLoadIniTimer != NULL)
+        delete m_pLoadIniTimer ;
 
     delete ui;
 }
@@ -111,6 +115,7 @@ QString CPhoto::GetLang( int nLang)
     else
         return "it" ;
 }
+
 
 //----------------------------------------------------
 void CPhoto::ChangeLang( int nLang)
@@ -281,6 +286,10 @@ void CPhoto::CreateActions()
 
     m_pTimer = new QTimer( this) ;
     connect( m_pTimer, SIGNAL( timeout()), this, SLOT( on_BtnRight_clicked())) ;
+
+
+    m_pLoadIniTimer = new QTimer( this) ;
+    connect( m_pLoadIniTimer, SIGNAL( timeout()), this, SLOT( on_IniLoad())) ;
 }
 
 //----------------------------------------------------
@@ -314,6 +323,13 @@ void CPhoto::on_ImgDropped( const QString& szFile, bool bShow)
 {
     m_szFileName = szFile ;
     LoadImage( bShow) ;
+}
+
+//----------------------------------------------------
+void CPhoto::on_IniLoad()
+{
+    ShowList();
+    m_pLoadIniTimer->stop();
 }
 
 
@@ -385,8 +401,6 @@ void CPhoto::LoadImages()
         m_szFileName = lszList.at(n) ;
         LoadImage( n == lszList.count() - 1);
     }
-
-
 }
 
 //----------------------------------------------------
@@ -490,7 +504,8 @@ void CPhoto::SeePrevImg()
     m_szFileName = ui->ImgList->item(m_nCurr)->text() ;
     ui->ImgList->setCurrentRow( m_nCurr);
     ShowPhoto( false) ;
-    ui->ImgView->ZoomAll();
+
+     ui->ImgView->ZoomAll();
 }
 
 //----------------------------------------------------
@@ -509,6 +524,7 @@ void CPhoto::SeeNextImg()
         m_pTimer->stop();
         m_pTimer->start();
     }
+
     ui->ImgView->ZoomAll();
 }
 

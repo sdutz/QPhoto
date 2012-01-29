@@ -22,7 +22,7 @@
 
 #include <QDialog>
 #include <QListWidgetItem>
-#include "Phonon/MediaObject"
+#include "Phonon"
 
 namespace Ui {
     class MusicMgr;

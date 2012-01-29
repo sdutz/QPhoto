@@ -30,6 +30,7 @@
 #define OPACITY_FACTOR     0.1
 
 
+
 //----------------------------------------------------
 PhotoView::PhotoView(QWidget *parent) :
     QGraphicsView(parent)
@@ -70,17 +71,6 @@ PhotoView::~PhotoView()
         delete m_pControlsTimer ;
 }
 
-//----------------------------------------------------
-void PhotoView::mouseReleaseEvent( QMouseEvent* e)
-{
-
-    if ( e->type() == QEvent::MouseButtonRelease) {
-        if ( e->button() == Qt::LeftButton  &&  m_bDrag) {
-            EndZoomRect();        
-            m_pParent->EndDrag();
-        }
-    }
-}
 
 //----------------------------------------------------
 void PhotoView::PrepareSlideshowItems()
@@ -158,7 +148,6 @@ void PhotoView::DrawPause()
     StartControlsTimer();
 }
 
-
 //----------------------------------------------------
 void PhotoView::mouseMoveEvent( QMouseEvent* e)
 {
@@ -202,6 +191,21 @@ void PhotoView::mouseMoveEvent( QMouseEvent* e)
     rect.setHeight( abs( nHeight));
 
     m_pRect = m_pScene->addRect( rect, pen) ;
+}
+
+
+//----------------------------------------------------
+void PhotoView::mouseReleaseEvent( QMouseEvent* e)
+{
+
+    if ( e->type() == QEvent::MouseButtonRelease) {
+        if ( e->button() == Qt::LeftButton  &&  m_bDrag) {
+            EndZoomRect();
+            m_pParent->EndDrag();
+        }
+    }
+
+    m_bDrag = false ;
 }
 
 //----------------------------------------------------
@@ -300,8 +304,6 @@ void PhotoView::ZoomAll()
 {
     QSize ImgSize ;
 
-    if ( m_pPrevImg == NULL)
-        return ;
 
     ImgSize = m_cImage.size() ;
 
