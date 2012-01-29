@@ -46,7 +46,6 @@ public:
     void     DrawPause() ;
     void     DrawPlay() ;
     void     PrepareSlideshowItems() ;
-    bool     IsFading() ;
 
 protected:
     void    dragEnterEvent(   QDragEnterEvent *event);
@@ -62,6 +61,7 @@ private:
     QFont    GetFontFromConfig() ;
     QColor   GetColorFromConfig() ;
     void     StartControlsTimer() ;
+    void     CheckFading() ;
 
 signals:
 

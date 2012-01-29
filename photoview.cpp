@@ -73,13 +73,6 @@ PhotoView::~PhotoView()
 
 
 //----------------------------------------------------
-bool
-PhotoView::IsFading()
-{
-    return m_pFadeTimer->isActive() ;
-}
-
-//----------------------------------------------------
 void PhotoView::PrepareSlideshowItems()
 {
     QPen                   pen ;
@@ -261,6 +254,13 @@ PhotoView::ShowPhoto( const QString& szFile)
 
     ResetView();
 
+
+    bDoFade = nFadeType == FADE_ALWAYS  ||
+              ( nFadeType == FADE_ONSLIDESHOW  &&  m_bSlideShow) ;
+
+    if ( bDoFade)
+        CheckFading() ;
+
     if ( m_pCurrImg != NULL)
         m_pPrevImg = m_pCurrImg ;
 
@@ -271,24 +271,33 @@ PhotoView::ShowPhoto( const QString& szFile)
 
     m_pCurrImg = m_pScene->addPixmap( m_cImage) ;
 
+    if ( bDoFade) {
+        m_pCurrImg->setOpacity( 0.);
+        m_pConf->GetIntProp( PROP_INT_SEC, &nSec) ;
+        m_pFadeTimer->setInterval( nSec * 10) ;
+        m_pFadeTimer->start();
+    }
+
     if ( bRet)
         setToolTip( szFile) ;
 
     if ( m_bFullScreen)
         SetCurrTitleOnScene() ;
 
-    bDoFade = nFadeType == FADE_ALWAYS  ||
-              ( nFadeType == FADE_ONSLIDESHOW  &&  m_bSlideShow) ;
+    return bRet ;
+}
 
-    if ( bDoFade) {
-        m_pCurrImg->setOpacity( 0.);
-        m_pConf->GetIntProp( PROP_INT_SEC, &nSec) ;
+//----------------------------------------------------
+void
+PhotoView::CheckFading()
+{
+    if ( m_pFadeTimer->isActive()) {
         m_pFadeTimer->stop() ;
-        m_pFadeTimer->setInterval( nSec * 10) ;
-        m_pFadeTimer->start();
+        if ( m_pPrevImg != NULL)
+            m_pScene->removeItem( m_pPrevImg);
+        m_pCurrImg->setOpacity( 1.);
     }
 
-    return bRet ;
 }
 
 //----------------------------------------------------
@@ -418,12 +427,8 @@ void PhotoView::DoFadeInOut()
 
     fOpacity = m_pCurrImg->opacity() + OPACITY_FACTOR ;
 
-    if ( fOpacity > 1 - OPACITY_FACTOR) {
-        if ( m_pPrevImg != NULL)
-            m_pScene->removeItem( m_pPrevImg);
-        m_pFadeTimer->stop();
-        m_pCurrImg->setOpacity( 1.);
-    }
+    if ( fOpacity > 1 - OPACITY_FACTOR)
+        CheckFading() ;
     else
         m_pCurrImg->setOpacity( fOpacity);
 }

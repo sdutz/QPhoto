@@ -29,7 +29,8 @@ ErrorDlg::ErrorDlg(QWidget *parent) :
 
     ui->setupUi(this);
     ui->LogView->setReadOnly( true);
-    setWindowTitle( "Error Log");
+
+    setWindowTitle( tr( "Error Dialog"));
 
     currSize = size() ;
     setMaximumSize( currSize);

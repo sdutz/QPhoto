@@ -34,7 +34,7 @@
 #define RIGHT_BUTTON       5
 #define SCENE_OFFS         20
 #define QPHOTO             "QPhoto"
-#define MSEC_INI_LOAD      100
+#define MSEC_INI_LOAD      200
 
 
 //----------------------------------------------------
@@ -55,6 +55,8 @@ CPhoto::CPhoto(QWidget *parent) :
     m_player        = NULL ;
     setMinimumSize( MIN_WIDTH, MIN_HEIGHT);
     m_pConf = new ConfMgr() ;
+    m_pColl = new CollectionMgr() ;
+    m_cCollDlg.SetMgr( m_pColl) ;
     InitLang() ;
     SetIds();
     CreateActions();
@@ -67,8 +69,6 @@ CPhoto::CPhoto(QWidget *parent) :
     setAcceptDrops( true);
     InitPlayer();
     RetranslateDialog();
-
-ui->BtnLibrary->setEnabled( false);
 }
 
 //----------------------------------------------------
@@ -79,6 +79,9 @@ CPhoto::~CPhoto()
 
     if ( m_pConf != NULL)
         delete m_pConf ;
+
+    if ( m_pColl != NULL)
+        delete m_pColl ;
 
     if ( m_player != NULL)
         delete m_player ;
@@ -529,9 +532,6 @@ void CPhoto::SeePrevImg()
     if ( m_nCurr == 0)
         return ;
 
-    if  ( ui->ImgView->IsFading())
-        return ;
-
     m_nCurr -- ;
     m_szFileName = ui->ImgList->item(m_nCurr)->text() ;
     ui->ImgList->setCurrentRow( m_nCurr);
@@ -544,9 +544,6 @@ void CPhoto::SeePrevImg()
 void CPhoto::SeeNextImg()
 {
     if ( m_nCurr == ui->ImgList->count() - 1)
-        return ;
-
-    if  ( ui->ImgView->IsFading())
         return ;
 
     m_nCurr ++ ;
@@ -1117,5 +1114,5 @@ QSize  CPhoto::GetSceneSize()
 //----------------------------------------------------
 void CPhoto::on_BtnLibrary_clicked()
 {
-
+    m_cCollDlg.show();
 }

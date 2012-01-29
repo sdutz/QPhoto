@@ -25,7 +25,9 @@
 #include <QListWidgetItem>
 #include <QMenu>
 #include "confmgr.h"
+#include "collectionmgr.h"
 #include "errordlg.h"
+#include "collectiondlg.h"
 #include <QTranslator>
 #include "Phonon"
 
@@ -130,7 +132,9 @@ private:
     QMenu                m_SlideShowMenu ;
     QSize                m_DiffSize ;
     ErrorDlg             m_cErrDlg ;
+    CollectionDlg        m_cCollDlg ;
     ConfMgr*             m_pConf ;
+    CollectionMgr*       m_pColl ;
     QTimer*              m_pTimer ;
     QTimer*              m_pLoadIniTimer ;
     QTimer*              m_pFullScreenTimer ;

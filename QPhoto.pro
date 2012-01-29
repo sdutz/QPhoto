@@ -6,10 +6,10 @@
 
 QT       += core gui
 QT       +=  phonon
+QT       += core sql
 
 TARGET = QPhoto
 TEMPLATE = app
-
 
 SOURCES += main.cpp\
         cphoto.cpp \
@@ -19,7 +19,9 @@ SOURCES += main.cpp\
     settingsdlg.cpp \
     errordlg.cpp \
     util.cpp \
-    musicmgr.cpp
+    musicmgr.cpp \
+    collectionmgr.cpp \
+    collectiondlg.cpp
 
 HEADERS  += cphoto.h \
     aboutdlg.h \
@@ -28,13 +30,16 @@ HEADERS  += cphoto.h \
     settingsdlg.h \
     errordlg.h \
     util.h \
-    musicmgr.h
+    musicmgr.h \
+    collectionmgr.h \
+    collectiondlg.h
 
 FORMS    += cphoto.ui \
     aboutdlg.ui \
     settingsdlg.ui \
     errordlg.ui \
-    musicmgr.ui
+    musicmgr.ui \
+    collectiondlg.ui
 
 TRANSLATIONS += QPhoto_it.ts \
      QPhoto_en.ts
