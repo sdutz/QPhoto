@@ -467,6 +467,8 @@ bool CPhoto::ShowPhoto( bool bToAddToList, bool bShow)
         OnShowLog();
     }
 
+    ui->ImgView->ZoomAll();
+
     return true ;
 }
 
@@ -537,7 +539,6 @@ void CPhoto::SeePrevImg()
     ui->ImgList->setCurrentRow( m_nCurr);
     ShowPhoto( false) ;
 
-     ui->ImgView->ZoomAll();
 }
 
 //----------------------------------------------------
@@ -557,7 +558,6 @@ void CPhoto::SeeNextImg()
         m_pTimer->start();
     }
 
-    ui->ImgView->ZoomAll();
 }
 
 //----------------------------------------------------
@@ -768,7 +768,7 @@ void CPhoto::UpdateLayoutAfterResize( int nXMove, int nYMove)
     QPoint  cPt ;
     QSize   cSize ;
 
-    for ( nId = 1 ;  nId < 6 ;  nId++) {
+    for ( nId = 1 ;  nId <= RIGHT_BUTTON ;  nId++) {
         cPt = ui->RightButtons->button( nId)->pos() ;
         cPt.setX( cPt.x() + nXMove);
         cPt.setY( cPt.y() + nYMove);
@@ -776,7 +776,7 @@ void CPhoto::UpdateLayoutAfterResize( int nXMove, int nYMove)
         ui->RightButtons->button( nId)->move( cPt);
     }
 
-    for ( nId = 1 ;  nId < 4 ;  nId++) {
+    for ( nId = 1 ;  nId <= LEFT_BUTTON ;  nId++) {
         cPt = ui->LeftButtons->button( nId)->pos() ;
         cPt.setY( cPt.y() + nYMove);
         ui->LeftButtons->button( nId)->move( cPt);

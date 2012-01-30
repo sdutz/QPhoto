@@ -320,10 +320,10 @@ void PhotoView::ZoomAll()
 {
     QSize ImgSize ;
 
-
     ImgSize = m_cImage.size() ;
 
     fitInView( 0, 0, ImgSize.width(), ImgSize.height(), Qt::KeepAspectRatio);
+    setSceneRect( m_cImage.rect());
 }
 
 
@@ -379,12 +379,16 @@ void PhotoView::SetCurrTitleOnScene()
 {
     int nSec ;
 
+    if ( m_pCurrImgTitle != NULL)
+        m_pCurrImgTitle->hide();
+    if ( m_pTextTimer->isActive())
+        m_pTextTimer->stop();
+
     m_pConf->GetIntProp( PROP_INT_SEC, &nSec) ;
     m_pCurrImgTitle = m_pScene->addText( toolTip(), GetFontFromConfig()) ;
     m_pCurrImgTitle->setDefaultTextColor( GetColorFromConfig());
     m_pCurrImgTitle->show();
-    m_pTextTimer->stop();
-    m_pTextTimer->setInterval( nSec * 50);
+    m_pTextTimer->setInterval( nSec * 35);
     m_pTextTimer->start() ;
 }
 
