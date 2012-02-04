@@ -49,6 +49,14 @@ ConfMgr::~ConfMgr()
 }
 
 //----------------------------------------------------
+bool  ConfMgr::SetDbMgr( CollectionMgr* pMgr)
+{
+    m_pDbMgr = pMgr ;
+
+    return m_pDbMgr != NULL ;
+}
+
+//----------------------------------------------------
 void ConfMgr::WriteList( const QString& szFile)
 {
     int     nIdx ;
@@ -58,6 +66,8 @@ void ConfMgr::WriteList( const QString& szFile)
     szMyFile = szFile.isEmpty() ? HISTORY_FILE : szFile ;
     nIdx     = szFile.lastIndexOf( "\\") ;
     m_aStrProp[ PROP_STR_LAST_DIR_LIST] = nIdx > 0 ? szFile.left( nIdx) : "" ;
+
+    m_pDbMgr->InsertItem( szFile, m_lszList) ;
 
     QFile cFile( szMyFile) ;
 
@@ -121,7 +131,7 @@ void ConfMgr::AddToList( const QString& szFile)
 {
     int nIdx ;
 
-    nIdx         = szFile.lastIndexOf( "\\") ;
+    nIdx = szFile.lastIndexOf( "\\") ;
     m_aStrProp[ PROP_STR_LAST_DIR] = szFile.left( nIdx) ;
     m_lszList.append( szFile) ;
 }
@@ -165,12 +175,12 @@ void ConfMgr::LoadSettings()
     DefColor  = Qt::black ;
     szBlack   = DefColor.name() ;
 
-    m_aIntProp[ PROP_INT_SEC]   = cSet.value( SLIDESHOWSEC, 5).toInt() ;
-    m_aIntProp[ PROP_INT_FADE]  = cSet.value( FADETYPE, 0).toInt() ;
-    m_aIntProp[ PROP_INT_LANG]  = cSet.value( LANG, ENGLISH).toInt() ;
-    m_aStrProp[ PROP_STR_COLOR] = cSet.value( COLOR, szBlack).toString() ;
-    m_aStrProp[ PROP_STR_FONT]  = cSet.value( FONT, DefFont.toString()).toString() ;
-    m_aStrProp[ PROP_STR_SONGS] = cSet.value( SONGS, "").toString() ;
+    m_aIntProp[ PROP_INT_SEC]           = cSet.value( SLIDESHOWSEC, 5).toInt() ;
+    m_aIntProp[ PROP_INT_FADE]          = cSet.value( FADETYPE, 0).toInt() ;
+    m_aIntProp[ PROP_INT_LANG]          = cSet.value( LANG, ENGLISH).toInt() ;
+    m_aStrProp[ PROP_STR_COLOR]         = cSet.value( COLOR, szBlack).toString() ;
+    m_aStrProp[ PROP_STR_FONT]          = cSet.value( FONT, DefFont.toString()).toString() ;
+    m_aStrProp[ PROP_STR_SONGS]         = cSet.value( SONGS, "").toString() ;
     m_aStrProp[ PROP_STR_LAST_DIR]      = cSet.value( LAST_DIR, "").toString() ;
     m_aStrProp[ PROP_STR_LAST_DIR_LIST] = cSet.value( LAST_DIR_LIST, "").toString() ;
 }

@@ -22,6 +22,7 @@
 
 
 #include "QtSql/QSqlDatabase"
+#include <QSqlQuery>
 
 
 class CollectionMgr {
@@ -30,16 +31,20 @@ public :
     CollectionMgr() ;
     ~CollectionMgr() ;
     QString GetLastErr() ;
+    bool    InsertItem( const QString& szName, const QStringList& lszFiles) ;
+
 
 private :
     bool InitDb() ;
     bool CloseDb() ;
     bool PopulateDb() ;
-
+    bool ExecQuery() ;
+    bool FindItem( const QString& szName) ;
 
 private :
     int          m_nLastErr ;
     QString      m_szQuery ;
+    QSqlQuery    m_qQuery ;
     QSqlDatabase m_db ;
 
 };

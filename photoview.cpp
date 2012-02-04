@@ -216,10 +216,7 @@ void PhotoView::wheelEvent( QWheelEvent* e)
         return ;
     }
 
-    if ( e->delta() > 0)
-        ZoomIn();
-    else
-        ZoomOut();
+    e->delta() > 0 ? ZoomIn() : ZoomOut();
 }
 
 //----------------------------------------------------
@@ -428,7 +425,6 @@ void PhotoView::DoFadeInOut()
         m_pPrevImg->setOpacity( fOpacity);
     }
 
-
     fOpacity = m_pCurrImg->opacity() + OPACITY_FACTOR ;
 
     if ( fOpacity > 1 - OPACITY_FACTOR)
@@ -493,7 +489,7 @@ void PhotoView::dragEnterEvent( QDragEnterEvent *event)
 }
 
 //----------------------------------------------------
-void PhotoView::dragLeaveEvent(   QDragLeaveEvent *event)
+void PhotoView::dragLeaveEvent( QDragLeaveEvent *event)
 {
     event->accept();
 }

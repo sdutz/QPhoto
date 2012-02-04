@@ -57,6 +57,7 @@ CPhoto::CPhoto(QWidget *parent) :
     m_pConf = new ConfMgr() ;
     m_pColl = new CollectionMgr() ;
     m_cCollDlg.SetMgr( m_pColl) ;
+    m_pConf->SetDbMgr( m_pColl) ;
     InitLang() ;
     SetIds();
     CreateActions();
@@ -563,19 +564,13 @@ void CPhoto::SeeNextImg()
 //----------------------------------------------------
 void CPhoto::on_BtnLeft_clicked()
 {
-    if ( m_bShiftPressed)
-        OnMoveCurrUp() ;
-    else
-        SeePrevImg() ;
+    m_bShiftPressed ? OnMoveCurrUp() : SeePrevImg() ;
 }
 
 //----------------------------------------------------
 void CPhoto::on_BtnRight_clicked()
 {
-    if ( m_bShiftPressed)
-        OnMoveCurrDown();
-    else
-        SeeNextImg();
+    m_bShiftPressed ? OnMoveCurrDown() : SeeNextImg() ;
 }
 
 //----------------------------------------------------

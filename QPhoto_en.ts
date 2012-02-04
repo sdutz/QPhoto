@@ -33,100 +33,108 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="289"/>
+        <location filename="cphoto.cpp" line="322"/>
         <source>Move Up</source>
         <translation>Move up</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="290"/>
+        <location filename="cphoto.cpp" line="323"/>
         <source>Move Down</source>
         <translation>Move down</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="291"/>
+        <location filename="cphoto.cpp" line="324"/>
         <source>Start SlideShow</source>
         <translation>Start Slideshow</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="292"/>
+        <location filename="cphoto.cpp" line="325"/>
         <source>Zoom All</source>
         <translation>Zoom all</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="293"/>
+        <location filename="cphoto.cpp" line="326"/>
         <source>Show Fullscreen</source>
         <translation>Show fullscreen</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="294"/>
+        <location filename="cphoto.cpp" line="327"/>
         <source> Exit Fullscreen</source>
         <translation>Exit fullscreen</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="295"/>
+        <location filename="cphoto.cpp" line="328"/>
         <source>End SlideShow</source>
         <translation>End slideshow</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="296"/>
+        <location filename="cphoto.cpp" line="329"/>
         <source>Pause SlideShow</source>
         <translation>Pause SlideShow</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="297"/>
-        <location filename="cphoto.cpp" line="300"/>
+        <location filename="cphoto.cpp" line="330"/>
+        <location filename="cphoto.cpp" line="333"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="301"/>
+        <location filename="cphoto.cpp" line="334"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="302"/>
+        <location filename="cphoto.cpp" line="335"/>
         <source>Exit</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="303"/>
+        <location filename="cphoto.cpp" line="336"/>
         <source>Open</source>
         <translation>Open</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="304"/>
+        <location filename="cphoto.cpp" line="337"/>
         <source>Save</source>
         <translation>Save</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="305"/>
+        <location filename="cphoto.cpp" line="338"/>
         <source>Zoom Out</source>
         <translation>Zoom Out</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="306"/>
+        <location filename="cphoto.cpp" line="339"/>
         <source>Zoom in</source>
         <translation>Zoom in</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="307"/>
+        <location filename="cphoto.cpp" line="340"/>
         <source>See Previous Image</source>
         <translation>Show Previous Image</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="308"/>
+        <location filename="cphoto.cpp" line="341"/>
         <source>See Next Image</source>
         <translation>Show next image</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="360"/>
+        <location filename="cphoto.cpp" line="408"/>
         <source>Open List</source>
         <translation>Open List</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="381"/>
+        <location filename="cphoto.cpp" line="430"/>
         <source>Open Images</source>
         <translation>Open Images</translation>
+    </message>
+</context>
+<context>
+    <name>CollectionDlg</name>
+    <message>
+        <location filename="collectiondlg.ui" line="13"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -144,6 +152,11 @@
     <message>
         <location filename="errordlg.ui" line="55"/>
         <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="errordlg.cpp" line="33"/>
+        <source>Error Dialog</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

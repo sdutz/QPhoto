@@ -20,30 +20,36 @@
 #ifndef CONFMGR_H
 #define CONFMGR_H
 
+#include "collectionmgr.h"
 #include <QString>
 #include <QSettings>
 #include <QStringList>
 #include <QColor>
 #include <QFont>
 
+//----------------------------------------------------
 #define NUM_STR_PROP 5
 #define NUM_INT_PROP 3
 
 
+//----------------------------------------------------
 #define PROP_STR_COLOR         0
 #define PROP_STR_FONT          1
 #define PROP_STR_SONGS         2
 #define PROP_STR_LAST_DIR      3
 #define PROP_STR_LAST_DIR_LIST 4
 
+//----------------------------------------------------
 #define PROP_INT_SEC   0
 #define PROP_INT_FADE  1
 #define PROP_INT_LANG  2
 
+//----------------------------------------------------
 #define FADE_NONE        0
 #define FADE_ONSLIDESHOW 1
 #define FADE_ALWAYS      2
 
+//----------------------------------------------------
 #define ENGLISH 0
 #define ITALIAN 1
 
@@ -54,6 +60,7 @@ class ConfMgr
 public:
     ConfMgr();
     ~ConfMgr();
+    bool            SetDbMgr( CollectionMgr* pMgr) ;
     void            WriteList(      const QString& szFile = "") ;
     void            LoadList(       const QString& szFile = "") ;
     bool            FindInList(     const QString& szFile, int* pnIdx = NULL) ;
@@ -75,6 +82,7 @@ private :
     void            WriteSettings() ;
 
 private :
+    CollectionMgr*  m_pDbMgr ;
     QStringList     m_lszList ;
     QString         m_aStrProp[NUM_STR_PROP] ;
     int             m_aIntProp[NUM_INT_PROP] ;

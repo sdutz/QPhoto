@@ -20,9 +20,12 @@
 #define UTIL_H
 
 #include <QSize>
+#include <QStringList>
 
 
-void GetPixBtnSize( const QSize& btnSize, QSize* pPixSize) ;
-void DoDebug(       const QString& szDebug) ;
+void GetPixBtnSize(          const QSize& btnSize, QSize* pPixSize) ;
+void DoDebug(                const QString& szDebug) ;
+bool FromStringToStringList( const QString& szList, QStringList* plszRes) ;
+bool FromStringListToString( const QStringList& lszList, QString* pszRes) ;
 
 #endif // UTIL_H

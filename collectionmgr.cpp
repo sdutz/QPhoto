@@ -18,14 +18,15 @@
 
 
 #include "collectionmgr.h"
+#include "util.h"
 #include <QSqlError>
-#include <QSqlQuery>
 #include <QStringList>
 
+
 //----------------------------------------------------
-#define DATABASE        "Db.db"
-#define SQLITE          "QSQLITE"
-#define TABLENAME       "PICTURECOLLECTION"
+#define DATABASE                "Db.db"
+#define SQLITE                  "QSQLITE"
+#define TABLENAME               "PICTURECOLLECTION"
 
 //----------------------------------------------------
 #define ERR_NO                  0
@@ -33,24 +34,32 @@
 #define ERR_OPENDB              2
 #define ERR_POPULATEDB          3
 
+//----------------------------------------------------
+#define NAME                    "name"
+#define FILES                   "files"
 
 //----------------------------------------------------
-CollectionMgr::CollectionMgr() {
+#define CHECK_ST_PARAM( s)      if ( s.isEmpty()) return false ;
 
+
+//----------------------------------------------------
+CollectionMgr::CollectionMgr()
+{
     m_nLastErr = ERR_NO ;
     InitDb();
-
 }
 
 
 //----------------------------------------------------
-CollectionMgr::~CollectionMgr() {
+CollectionMgr::~CollectionMgr()
+{
     CloseDb();
 }
 
 
 //----------------------------------------------------
-bool CollectionMgr::InitDb() {
+bool CollectionMgr::InitDb()
+{
     m_db = QSqlDatabase::addDatabase( SQLITE) ;
 
     if ( ! m_db.isValid()) {
@@ -79,33 +88,70 @@ bool CollectionMgr::InitDb() {
     return true ;
 }
 
-
 //----------------------------------------------------
-bool CollectionMgr::PopulateDb() {
+bool CollectionMgr::ExecQuery()
+{
+    CHECK_ST_PARAM( m_szQuery)
 
-    QSqlQuery qQuery ;
+    m_qQuery = m_db.exec( m_szQuery) ;
 
-    m_szQuery = QString( "create table %s( STRING name, STRING files)").arg( TABLENAME) ;
-    qQuery    = m_db.exec( m_szQuery) ;
-
-    return true ;
+    return m_qQuery.isValid() && m_qQuery.exec() ;
 }
 
 //----------------------------------------------------
-bool CollectionMgr::CloseDb() {
+bool CollectionMgr::PopulateDb()
+{
+    m_szQuery = QString( "CREATE TABLE %1( %2 STRING, %3 STRING);").arg( TABLENAME).arg( NAME).arg(FILES) ;
+
+    return ExecQuery() ;
+}
+
+//----------------------------------------------------
+bool CollectionMgr::CloseDb()
+{
     m_db.close();
 
     return true ;
 }
 
+
 //----------------------------------------------------
-QString CollectionMgr::GetLastErr() {
+bool CollectionMgr::InsertItem( const QString& szName, const QStringList& lszFiles)
+{
+    QString szList ;
+
+    CHECK_ST_PARAM( szName)
+    CHECK_ST_PARAM( lszFiles)
+
+
+    FromStringListToString( lszFiles, &szList) ;
+
+    m_szQuery = FindItem( szName) ? QString( "UPDATE %1 SET %2 = %3 WHERE %4 = %5;").arg(TABLENAME).arg( FILES).arg(szList).arg( NAME).arg(szName) :
+                                    QString( "INSERT INTO %1 ( %2 = %3, %4 = %5);").arg(TABLENAME).arg( NAME).arg(szName).arg( FILES).arg(szList) ;
+
+    return ExecQuery() ;
+}
+
+
+//----------------------------------------------------
+bool CollectionMgr::FindItem( const QString& szName)
+{
+    CHECK_ST_PARAM( szName)
+
+    m_szQuery = QString( "SELECT * FROM %1 WHERE %2 = %3;").arg( TABLENAME).arg( NAME).arg( szName) ;
+
+    return ExecQuery()  &&  m_qQuery.first() ;
+}
+
+//----------------------------------------------------
+QString CollectionMgr::GetLastErr()
+{
     QString   szLog ;
     QSqlError qErr ;
 
-    qErr = m_db.lastError() ;
+    qErr   = m_db.lastError() ;
 
-    szLog = QString( "%d:").arg( m_nLastErr) ;
+    szLog  = QString( "%1:").arg( m_nLastErr) ;
     szLog += qErr.text() ;
 
     return szLog  ;
