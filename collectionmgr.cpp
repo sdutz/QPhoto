@@ -19,6 +19,7 @@
 
 #include "collectionmgr.h"
 #include "util.h"
+#include <QVariant>
 #include <QSqlError>
 #include <QStringList>
 
@@ -37,6 +38,9 @@
 //----------------------------------------------------
 #define NAME                    "name"
 #define FILES                   "files"
+
+#define NAME_VAL                 0
+#define FILES_VAL                1
 
 //----------------------------------------------------
 #define CHECK_ST_PARAM( s)      if ( s.isEmpty()) return false ;
@@ -74,7 +78,6 @@ bool CollectionMgr::InitDb()
         return false ;
     }
 
-
     QStringList lszTabs = m_db.tables() ;
 
     if ( lszTabs.count() < 1) {
@@ -95,7 +98,7 @@ bool CollectionMgr::ExecQuery()
 
     m_qQuery = m_db.exec( m_szQuery) ;
 
-    return m_qQuery.isValid() && m_qQuery.exec() ;
+    return m_qQuery.exec() ;
 }
 
 //----------------------------------------------------
@@ -123,24 +126,63 @@ bool CollectionMgr::InsertItem( const QString& szName, const QStringList& lszFil
     CHECK_ST_PARAM( szName)
     CHECK_ST_PARAM( lszFiles)
 
-
     FromStringListToString( lszFiles, &szList) ;
 
-    m_szQuery = FindItem( szName) ? QString( "UPDATE %1 SET %2 = %3 WHERE %4 = %5;").arg(TABLENAME).arg( FILES).arg(szList).arg( NAME).arg(szName) :
-                                    QString( "INSERT INTO %1 ( %2 = %3, %4 = %5);").arg(TABLENAME).arg( NAME).arg(szName).arg( FILES).arg(szList) ;
+    m_szQuery = FindItem( szName) ? QString( "UPDATE %1 SET %2 = '%3' WHERE %4 = '%5';").arg(TABLENAME).arg( FILES).arg(szList).arg( NAME).arg(szName) :
+                                    QString( "INSERT INTO %1 (%2,%3) VALUES ('%4','%5');").arg(TABLENAME).arg( NAME).arg( FILES).arg( szName).arg( szList) ;
 
     return ExecQuery() ;
 }
 
+//----------------------------------------------------
+bool CollectionMgr::DeleteItem( const QString& szName)
+{
+    CHECK_ST_PARAM( szName)
+
+    m_szQuery = QString( "DELETE FROM %1 WHERE %2 = '%3';").arg( TABLENAME).arg( NAME).arg( szName) ;
+
+    return ExecQuery() ;
+}
 
 //----------------------------------------------------
 bool CollectionMgr::FindItem( const QString& szName)
 {
     CHECK_ST_PARAM( szName)
 
-    m_szQuery = QString( "SELECT * FROM %1 WHERE %2 = %3;").arg( TABLENAME).arg( NAME).arg( szName) ;
+    m_szQuery = QString( "SELECT * FROM %1 WHERE %2 = '%3';").arg( TABLENAME).arg( NAME).arg( szName) ;
 
-    return ExecQuery()  &&  m_qQuery.first() ;
+    ExecQuery() ;
+
+    return m_qQuery.first() ;
+}
+
+//----------------------------------------------------
+QStringList CollectionMgr::GetItemsList()
+{
+    QStringList lszList ;
+
+    m_szQuery = QString( "SELECT * FROM %1;").arg( TABLENAME) ;
+
+    if ( ! ExecQuery())
+        return lszList ;
+
+    while ( m_qQuery.next())
+        lszList.append( m_qQuery.value( NAME_VAL).toString()) ;
+
+    return lszList ;
+}
+
+//----------------------------------------------------
+QStringList CollectionMgr::GetItemData( const QString& szName)
+{
+    QStringList lszList ;
+
+    if ( ! FindItem( szName))
+        return lszList ;
+
+    FromStringToStringList( m_qQuery.value( FILES_VAL).toString(), &lszList) ;
+
+    return lszList ;
 }
 
 //----------------------------------------------------
@@ -153,6 +195,8 @@ QString CollectionMgr::GetLastErr()
 
     szLog  = QString( "%1:").arg( m_nLastErr) ;
     szLog += qErr.text() ;
+    szLog += " Executing " ;
+    szLog += m_qQuery.lastQuery() ;
 
     return szLog  ;
 }

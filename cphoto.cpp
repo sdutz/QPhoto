@@ -38,6 +38,9 @@
 
 
 //----------------------------------------------------
+#define SET_MOD            m_bChanged = true ;
+
+//----------------------------------------------------
 CPhoto::CPhoto(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CPhoto)
@@ -47,7 +50,7 @@ CPhoto::CPhoto(QWidget *parent) :
     setWindowTitle( QPHOTO);
     m_szFileName    = "" ;
     m_nCurr         = -1 ;
-    m_bOrdChanged   = false ;
+    m_bChanged      = false ;
     m_bFullScreen   = false ;
     m_bShowHelp     = false ;
     m_bShiftPressed = false ;
@@ -56,7 +59,6 @@ CPhoto::CPhoto(QWidget *parent) :
     setMinimumSize( MIN_WIDTH, MIN_HEIGHT);
     m_pConf = new ConfMgr() ;
     m_pColl = new CollectionMgr() ;
-    m_cCollDlg.SetMgr( m_pColl) ;
     m_pConf->SetDbMgr( m_pColl) ;
     InitLang() ;
     SetIds();
@@ -70,6 +72,7 @@ CPhoto::CPhoto(QWidget *parent) :
     setAcceptDrops( true);
     InitPlayer();
     RetranslateDialog();
+    InitDialogs();
 }
 
 //----------------------------------------------------
@@ -88,6 +91,15 @@ CPhoto::~CPhoto()
         delete m_player ;
 
     delete ui;
+}
+
+//----------------------------------------------------
+void CPhoto::closeEvent( QCloseEvent * e)
+{
+    if ( m_cErrDlg.isVisible())
+        m_cErrDlg.DoHide();
+    if ( m_cCollDlg.isVisible())
+        m_cCollDlg.DoHide();
 }
 
 //----------------------------------------------------
@@ -177,7 +189,6 @@ void CPhoto::DeleteAction()
 }
 
 
-
 //----------------------------------------------------
 void CPhoto::SetBtnIcons()
 {
@@ -243,10 +254,13 @@ void CPhoto::SetIds()
 }
 
 //----------------------------------------------------
-void CPhoto::InitLogDlg()
+void CPhoto::InitDialogs()
 {
     m_cErrDlg.SetMgr( m_pConf) ;
     m_cErrDlg.setModal( false);
+
+    m_cCollDlg.SetMgr( m_pColl) ;
+    m_cCollDlg.setModal( false);
 }
 
 //----------------------------------------------------
@@ -445,6 +459,8 @@ void CPhoto::LoadImage( bool bShow)
     ShowPhoto( true, bShow) ;
     m_nCurr = ui->ImgList->count() - 1 ;
     ui->ImgList->setCurrentRow( m_nCurr) ;
+
+    SET_MOD
 }
 
 //----------------------------------------------------
@@ -475,12 +491,13 @@ bool CPhoto::ShowPhoto( bool bToAddToList, bool bShow)
 
 //----------------------------------------------------
 void CPhoto::on_BtnExit_clicked()
-{
-    m_cErrDlg.close() ;
+{   
 
-    if ( m_bOrdChanged)
+    if ( m_bChanged) {
         RefreshList() ;
-    m_pConf->WriteList();
+        m_pConf->WriteList();
+    }
+
     QDialog::close() ;
 }
 
@@ -604,6 +621,8 @@ void CPhoto::DeleteSingle()
     m_szFileName = ui->ImgList->item( m_nCurr)->text() ;
     if( ! m_szFileName.isEmpty())
         ShowPhoto( false) ;
+
+    SET_MOD
 }
 
 //----------------------------------------------------
@@ -664,7 +683,7 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
         OnZoomAll();
         break ;
 
-        case  Qt::Key_L :
+        case  Qt::Key_O :
         on_BtnOpen_clicked();
         break ;
 
@@ -692,6 +711,10 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
 
         case Qt::Key_C :
         OnConfig();
+        break ;
+
+        case Qt::Key_L :
+        on_BtnLibrary_clicked();
         break ;
 
         case Qt::Key_M :
@@ -753,7 +776,9 @@ void CPhoto::on_BtnSave_clicked()
     m_pConf->GetStrProp( PROP_STR_LAST_DIR_LIST, &szLastDir) ;
     szFile    = QFileDialog::getSaveFileName( this, "Save File", szLastDir, szFilters) ;
 
-    m_pConf->WriteList( szFile);
+    m_pConf->WriteList( szFile, true);
+
+    m_bChanged = false ;
 }
 
 //----------------------------------------------------
@@ -880,7 +905,8 @@ void CPhoto::OnMoveCurrUp()
 
     m_nCurr = nCurrRow ;
     ui->ImgList->setCurrentRow( m_nCurr);
-    m_bOrdChanged = true ;
+
+    SET_MOD
 }
 
 //----------------------------------------------------
@@ -899,7 +925,8 @@ void CPhoto::OnMoveCurrDown()
 
     m_nCurr = nCurrRow ;
     ui->ImgList->setCurrentRow( m_nCurr);
-    m_bOrdChanged = true ;
+
+    SET_MOD
 }
 
 //----------------------------------------------------
@@ -1068,17 +1095,23 @@ void CPhoto::OnPauseSlideShow()
 //----------------------------------------------------
 void CPhoto::OnShowLog()
 {
-    QPoint pos ;
-    QSize  size ;
-    QRect  rect ;
+    if( m_cErrDlg.isVisible())
+        m_cErrDlg.DoHide();
 
-    pos  = ui->ImgList->pos() ;
-    size = ui->ImgList->size() ;
+    else {
 
-    rect.setTopLeft( pos);
-    rect.setSize( size);
+        QPoint pos ;
+        QSize  size ;
+        QRect  rect ;
 
-    m_cErrDlg.DoShow( rect, m_szLog) ;
+        pos  = ui->ImgList->pos() ;
+        size = ui->ImgList->size() ;
+
+        rect.setTopLeft( pos);
+        rect.setSize( size);
+
+        m_cErrDlg.DoShow( rect, m_szLog) ;
+    }
 
     m_szLog.clear();
 }
@@ -1109,5 +1142,10 @@ QSize  CPhoto::GetSceneSize()
 //----------------------------------------------------
 void CPhoto::on_BtnLibrary_clicked()
 {
-    m_cCollDlg.show();
+    QPoint myPos ;
+
+    myPos = pos() ;
+    myPos.setX( myPos.x() + width());
+
+    m_cCollDlg.isVisible() ? m_cCollDlg.DoHide() : m_cCollDlg.DoShow( myPos, height());
 }

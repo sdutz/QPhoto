@@ -53,8 +53,8 @@ PhotoView::PhotoView(QWidget *parent) :
     m_pTextTimer     = new QTimer( this) ;
     m_pFadeTimer     = new QTimer( this) ;
     m_pControlsTimer = new QTimer( this) ;
-    connect( m_pTextTimer, SIGNAL( timeout()), this, SLOT( DecreaseAlfa())) ;
-    connect( m_pFadeTimer, SIGNAL( timeout()), this, SLOT( DoFadeInOut())) ;
+    connect( m_pTextTimer,     SIGNAL( timeout()), this, SLOT( DecreaseAlfa())) ;
+    connect( m_pFadeTimer,     SIGNAL( timeout()), this, SLOT( DoFadeInOut())) ;
     connect( m_pControlsTimer, SIGNAL( timeout()), this, SLOT( DoControlsFadeOut())) ;
 }
 
@@ -79,8 +79,8 @@ void PhotoView::PrepareSlideshowItems()
     QBrush                 brush ;
     QList< QGraphicsItem*> list ;
     QVector< QPoint>       points ;
-    QRect     rect1(0, 0, 20, 60 ) ;
-    QRect     rect2(40, 0, 20, 60 ) ;
+    QRect                  rect1(0, 0, 20, 60 ) ;
+    QRect                  rect2(40, 0, 20, 60 ) ;
 
     pen.setColor( GetColorFromConfig());
     brush.setColor( GetColorFromConfig());
@@ -104,7 +104,6 @@ void PhotoView::DrawPlay()
     QSize   sceneSize ;
     QSizeF  grpSize ;
     QPointF pos ;
-
 
     sceneSize = m_pParent->GetSceneSize() ;
     grpSize   = m_pTria->boundingRect().size();
@@ -136,7 +135,6 @@ void PhotoView::DrawPause()
     QSize   sceneSize ;
     QSizeF  grpSize ;
     QPointF pos ;
-
 
     sceneSize = m_pParent->GetSceneSize() ;
     grpSize   = m_pauseGrp->boundingRect().size() ;
@@ -197,7 +195,6 @@ void PhotoView::mouseMoveEvent( QMouseEvent* e)
 //----------------------------------------------------
 void PhotoView::mouseReleaseEvent( QMouseEvent* e)
 {
-
     if ( e->type() == QEvent::MouseButtonRelease) {
         if ( e->button() == Qt::LeftButton  &&  m_bDrag) {
             EndZoomRect();
@@ -251,7 +248,6 @@ PhotoView::ShowPhoto( const QString& szFile)
 
     ResetView();
 
-
     bDoFade = nFadeType == FADE_ALWAYS  ||
               ( nFadeType == FADE_ONSLIDESHOW  &&  m_bSlideShow) ;
 
@@ -298,15 +294,15 @@ PhotoView::CheckFading()
 }
 
 //----------------------------------------------------
-void PhotoView::ZoomOut() {
-
+void PhotoView::ZoomOut()
+{
     scale( SCALE_FACTOR_MINUS, SCALE_FACTOR_MINUS) ;
     m_dScale -= SCALE_FACTOR ;
 }
 
 //----------------------------------------------------
-void PhotoView::ZoomIn() {
-
+void PhotoView::ZoomIn()
+{
     scale( SCALE_FACTOR_PLUS, SCALE_FACTOR_PLUS);
     m_dScale += SCALE_FACTOR ;
 }
@@ -392,7 +388,6 @@ void PhotoView::SetCurrTitleOnScene()
 //----------------------------------------------------
 void PhotoView::SetFullScreen( bool bFullScreen)
 {
-
     if ( ! bFullScreen  &&  m_pCurrImgTitle != NULL)
         m_pScene->removeItem( m_pCurrImgTitle);
     else if ( bFullScreen)
@@ -460,7 +455,7 @@ QFont PhotoView::GetFontFromConfig()
     QFont   font ;
     QString szFont ;
 
-    if ( ! m_pConf->GetStrProp( PROP_STR_FONT, &szFont) )
+    if ( ! m_pConf->GetStrProp( PROP_STR_FONT, &szFont))
         return QFont() ;
 
     font.fromString( szFont) ;

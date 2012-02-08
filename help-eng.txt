@@ -5,10 +5,13 @@ Shift + Delete -> Erase all in current playlist
 Shift + Right  -> Move current picture down in list
 Shift + Mouse Wheel -> Zoom in/out
 Delete  -> Delete current image
-L -> Load an image into playlist
+O -> Load an image into playlist
 F -> Full Screen
 A -> Zoom Fit
 H -> Help menu
+C -> Configure
+L -> Library
+E -> Error Log
 Space     -> See next image in playlist
 BackSpace -> See previous image in playlist
 Ctrl + Q -> Close QPhoto

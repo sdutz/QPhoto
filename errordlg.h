@@ -33,6 +33,7 @@ class ErrorDlg : public QDialog
 public:
     explicit ErrorDlg(QWidget *parent = 0);
     void     DoShow( const QRect& cRect, const QString& szLog = "") ;
+    void     DoHide() ;
     bool     SetMgr( ConfMgr* pConf) ;
 
     ~ErrorDlg();

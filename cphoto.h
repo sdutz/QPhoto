@@ -71,7 +71,7 @@ private :
     void RefreshList() ;
     void DeleteAction() ;
     void DeleteTimers() ;
-    void InitLogDlg() ;
+    void InitDialogs() ;
     void SetBtnIcons() ;
     void GoToStartEnd( bool bStart) ;
     void InitPlayer() ;
@@ -96,6 +96,7 @@ private slots:
     void on_BtnDel_clicked();
     void on_BtnSave_clicked();
     void resizeEvent(     QResizeEvent* event) ;
+    void closeEvent( QCloseEvent * e) ;
     void OnMoveCurrUp() ;
     void OnMoveCurrDown() ;
     void OnZoomAll() ;
@@ -112,7 +113,7 @@ private slots:
 private:
     Ui::CPhoto*          ui;
     bool                 m_bShiftPressed ;
-    bool                 m_bOrdChanged ;
+    bool                 m_bChanged ;
     bool                 m_bFullScreen ;
     bool                 m_bCtrlPressed ;
     bool                 m_bShowHelp ;

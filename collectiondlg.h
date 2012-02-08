@@ -20,6 +20,7 @@
 #define COLLECTIONDLG_H
 
 #include <QDialog>
+#include <QListWidgetItem>
 #include "collectionmgr.h"
 
 namespace Ui {
@@ -34,7 +35,16 @@ public:
     explicit CollectionDlg(QWidget *parent = 0);
     ~CollectionDlg();
     void SetMgr( CollectionMgr* pMgr) ;
-    
+    void DoShow( const QPoint& pos, double dHeight) ;
+    void DoHide() ;
+
+
+private slots:
+    void on_recordsList_itemDoubleClicked(QListWidgetItem *item);
+
+private :
+    void PopulateRecordsList() ;
+
 private:
     Ui::CollectionDlg* ui;
     CollectionMgr*     m_pCollMgr ;

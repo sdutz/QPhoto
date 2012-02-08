@@ -26,6 +26,7 @@
 //----------------------------------------------------
 #define CHECK_PTR_PARAM( p)   if ( p == NULL) return false ;
 
+
 //----------------------------------------------------
 void GetPixBtnSize( const QSize& btnSize, QSize* pPixSize)
 {
@@ -54,7 +55,7 @@ bool FromStringListToString( const QStringList& lszList, QString* pszRes) {
     pszRes->clear();
 
     for ( int n = 0 ;  n < lszList.count()  ; n ++)
-        pszRes->append( "%1,").arg( lszList.at(n)) ;
+        pszRes->append( QString( "%1,").arg( lszList.at(n))) ;
 
     return true ;
 }
@@ -75,7 +76,7 @@ bool FromStringToStringList( const QString& szList, QStringList* plszRes)
 
         nCurr = szList.indexOf( ",", nPos) ;
         plszRes->append( szList.mid( nPos, nCurr - nPos));
-        nPos  = nCurr ;
+        nPos  = nCurr + 1 ;
     }
 
     return true ;

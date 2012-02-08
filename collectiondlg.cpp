@@ -27,6 +27,8 @@ CollectionDlg::CollectionDlg(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setWindowTitle( tr( "Collection"));
+    setFixedWidth( width());
     m_pCollMgr = NULL ;
 }
 
@@ -41,4 +43,40 @@ void CollectionDlg::SetMgr( CollectionMgr* pMgr)
 {
     if ( pMgr != NULL)
         m_pCollMgr = pMgr ;
+}
+
+//----------------------------------------------------
+void CollectionDlg::on_recordsList_itemDoubleClicked(QListWidgetItem *item)
+{
+    ui->filesList->clear();
+    ui->filesList->addItems( m_pCollMgr->GetItemData( item->text()));
+}
+
+//----------------------------------------------------
+void CollectionDlg::DoHide()
+{
+    hide() ;
+    setVisible( false);
+}
+
+//----------------------------------------------------
+void CollectionDlg::DoShow( const QPoint& pos, double dHeight)
+{
+
+    move( pos) ;
+    setFixedHeight( dHeight);
+    setVisible( true);
+    show() ;
+    raise();
+    activateWindow();
+
+    PopulateRecordsList() ;
+}
+
+//----------------------------------------------------
+void CollectionDlg::PopulateRecordsList()
+{
+    ui->recordsList->clear();
+    ui->recordsList->addItems( m_pCollMgr->GetItemsList());
+    on_recordsList_itemDoubleClicked( ui->recordsList->item(0)) ;
 }

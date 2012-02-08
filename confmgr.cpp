@@ -57,15 +57,17 @@ bool  ConfMgr::SetDbMgr( CollectionMgr* pMgr)
 }
 
 //----------------------------------------------------
-void ConfMgr::WriteList( const QString& szFile)
+void ConfMgr::WriteList( const QString& szFile, bool bSaveDir)
 {
     int     nIdx ;
     int     nItems ;
     QString szMyFile ;
 
     szMyFile = szFile.isEmpty() ? HISTORY_FILE : szFile ;
-    nIdx     = szFile.lastIndexOf( "\\") ;
-    m_aStrProp[ PROP_STR_LAST_DIR_LIST] = nIdx > 0 ? szFile.left( nIdx) : "" ;
+    if ( bSaveDir) {
+        nIdx = szFile.lastIndexOf( "/") ;
+        m_aStrProp[ PROP_STR_LAST_DIR_LIST] = nIdx > 0 ? szFile.left( nIdx) : "" ;
+    }
 
     m_pDbMgr->InsertItem( szFile, m_lszList) ;
 

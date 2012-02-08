@@ -61,7 +61,7 @@ public:
     ConfMgr();
     ~ConfMgr();
     bool            SetDbMgr( CollectionMgr* pMgr) ;
-    void            WriteList(      const QString& szFile = "") ;
+    void            WriteList(      const QString& szFile = "", bool bSaveDir = false) ;
     void            LoadList(       const QString& szFile = "") ;
     bool            FindInList(     const QString& szFile, int* pnIdx = NULL) ;
     void            AddToList(      const QString& szFile) ;

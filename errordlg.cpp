@@ -53,6 +53,13 @@ void ErrorDlg::on_ClearBtn_clicked()
 //----------------------------------------------------
 void ErrorDlg::on_CloseBtn_clicked()
 {
+    DoHide();
+}
+
+
+//----------------------------------------------------
+void ErrorDlg::DoHide()
+{
     m_pConf->WriteLog( ui->LogView->toPlainText()) ;
     hide() ;
     setVisible( false);
@@ -61,11 +68,6 @@ void ErrorDlg::on_CloseBtn_clicked()
 //----------------------------------------------------
 void ErrorDlg::DoShow( const QRect& cRect, const QString& szLog)
 {
-    if( isVisible()  &&  szLog.isEmpty()) {
-        on_CloseBtn_clicked();
-        return ;
-    }
-
     QString szFullLog ;
 
     szFullLog = m_pConf->GetLog() + "\n" + szLog ;
