@@ -45,7 +45,7 @@ ConfMgr::ConfMgr()
 //----------------------------------------------------
 ConfMgr::~ConfMgr()
 {
-    WriteSettings();
+    WriteSettings() ;
 }
 
 //----------------------------------------------------
@@ -92,9 +92,10 @@ void ConfMgr::LoadList( const QString& szFile)
     QString szTmp ;
     QString szMyFile ;
 
+    ClearList() ;
     szMyFile = szFile.isEmpty() ? HISTORY_FILE : szFile ;
 
-    QFile   cFile( szMyFile) ;
+    QFile cFile( szMyFile) ;
 
     if ( ! cFile.open(QIODevice::ReadOnly | QIODevice::Text))
          return;
@@ -106,7 +107,9 @@ void ConfMgr::LoadList( const QString& szFile)
          m_lszList.append( szTmp) ;
     }
 
-    cFile.close();
+    cFile.close() ;
+
+    m_pDbMgr->InsertItem( szFile, m_lszList) ;
 }
 
 //----------------------------------------------------
@@ -127,7 +130,6 @@ bool ConfMgr::FindInList( const QString& szFile, int* pnIdx)
     return false ;
 }
 
-
 //----------------------------------------------------
 void ConfMgr::AddToList( const QString& szFile)
 {
@@ -147,12 +149,11 @@ void ConfMgr::RemoveFromList( const QString& szFile)
         m_lszList.takeAt( nToErase) ;
 }
 
-
 //----------------------------------------------------
-void  ConfMgr::ClearList() {
+void  ConfMgr::ClearList()
+{
     m_lszList.clear();
 }
-
 
 //----------------------------------------------------
 QString ConfMgr::GetListItem( int n)
@@ -192,14 +193,14 @@ void ConfMgr::WriteSettings()
 {
     QSettings cSet ;
 
-    cSet.setValue( SLIDESHOWSEC, m_aIntProp[ PROP_INT_SEC]);
-    cSet.setValue( FADETYPE, m_aIntProp[ PROP_INT_FADE]);
-    cSet.setValue( LANG, m_aIntProp[ PROP_INT_LANG]);
-    cSet.setValue( COLOR, m_aStrProp[PROP_STR_COLOR]) ;
-    cSet.setValue( FONT, m_aStrProp[PROP_STR_FONT]);
-    cSet.setValue( SONGS, m_aStrProp[PROP_STR_SONGS]);
-    cSet.setValue( LAST_DIR, m_aStrProp[ PROP_STR_LAST_DIR]);
-    cSet.setValue( LAST_DIR_LIST, m_aStrProp[ PROP_STR_LAST_DIR_LIST]);
+    cSet.setValue( SLIDESHOWSEC, m_aIntProp[ PROP_INT_SEC]) ;
+    cSet.setValue( FADETYPE, m_aIntProp[ PROP_INT_FADE]) ;
+    cSet.setValue( LANG, m_aIntProp[ PROP_INT_LANG]) ;
+    cSet.setValue( COLOR, m_aStrProp[PROP_STR_COLOR])  ;
+    cSet.setValue( FONT, m_aStrProp[PROP_STR_FONT]) ;
+    cSet.setValue( SONGS, m_aStrProp[PROP_STR_SONGS]) ;
+    cSet.setValue( LAST_DIR, m_aStrProp[ PROP_STR_LAST_DIR]) ;
+    cSet.setValue( LAST_DIR_LIST, m_aStrProp[ PROP_STR_LAST_DIR_LIST]) ;
 }
 
 //----------------------------------------------------
@@ -215,7 +216,7 @@ void ConfMgr::ShowSettingsDlg()
     sets.szFont    = m_aStrProp[ PROP_STR_FONT] ;
     sets.szSongs   = m_aStrProp[ PROP_STR_SONGS] ;
 
-    cDlg.SetInitSettings( sets);
+    cDlg.SetInitSettings( sets) ;
 
     if ( cDlg.exec() == QDialog::Accepted) {
         sets = cDlg.GetSettings() ;
@@ -284,9 +285,7 @@ bool ConfMgr::WriteLog( const QString szLog)
     else {
         QByteArray pByte ;
         pByte.append( szLog) ;
-
         cFile.write( pByte) ;
-
     }
 
     cFile.close() ;
@@ -303,8 +302,10 @@ bool ConfMgr::ResetLog()
 //----------------------------------------------------
 bool ConfMgr::GetStrProp( int nProp, QString* pVal)
 {
-
     if ( nProp < 0  ||  nProp >= NUM_STR_PROP)
+        return false ;
+
+    if ( pVal == NULL)
         return false ;
 
     *pVal = m_aStrProp[nProp] ;
@@ -316,6 +317,9 @@ bool ConfMgr::GetStrProp( int nProp, QString* pVal)
 bool ConfMgr::GetIntProp( int nProp, int* pVal)
 {
     if ( nProp < 0  ||  nProp >= NUM_INT_PROP)
+        return false ;
+
+    if ( pVal == NULL)
         return false ;
 
     *pVal = m_aIntProp[nProp] ;

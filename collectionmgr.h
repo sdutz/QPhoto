@@ -31,14 +31,15 @@ public :
     CollectionMgr() ;
     ~CollectionMgr() ;
     QString      GetLastErr() ;
-    bool         InsertItem( const QString& szName, const QStringList& lszFiles) ;
-    bool         DeleteItem( const QString& szName) ;
+    bool         InsertItem(  const QString& szName, const QStringList& lszFiles) ;
+    bool         DeleteItem(  const QString& szName) ;
     QStringList  GetItemData( const QString& szName) ;
     QStringList  GetItemsList() ;
+    bool         HasLastQueryMod() ;
 
 private :
     bool         InitDb() ;
-    bool         CloseDb() ;
+    void         CloseDb() ;
     bool         PopulateDb() ;
     bool         ExecQuery() ;
     bool         FindItem( const QString& szName) ;

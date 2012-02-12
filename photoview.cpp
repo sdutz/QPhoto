@@ -227,7 +227,7 @@ void PhotoView::ResetView( bool bClearAll)
         m_dScale = 1. ;
     }
 
-    centerOn(0, 0);
+    centerOn( 0, 0);
 
     if ( bClearAll) {
         m_pScene->clear();
@@ -434,10 +434,7 @@ void PhotoView::DoControlsFadeOut()
     float          fOpacity ;
     QGraphicsItem* pItem ;
 
-    if ( m_pTria->isVisible())
-        pItem = m_pTria ;
-    else
-        pItem = m_pauseGrp ;
+    pItem = m_pTria->isVisible() ? m_pTria : ( QGraphicsItem*) m_pauseGrp ;
 
     fOpacity = pItem->opacity() - OPACITY_FACTOR ;
     if ( fOpacity < OPACITY_FACTOR) {

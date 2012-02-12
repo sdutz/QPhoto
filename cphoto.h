@@ -45,11 +45,11 @@ public:
     void     on_ImgDropped( const QString& szFile, bool bShow) ;
     void     EndDrag() ;
     QSize    GetSceneSize() ;
+    void     ShowList( const QString& szFile = "") ;
 
 
 private :
     bool ShowPhoto( bool bToAddToList, bool bShow = true) ;
-    void ShowList(  const QString& szFile = "") ;
     void DeleteSingle();
     void DeleteAll();
     void LoadImage( bool bShow = true);
@@ -79,6 +79,7 @@ private :
     void ChangeLang( int nLang) ;
     QString GetLang( int nLang) ;
     void RetranslateDialog() ;
+    void UpdateCollDlg() ;
 
 private slots:
     void on_BtnOpen_clicked();
@@ -93,10 +94,11 @@ private slots:
     void keyPressEvent (  QKeyEvent * e ) ;
     void keyReleaseEvent( QKeyEvent* e);
     void mousePressEvent( QMouseEvent* e);
+    void resizeEvent(     QResizeEvent* event) ;
+    void moveEvent(       QMoveEvent* event);
+    void closeEvent(      QCloseEvent * e) ;
     void on_BtnDel_clicked();
     void on_BtnSave_clicked();
-    void resizeEvent(     QResizeEvent* event) ;
-    void closeEvent( QCloseEvent * e) ;
     void OnMoveCurrUp() ;
     void OnMoveCurrDown() ;
     void OnZoomAll() ;
@@ -117,8 +119,10 @@ private:
     bool                 m_bFullScreen ;
     bool                 m_bCtrlPressed ;
     bool                 m_bShowHelp ;
+    bool                 m_bLoadSingle ;
     int                  m_nCurr ;
     QString              m_szFileName ;
+    QString              m_szPrev ;
     QString              m_szLog ;
     QAction*             m_pMoveUpAct ;
     QAction*             m_pMoveDownAct ;

@@ -39,8 +39,8 @@
 #define NAME                    "name"
 #define FILES                   "files"
 
-#define NAME_VAL                 0
-#define FILES_VAL                1
+#define NAME_VAL                0
+#define FILES_VAL               1
 
 //----------------------------------------------------
 #define CHECK_ST_PARAM( s)      if ( s.isEmpty()) return false ;
@@ -50,16 +50,22 @@
 CollectionMgr::CollectionMgr()
 {
     m_nLastErr = ERR_NO ;
-    InitDb();
+    InitDb() ;
 }
 
 
 //----------------------------------------------------
 CollectionMgr::~CollectionMgr()
 {
-    CloseDb();
+    CloseDb() ;
 }
 
+
+//----------------------------------------------------
+bool CollectionMgr::HasLastQueryMod()
+{
+    return m_szQuery.indexOf( "INSERT") >= 0 ;
+}
 
 //----------------------------------------------------
 bool CollectionMgr::InitDb()
@@ -71,7 +77,7 @@ bool CollectionMgr::InitDb()
         return false ;
     }
 
-    m_db.setDatabaseName( DATABASE);
+    m_db.setDatabaseName( DATABASE) ;
 
     if ( ! m_db.open()) {
         m_nLastErr = ERR_OPENDB ;
@@ -80,13 +86,12 @@ bool CollectionMgr::InitDb()
 
     QStringList lszTabs = m_db.tables() ;
 
-    if ( lszTabs.count() < 1) {
+    if ( lszTabs.count() == 0) {
         if ( ! PopulateDb()) {
             m_nLastErr = ERR_POPULATEDB ;
             return false ;
         }
     }
-
 
     return true ;
 }
@@ -98,7 +103,7 @@ bool CollectionMgr::ExecQuery()
 
     m_qQuery = m_db.exec( m_szQuery) ;
 
-    return m_qQuery.exec() ;
+    return true ;
 }
 
 //----------------------------------------------------
@@ -110,11 +115,9 @@ bool CollectionMgr::PopulateDb()
 }
 
 //----------------------------------------------------
-bool CollectionMgr::CloseDb()
+void CollectionMgr::CloseDb()
 {
-    m_db.close();
-
-    return true ;
+    m_db.close() ;
 }
 
 
@@ -198,5 +201,5 @@ QString CollectionMgr::GetLastErr()
     szLog += " Executing " ;
     szLog += m_qQuery.lastQuery() ;
 
-    return szLog  ;
+    return szLog ;
 }

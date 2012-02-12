@@ -73,7 +73,7 @@ public:
     bool            GetStrProp( int nProp, QString* pVal) ;
     bool            GetIntProp( int nProp, int* pVal) ;
     bool            GetHelpFromFile( QString* pszHelp) ;
-    QString         GetLog( ) ;
+    QString         GetLog() ;
     bool            WriteLog( const QString szLog) ;
     bool            ResetLog() ;
 

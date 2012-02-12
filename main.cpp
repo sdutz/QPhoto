@@ -19,14 +19,14 @@
 #include <QtGui/QApplication>
 #include "cphoto.h"
 
-int main(int argc, char *argv[])
+int main( int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication a( argc, argv) ;
     QCoreApplication::setOrganizationName( "Sdutz") ;
     QCoreApplication::setApplicationName( "QPhoto") ;
 
-    CPhoto w;
-    w.show();
+    CPhoto w ;
+    w.show() ;
 
-    return a.exec();
+    return a.exec() ;
 }

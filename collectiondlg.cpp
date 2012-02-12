@@ -18,65 +18,174 @@
 
 #include "collectiondlg.h"
 #include "ui_collectiondlg.h"
+#include "cphoto.h"
 
 
 //----------------------------------------------------
-CollectionDlg::CollectionDlg(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::CollectionDlg)
-{
-    ui->setupUi(this);
+#define BUTTONS     4
 
-    setWindowTitle( tr( "Collection"));
-    setFixedWidth( width());
-    m_pCollMgr = NULL ;
+//----------------------------------------------------
+CollectionDlg::CollectionDlg( QWidget *parent) :
+    QDialog( parent),
+    ui( new Ui::CollectionDlg)
+{
+    ui->setupUi( this) ;
+
+    setWindowTitle( tr( "Collection")) ;
+    setFixedWidth(  width()) ;
+    ui->preView->setAlignment( Qt::AlignCenter) ;
+    ui->preView->setText( tr( "Preview")) ;
+    m_pCollMgr   = NULL ;
+    m_pParent    = NULL ;
+    m_bAllowMove = false ;
+
+    SetIds() ;
+
+ui->AppendAllBtn->hide() ;
+ui->appendBtn->hide() ;
 }
 
 //----------------------------------------------------
 CollectionDlg::~CollectionDlg()
 {
-    delete ui;
+    delete ui ;
 }
 
 //----------------------------------------------------
-void CollectionDlg::SetMgr( CollectionMgr* pMgr)
+void CollectionDlg::SetIds()
 {
-    if ( pMgr != NULL)
-        m_pCollMgr = pMgr ;
+    ui->buttons->setId( ui->delBtn,       1) ;
+    ui->buttons->setId( ui->loadBtn,      2) ;
+    ui->buttons->setId( ui->AppendAllBtn, 3) ;
+    ui->buttons->setId( ui->appendBtn,    4) ;
 }
 
 //----------------------------------------------------
-void CollectionDlg::on_recordsList_itemDoubleClicked(QListWidgetItem *item)
+void CollectionDlg::UpdateDbView()
 {
-    ui->filesList->clear();
-    ui->filesList->addItems( m_pCollMgr->GetItemData( item->text()));
+    if ( m_pCollMgr->HasLastQueryMod())
+        PopulateRecordsList();
 }
 
 //----------------------------------------------------
-void CollectionDlg::DoHide()
+bool CollectionDlg::Initialize( CollectionMgr* pMgr, QDialog* pParent)
 {
-    hide() ;
-    setVisible( false);
+    m_pCollMgr = pMgr ;
+    m_pParent  = ( CPhoto*) pParent ;
+
+    return m_pCollMgr != NULL  &&  m_pParent != NULL ;
 }
 
 //----------------------------------------------------
-void CollectionDlg::DoShow( const QPoint& pos, double dHeight)
+void CollectionDlg::on_recordsList_itemDoubleClicked( QListWidgetItem *item)
 {
+    ui->filesList->clear() ;
+    ui->filesList->addItems( m_pCollMgr->GetItemData( item->text())) ;
+    if ( ui->filesList->count() > 0) {
+        QListWidgetItem* first = ui->filesList->item( 0) ;
+        ui->filesList->setItemSelected( first, true) ;
+        on_filesList_itemDoubleClicked( first) ;
+    }
+}
 
-    move( pos) ;
-    setFixedHeight( dHeight);
-    setVisible( true);
-    show() ;
-    raise();
-    activateWindow();
+//----------------------------------------------------
+void CollectionDlg::DoShowHide( bool bShow)
+{
+    if ( bShow) {
+        setVisible( true) ;
+        show() ;
+        raise() ;
+        activateWindow() ;
 
-    PopulateRecordsList() ;
+        PopulateRecordsList() ;
+    }
+    else {
+        hide() ;
+        setVisible( false) ;
+    }
 }
 
 //----------------------------------------------------
 void CollectionDlg::PopulateRecordsList()
 {
-    ui->recordsList->clear();
-    ui->recordsList->addItems( m_pCollMgr->GetItemsList());
-    on_recordsList_itemDoubleClicked( ui->recordsList->item(0)) ;
+    ui->recordsList->clear() ;
+    ui->recordsList->addItems( m_pCollMgr->GetItemsList()) ;
+    if ( ui->recordsList->count() > 0) {
+        QListWidgetItem* first = ui->recordsList->item( 0) ;
+        ui->recordsList->setItemSelected( first, true) ;
+        on_recordsList_itemDoubleClicked( first) ;
+    }
+}
+
+//----------------------------------------------------
+void CollectionDlg::on_filesList_itemDoubleClicked( QListWidgetItem *item)
+{
+    QImage imgTmp ;
+
+    ! imgTmp.load( item->text()) ?
+    ui->preView->setText(   tr( "No preview available")) :
+    ui->preView->setPixmap( QPixmap::fromImage( imgTmp.scaled( imgTmp.width()  * 0.25,
+                                                               imgTmp.height() * 0.25,
+                                                               Qt::KeepAspectRatio,
+                                                               Qt::FastTransformation))) ;
+}
+
+//----------------------------------------------------
+void CollectionDlg::moveEvent( QMoveEvent* event)
+{
+    if ( ! m_bAllowMove)
+        move( m_pos) ;
+}
+
+//----------------------------------------------------
+void CollectionDlg::UpdatePosHeight( const QPoint& pos, int height)
+{
+    int    i ;
+    int    diff ;
+    QPoint btnPos ;
+    QSize  size ;
+
+    diff         = this->height() - height ;
+    m_bAllowMove = true ;
+    move( pos) ;
+    m_bAllowMove = false ;
+    m_pos        = pos ;
+
+    setFixedHeight( height) ;
+    for ( i = 1 ;  i <= BUTTONS ;  i ++) {
+        btnPos = ui->buttons->button(i)->pos() ;
+        ui->buttons->button(i)->move( btnPos.x(), btnPos.y() - diff) ;
+    }
+
+    size = ui->preView->size() ;
+    ui->preView->resize( size.width(), size.height() - diff) ;
+    ui->frame->resize( size.width(), size.height() - diff) ;
+}
+
+//----------------------------------------------------
+void CollectionDlg::on_loadBtn_clicked()
+{
+    m_pParent->ShowList( GetCurrTextItem()) ;
+}
+
+//----------------------------------------------------
+void CollectionDlg::on_delBtn_clicked()
+{
+    int nCurr = ui->recordsList->currentRow() ;
+    int nNext = nCurr == ui->recordsList->count() - 1 ? 0 : nCurr ;
+
+    m_pCollMgr->DeleteItem( GetCurrTextItem()) ;
+    ui->recordsList->takeItem( nCurr) ;
+
+    if ( ui->recordsList->count() > 0) {
+        QListWidgetItem* pNext = ui->recordsList->item( nNext) ;
+        ui->recordsList->setItemSelected( pNext, true) ;
+        on_recordsList_itemDoubleClicked( pNext) ;
+    }
+}
+
+//----------------------------------------------------
+QString CollectionDlg::GetCurrTextItem()
+{
+    return ui->recordsList->currentItem()->text() ;
 }
