@@ -28,17 +28,17 @@
 
 
 //----------------------------------------------------
-#define MIN_WIDTH          814
-#define MIN_HEIGHT         764
-#define LEFT_BUTTON        5
-#define RIGHT_BUTTON       5
-#define SCENE_OFFS         20
-#define QPHOTO             "QPhoto"
-#define MSEC_INI_LOAD      200
+#define MIN_WIDTH     814
+#define MIN_HEIGHT    764
+#define LEFT_BUTTON   5
+#define RIGHT_BUTTON  5
+#define SCENE_OFFS    20
+#define QPHOTO        "QPhoto"
+#define MSEC_INI_LOAD 200
 
 
 //----------------------------------------------------
-#define SET_MOD            m_bChanged = true ;
+#define SET_MOD       m_bChanged = true ;
 
 //----------------------------------------------------
 CPhoto::CPhoto( QWidget *parent) :
@@ -133,7 +133,6 @@ QString CPhoto::GetLang( int nLang)
     }
 }
 
-
 //----------------------------------------------------
 void CPhoto::ChangeLang( int nLang)
 {
@@ -200,7 +199,6 @@ void CPhoto::SetBtnIcons()
     QIcon icon ;
     QSize pixSize ;
 
-
     GetPixBtnSize( ui->BtnLeft->size(), &pixSize) ;
     icon.addFile( "icons/arrow_left.png", pixSize) ;
     ui->BtnLeft->setIcon( icon) ;
@@ -245,17 +243,17 @@ void CPhoto::SetBtnIcons()
 //----------------------------------------------------
 void CPhoto::SetIds()
 {
-    ui->RightButtons->setId( ui->BtnPlus, 1)  ;
+    ui->RightButtons->setId( ui->BtnPlus,  1) ;
     ui->RightButtons->setId( ui->BtnMinus, 2) ;
-    ui->RightButtons->setId( ui->BtnLeft, 3) ;
+    ui->RightButtons->setId( ui->BtnLeft,  3) ;
     ui->RightButtons->setId( ui->BtnRight, 4) ;
-    ui->RightButtons->setId( ui->BtnExit, 5) ;
+    ui->RightButtons->setId( ui->BtnExit,  5) ;
 
-    ui->LeftButtons->setId( ui->BtnSave, 1) ;
-    ui->LeftButtons->setId( ui->BtnDel, 2) ;
-    ui->LeftButtons->setId( ui->BtnOpen,  3) ;
+    ui->LeftButtons->setId( ui->BtnSave,    1) ;
+    ui->LeftButtons->setId( ui->BtnDel,     2) ;
+    ui->LeftButtons->setId( ui->BtnOpen,    3) ;
     ui->LeftButtons->setId( ui->BtnLibrary, 4) ;
-    ui->LeftButtons->setId( ui->BtnConfig, 5) ;
+    ui->LeftButtons->setId( ui->BtnConfig,  5) ;
 }
 
 //----------------------------------------------------
@@ -338,27 +336,28 @@ void CPhoto::CreateActions()
 //----------------------------------------------------
 void CPhoto::RetranslateDialog()
 {
-    m_pMoveUpAct->setText( tr( "Move Up"))  ;
-    m_pMoveDownAct->setText( tr( "Move Down" )) ;
+    m_pMoveUpAct->setText( tr(         "Move Up"))  ;
+    m_pMoveDownAct->setText( tr(       "Move Down" )) ;
     m_pStartSlideShowAct->setText( tr( "Start SlideShow"))  ;
-    m_pZoomAllAct->setText( tr( "Zoom All")) ;
-    m_pShowFullScreen->setText( tr( "Show Fullscreen")) ;
-    m_pExitFullScreen->setText( tr(" Exit Fullscreen")) ;
-    m_pEndSlideShowAct->setText( tr( "End SlideShow")) ;
+    m_pZoomAllAct->setText( tr(        "Zoom All")) ;
+    m_pShowFullScreen->setText( tr(    "Show Fullscreen")) ;
+    m_pExitFullScreen->setText( tr(    "Exit Fullscreen")) ;
+    m_pEndSlideShowAct->setText( tr(   "End SlideShow")) ;
     m_pPauseSlideShowAct->setText( tr( "Pause SlideShow")) ;
-    m_pConfigAct->setText( tr( "Settings")) ;
+    m_pConfigAct->setText( tr(         "Settings")) ;
 
 
     ui->BtnConfig->setToolTip( tr( "Settings")) ;
-    ui->BtnDel->setToolTip( tr( "Delete")) ;
-    ui->BtnExit->setToolTip( tr( "Exit")) ;
-    ui->BtnOpen->setToolTip( tr( "Open")) ;
-    ui->BtnSave->setToolTip( tr( "Save")) ;
-    ui->BtnMinus->setToolTip( tr( "Zoom Out")) ;
-    ui->BtnPlus->setToolTip( tr( "Zoom in")) ;
-    ui->BtnLeft->setToolTip( tr( "See Previous Image")) ;
-    ui->BtnRight->setToolTip( tr( "See Next Image")) ;
+    ui->BtnDel->setToolTip( tr(    "Delete")) ;
+    ui->BtnExit->setToolTip( tr(   "Exit")) ;
+    ui->BtnOpen->setToolTip( tr(   "Open")) ;
+    ui->BtnSave->setToolTip( tr(   "Save")) ;
+    ui->BtnMinus->setToolTip( tr(  "Zoom Out")) ;
+    ui->BtnPlus->setToolTip( tr(   "Zoom in")) ;
+    ui->BtnLeft->setToolTip( tr(   "See Previous Image")) ;
+    ui->BtnRight->setToolTip( tr(  "See Next Image")) ;
 
+    m_cCollDlg.RetranslateDialog() ;
 }
 
 //----------------------------------------------------
@@ -458,7 +457,7 @@ void CPhoto::LoadImage( bool bShow)
        return ;
 
     ShowPhoto( true, bShow) ;
-    m_nCurr = ui->ImgList->count() - 1 ;
+    m_nCurr ++ ;
     ui->ImgList->setCurrentRow( m_nCurr) ;
 
     SET_MOD
@@ -477,7 +476,7 @@ bool CPhoto::ShowPhoto( bool bToAddToList, bool bShow)
         setWindowTitle( title) ;
         if( bToAddToList  &&  ! m_pConf->FindInList( m_szFileName)) {
             m_pConf->AddToList( m_szFileName) ;
-            ui->ImgList->addItem( m_szFileName) ;
+            ui->ImgList->insertItem( ui->ImgList->currentRow() + 1, m_szFileName) ;
         }
     }
     else {

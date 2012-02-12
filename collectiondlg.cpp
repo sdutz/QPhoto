@@ -19,6 +19,7 @@
 #include "collectiondlg.h"
 #include "ui_collectiondlg.h"
 #include "cphoto.h"
+#include "util.h"
 
 
 //----------------------------------------------------
@@ -30,8 +31,6 @@ CollectionDlg::CollectionDlg( QWidget *parent) :
     ui( new Ui::CollectionDlg)
 {
     ui->setupUi( this) ;
-
-    setWindowTitle( tr( "Collection")) ;
     setFixedWidth(  width()) ;
     ui->preView->setAlignment( Qt::AlignCenter) ;
     ui->preView->setText( tr( "Preview")) ;
@@ -40,6 +39,8 @@ CollectionDlg::CollectionDlg( QWidget *parent) :
     m_bAllowMove = false ;
 
     SetIds() ;
+    SetBtnIcons() ;
+    RetranslateDialog() ;
 
 ui->AppendAllBtn->hide() ;
 ui->appendBtn->hide() ;
@@ -61,10 +62,33 @@ void CollectionDlg::SetIds()
 }
 
 //----------------------------------------------------
+void CollectionDlg::SetBtnIcons()
+{
+    QIcon icon ;
+    QSize pixSize ;
+
+    GetPixBtnSize( ui->loadBtn->size(), &pixSize) ;
+    icon.addFile( "icons/book_go.png", pixSize) ;
+    ui->loadBtn->setIcon( icon) ;
+
+    GetPixBtnSize( ui->delBtn->size(), &pixSize) ;
+    icon.addFile( "icons/book_delete.png", pixSize) ;
+    ui->delBtn->setIcon( icon) ;
+}
+
+//----------------------------------------------------
+void CollectionDlg::RetranslateDialog()
+{
+    setWindowTitle( tr( "Collection")) ;
+    ui->loadBtn->setToolTip( tr( "Load from library")) ;
+    ui->delBtn->setToolTip( tr( "Delete from library")) ;
+}
+
+//----------------------------------------------------
 void CollectionDlg::UpdateDbView()
 {
     if ( m_pCollMgr->HasLastQueryMod())
-        PopulateRecordsList();
+        PopulateRecordsList() ;
 }
 
 //----------------------------------------------------

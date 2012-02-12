@@ -41,6 +41,8 @@ public:
     void DoShowHide(      bool bShow) ;
     void UpdatePosHeight( const QPoint& pos, int height) ;
     void UpdateDbView() ;
+    void RetranslateDialog() ;
+    void SetBtnIcons() ;
 
 private slots:
     void on_recordsList_itemDoubleClicked(QListWidgetItem *item) ;

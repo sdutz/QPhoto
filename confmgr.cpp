@@ -69,7 +69,7 @@ void ConfMgr::WriteList( const QString& szFile, bool bSaveDir)
         m_aStrProp[ PROP_STR_LAST_DIR_LIST] = nIdx > 0 ? szFile.left( nIdx) : "" ;
     }
 
-    m_pDbMgr->InsertItem( szFile, m_lszList) ;
+    m_pDbMgr->InsertItem( szFile.isEmpty() ? m_szList : szFile, m_lszList) ;
 
     QFile cFile( szMyFile) ;
 
@@ -93,7 +93,12 @@ void ConfMgr::LoadList( const QString& szFile)
     QString szMyFile ;
 
     ClearList() ;
-    szMyFile = szFile.isEmpty() ? HISTORY_FILE : szFile ;
+    if ( szFile.isEmpty())
+        szMyFile = HISTORY_FILE ;
+    else {
+        szMyFile = szFile ;
+        m_szList = szMyFile ;
+    }
 
     QFile cFile( szMyFile) ;
 
