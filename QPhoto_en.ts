@@ -149,18 +149,7 @@
         <location filename="collectiondlg.ui" line="81"/>
         <location filename="collectiondlg.ui" line="97"/>
         <location filename="collectiondlg.ui" line="113"/>
-        <location filename="collectiondlg.ui" line="129"/>
         <source>buttons</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="collectiondlg.ui" line="110"/>
-        <source>Append</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="collectiondlg.ui" line="126"/>
-        <source>Append all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -184,7 +173,12 @@
         <translation>Delete from library</translation>
     </message>
     <message>
-        <location filename="collectiondlg.cpp" line="150"/>
+        <location filename="collectiondlg.cpp" line="85"/>
+        <source>Load current image preview to playlist</source>
+        <translation type="unfinished">Load current image preview to playlist</translation>
+    </message>
+    <message>
+        <location filename="collectiondlg.cpp" line="151"/>
         <source>No preview available</source>
         <translation>No preview available</translation>
     </message>

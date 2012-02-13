@@ -76,10 +76,12 @@ public:
     QString         GetLog() ;
     bool            WriteLog( const QString szLog) ;
     bool            ResetLog() ;
+    QString         GetLang( int nLang) ;
 
 private :
     void            LoadSettings() ;
     void            WriteSettings() ;
+    QString         GetHelpFile() ;
 
 private :
     CollectionMgr*  m_pDbMgr ;

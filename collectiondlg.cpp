@@ -23,7 +23,7 @@
 
 
 //----------------------------------------------------
-#define BUTTONS     4
+#define BUTTONS     3
 
 //----------------------------------------------------
 CollectionDlg::CollectionDlg( QWidget *parent) :
@@ -41,9 +41,6 @@ CollectionDlg::CollectionDlg( QWidget *parent) :
     SetIds() ;
     SetBtnIcons() ;
     RetranslateDialog() ;
-
-ui->AppendAllBtn->hide() ;
-ui->appendBtn->hide() ;
 }
 
 //----------------------------------------------------
@@ -55,10 +52,9 @@ CollectionDlg::~CollectionDlg()
 //----------------------------------------------------
 void CollectionDlg::SetIds()
 {
-    ui->buttons->setId( ui->delBtn,       1) ;
-    ui->buttons->setId( ui->loadBtn,      2) ;
-    ui->buttons->setId( ui->AppendAllBtn, 3) ;
-    ui->buttons->setId( ui->appendBtn,    4) ;
+    ui->buttons->setId( ui->delBtn,    1) ;
+    ui->buttons->setId( ui->loadBtn,   2) ;
+    ui->buttons->setId( ui->appendBtn, 3) ;
 }
 
 //----------------------------------------------------
@@ -74,6 +70,10 @@ void CollectionDlg::SetBtnIcons()
     GetPixBtnSize( ui->delBtn->size(), &pixSize) ;
     icon.addFile( "icons/book_delete.png", pixSize) ;
     ui->delBtn->setIcon( icon) ;
+
+    GetPixBtnSize( ui->appendBtn->size(), &pixSize) ;
+    icon.addFile( "icons/picture_add.png", pixSize) ;
+    ui->appendBtn->setIcon( icon) ;
 }
 
 //----------------------------------------------------
@@ -82,6 +82,7 @@ void CollectionDlg::RetranslateDialog()
     setWindowTitle( tr( "Collection")) ;
     ui->loadBtn->setToolTip( tr( "Load from library")) ;
     ui->delBtn->setToolTip( tr( "Delete from library")) ;
+    ui->appendBtn->setToolTip( tr( "Load current image preview to playlist")) ;
 }
 
 //----------------------------------------------------
@@ -209,7 +210,14 @@ void CollectionDlg::on_delBtn_clicked()
 }
 
 //----------------------------------------------------
+void CollectionDlg::on_appendBtn_clicked()
+{
+    m_pParent->on_ImgDropped( ui->filesList->currentItem()->text(), true) ;
+}
+
+//----------------------------------------------------
 QString CollectionDlg::GetCurrTextItem()
 {
     return ui->recordsList->currentItem()->text() ;
 }
+

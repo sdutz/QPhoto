@@ -113,24 +113,11 @@ void CPhoto::InitLang()
     m_pConf->GetIntProp( PROP_INT_LANG, &nLang) ;
 
     szLangFile  = "QPhoto_" ;
-    szLangFile += GetLang( nLang) ;
+    szLangFile += m_pConf->GetLang( nLang) ;
 
     m_cTranslator.load( szLangFile) ;
 
     QCoreApplication::installTranslator( &m_cTranslator) ;
-}
-
-//----------------------------------------------------
-QString CPhoto::GetLang( int nLang)
-{
-    switch ( nLang) {
-        case ( ENGLISH) :
-            return "en" ;
-        case ( ITALIAN) :
-            return "it" ;
-        default :
-            return "en" ;
-    }
 }
 
 //----------------------------------------------------
@@ -141,7 +128,7 @@ void CPhoto::ChangeLang( int nLang)
     QCoreApplication::removeTranslator( &m_cTranslator) ;
 
     szLangFile = "QPhoto_" ;
-    szLangFile += GetLang( nLang) ;
+    szLangFile += m_pConf->GetLang( nLang) ;
 
     m_cTranslator.load( szLangFile) ;
 
@@ -272,7 +259,7 @@ void CPhoto::CreateTimers()
     m_pTimer = new QTimer( this) ;
     connect( m_pTimer, SIGNAL( timeout()), this, SLOT( on_BtnRight_clicked())) ;
 
-    m_pLoadIniTimer    = new QTimer( this) ;
+    m_pLoadIniTimer = new QTimer( this) ;
     connect( m_pLoadIniTimer, SIGNAL( timeout()), this, SLOT( OnIniLoad())) ;
 
     m_pFullScreenTimer = new QTimer( this) ;
@@ -358,6 +345,39 @@ void CPhoto::RetranslateDialog()
     ui->BtnRight->setToolTip( tr(  "See Next Image")) ;
 
     m_cCollDlg.RetranslateDialog() ;
+}
+
+//----------------------------------------------------
+void CPhoto::on_UrlDropped( const QString& szUrl, bool bShow)
+{
+    QDir dir ( szUrl) ;
+
+    dir.exists() ? on_DirDropped( szUrl, bShow) : on_ImgDropped( szUrl, bShow) ;
+}
+
+//----------------------------------------------------
+void CPhoto::on_DirDropped( const QString& szDir, bool bShow)
+{
+    int           n ;
+    int           nTot ;
+    QString       szExt ;
+    QDir          dir( szDir) ;
+    QFileInfo     fileInfo ;
+    QFileInfoList list ;
+
+    dir.setFilter(  QDir::Files | QDir::NoSymLinks) ;
+    dir.setSorting( QDir::Type) ;
+
+    list = dir.entryInfoList() ;
+    nTot = list.count() ;
+    for ( n = 0 ;  n < nTot ;  n ++) {
+        fileInfo = list.at( n) ;
+        szExt    = fileInfo.suffix() ;
+        if ( QString::compare( szExt, "jpg",  Qt::CaseInsensitive) != 0  &&
+             QString::compare( szExt, "jpeg", Qt::CaseInsensitive) != 0)
+            continue ;
+        on_ImgDropped( fileInfo.filePath(), n == nTot -1 ? bShow : false) ;
+    }
 }
 
 //----------------------------------------------------
@@ -721,7 +741,7 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
             m_player->pause();
         break ;
 
-        case Qt::Key_Pause :
+        case Qt::Key_B :
         OnPauseSlideShow();
         break ;
     }

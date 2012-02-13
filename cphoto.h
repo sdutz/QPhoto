@@ -43,6 +43,8 @@ public:
     explicit CPhoto(QWidget *parent = 0);
     ~CPhoto();
     void     on_ImgDropped( const QString& szFile, bool bShow) ;
+    void     on_DirDropped( const QString& szDir,  bool bShow) ;
+    void     on_UrlDropped( const QString& szUrl,  bool bShow) ;
     void     EndDrag() ;
     QSize    GetSceneSize() ;
     void     ShowList( const QString& szFile = "") ;
@@ -77,7 +79,6 @@ private :
     void InitPlayer() ;
     void InitLang() ;
     void ChangeLang( int nLang) ;
-    QString GetLang( int nLang) ;
     void RetranslateDialog() ;
     void UpdateCollDlg() ;
 

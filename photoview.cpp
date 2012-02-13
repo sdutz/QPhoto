@@ -501,7 +501,7 @@ void PhotoView::dropEvent( QDropEvent *event)
 
     for ( n = 0 ;  n < pData->urls().count() ;  n ++) {
         url = pData->urls().at(n) ;
-        m_pParent->on_ImgDropped( url.toLocalFile(), n == pData->urls().count() - 1);
+        m_pParent->on_UrlDropped( url.toLocalFile(), n == pData->urls().count() - 1);
     }
 }
 

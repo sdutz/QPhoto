@@ -149,18 +149,7 @@
         <location filename="collectiondlg.ui" line="81"/>
         <location filename="collectiondlg.ui" line="97"/>
         <location filename="collectiondlg.ui" line="113"/>
-        <location filename="collectiondlg.ui" line="129"/>
         <source>buttons</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="collectiondlg.ui" line="110"/>
-        <source>Append</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="collectiondlg.ui" line="126"/>
-        <source>Append all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -184,7 +173,12 @@
         <translation>Cancella da libreria</translation>
     </message>
     <message>
-        <location filename="collectiondlg.cpp" line="150"/>
+        <location filename="collectiondlg.cpp" line="85"/>
+        <source>Load current image preview to playlist</source>
+        <translation type="unfinished">Carica l&apos;anteprima corrente nella playlist</translation>
+    </message>
+    <message>
+        <location filename="collectiondlg.cpp" line="151"/>
         <source>No preview available</source>
         <translation>Nessuna anteprima disponibile</translation>
     </message>

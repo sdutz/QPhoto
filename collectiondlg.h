@@ -50,6 +50,7 @@ private slots:
     void moveEvent( QMoveEvent* event) ;
     void on_loadBtn_clicked() ;
     void on_delBtn_clicked() ;
+    void on_appendBtn_clicked() ;
 
 private :
     void    PopulateRecordsList() ;

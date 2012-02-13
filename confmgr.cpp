@@ -237,7 +237,7 @@ void ConfMgr::ShowSettingsDlg()
 //----------------------------------------------------
 bool ConfMgr::GetHelpFromFile( QString* pszHelp)
 {
-    QFile       file( HELP_FILE_ENG) ;
+    QFile       file( GetHelpFile()) ;
     QByteArray  pByte ;
 
     if ( pszHelp == NULL)
@@ -254,6 +254,16 @@ bool ConfMgr::GetHelpFromFile( QString* pszHelp)
     file.close();
 
     return true ;
+}
+
+//----------------------------------------------------
+QString ConfMgr::GetHelpFile()
+{
+    QString szHelp = QString( "help-%1.txt").arg( GetLang( m_aIntProp[ PROP_INT_LANG])) ;
+
+    QFile file( szHelp) ;
+
+    return file.exists() ? szHelp : HELP_FILE_ENG ;
 }
 
 //----------------------------------------------------
@@ -332,3 +342,15 @@ bool ConfMgr::GetIntProp( int nProp, int* pVal)
     return true ;
 }
 
+//----------------------------------------------------
+QString ConfMgr::GetLang( int nLang)
+{
+    switch ( nLang) {
+        case ( ENGLISH) :
+            return "en" ;
+        case ( ITALIAN) :
+            return "it" ;
+        default :
+            return "en" ;
+    }
+}
