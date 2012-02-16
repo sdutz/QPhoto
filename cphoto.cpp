@@ -206,9 +206,9 @@ void CPhoto::SetBtnIcons()
     icon.addFile( "icons/picture_delete.png", pixSize) ;
     ui->BtnDel->setIcon( icon) ;
 
-    GetPixBtnSize( ui->BtnSave->size(), &pixSize) ;
-    icon.addFile( "icons/picture_save.png", pixSize) ;
-    ui->BtnSave->setIcon( icon) ;
+    GetPixBtnSize( ui->BtnNotes->size(), &pixSize) ;
+    icon.addFile( "icons/picture_edit.png", pixSize) ;
+    ui->BtnNotes->setIcon( icon) ;
 
     GetPixBtnSize( ui->BtnConfig->size(), &pixSize) ;
     icon.addFile( "icons/wrench.png", pixSize) ;
@@ -236,7 +236,7 @@ void CPhoto::SetIds()
     ui->RightButtons->setId( ui->BtnRight, 4) ;
     ui->RightButtons->setId( ui->BtnExit,  5) ;
 
-    ui->LeftButtons->setId( ui->BtnSave,    1) ;
+    ui->LeftButtons->setId( ui->BtnNotes,   1) ;
     ui->LeftButtons->setId( ui->BtnDel,     2) ;
     ui->LeftButtons->setId( ui->BtnOpen,    3) ;
     ui->LeftButtons->setId( ui->BtnLibrary, 4) ;
@@ -338,7 +338,7 @@ void CPhoto::RetranslateDialog()
     ui->BtnDel->setToolTip( tr(    "Delete")) ;
     ui->BtnExit->setToolTip( tr(   "Exit")) ;
     ui->BtnOpen->setToolTip( tr(   "Open")) ;
-    ui->BtnSave->setToolTip( tr(   "Save")) ;
+    ui->BtnNotes->setToolTip( tr(  "Notes")) ;
     ui->BtnMinus->setToolTip( tr(  "Zoom Out")) ;
     ui->BtnPlus->setToolTip( tr(   "Zoom in")) ;
     ui->BtnLeft->setToolTip( tr(   "See Previous Image")) ;
@@ -780,7 +780,7 @@ void CPhoto::on_BtnDel_clicked()
 }
 
 //----------------------------------------------------
-void CPhoto::on_BtnSave_clicked()
+void CPhoto::OnSave()
 {
     QString szFile ;
     QString szLastDir ;

@@ -52,6 +52,8 @@ private slots:
     void on_delBtn_clicked() ;
     void on_appendBtn_clicked() ;
 
+    void on_saveBtn_clicked();
+
 private :
     void    PopulateRecordsList() ;
     void    SetIds() ;

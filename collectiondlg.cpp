@@ -23,7 +23,7 @@
 
 
 //----------------------------------------------------
-#define BUTTONS     3
+#define BUTTONS     4
 
 //----------------------------------------------------
 CollectionDlg::CollectionDlg( QWidget *parent) :
@@ -54,7 +54,8 @@ void CollectionDlg::SetIds()
 {
     ui->buttons->setId( ui->delBtn,    1) ;
     ui->buttons->setId( ui->loadBtn,   2) ;
-    ui->buttons->setId( ui->appendBtn, 3) ;
+    ui->buttons->setId( ui->saveBtn,   3) ;
+    ui->buttons->setId( ui->appendBtn, 4) ;
 }
 
 //----------------------------------------------------
@@ -71,6 +72,10 @@ void CollectionDlg::SetBtnIcons()
     icon.addFile( "icons/book_delete.png", pixSize) ;
     ui->delBtn->setIcon( icon) ;
 
+    GetPixBtnSize( ui->saveBtn->size(), &pixSize) ;
+    icon.addFile( "icons/picture_save.png", pixSize) ;
+    ui->saveBtn->setIcon( icon) ;
+
     GetPixBtnSize( ui->appendBtn->size(), &pixSize) ;
     icon.addFile( "icons/picture_add.png", pixSize) ;
     ui->appendBtn->setIcon( icon) ;
@@ -79,9 +84,10 @@ void CollectionDlg::SetBtnIcons()
 //----------------------------------------------------
 void CollectionDlg::RetranslateDialog()
 {
-    setWindowTitle( tr( "Collection")) ;
-    ui->loadBtn->setToolTip( tr( "Load from library")) ;
-    ui->delBtn->setToolTip( tr( "Delete from library")) ;
+    setWindowTitle( tr(            "Collection")) ;
+    ui->loadBtn->setToolTip( tr(   "Load from library")) ;
+    ui->delBtn->setToolTip( tr(    "Delete from library")) ;
+    ui->saveBtn->setToolTip( tr(   "Save playlist to library")) ;
     ui->appendBtn->setToolTip( tr( "Load current image preview to playlist")) ;
 }
 
@@ -221,3 +227,8 @@ QString CollectionDlg::GetCurrTextItem()
     return ui->recordsList->currentItem()->text() ;
 }
 
+//----------------------------------------------------
+void CollectionDlg::on_saveBtn_clicked()
+{
+    m_pParent->OnSave() ;
+}

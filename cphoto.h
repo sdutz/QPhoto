@@ -48,6 +48,7 @@ public:
     void     EndDrag() ;
     QSize    GetSceneSize() ;
     void     ShowList( const QString& szFile = "") ;
+     void    OnSave();
 
 
 private :
@@ -99,7 +100,6 @@ private slots:
     void moveEvent(       QMoveEvent* event);
     void closeEvent(      QCloseEvent * e) ;
     void on_BtnDel_clicked();
-    void on_BtnSave_clicked();
     void OnMoveCurrUp() ;
     void OnMoveCurrDown() ;
     void OnZoomAll() ;

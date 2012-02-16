@@ -141,7 +141,7 @@
     <string>RightButtons</string>
    </attribute>
   </widget>
-  <widget class="QPushButton" name="BtnSave">
+  <widget class="QPushButton" name="BtnNotes">
    <property name="geometry">
     <rect>
      <x>20</x>
