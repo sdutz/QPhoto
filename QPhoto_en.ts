@@ -33,27 +33,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="333"/>
+        <location filename="cphoto.cpp" line="312"/>
         <source>Move Up</source>
         <translation>Move up</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="334"/>
+        <location filename="cphoto.cpp" line="313"/>
         <source>Move Down</source>
         <translation>Move down</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="335"/>
+        <location filename="cphoto.cpp" line="314"/>
         <source>Start SlideShow</source>
         <translation>Start Slideshow</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="336"/>
+        <location filename="cphoto.cpp" line="315"/>
         <source>Zoom All</source>
         <translation>Zoom all</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="337"/>
+        <location filename="cphoto.cpp" line="316"/>
         <source>Show Fullscreen</source>
         <translation>Show fullscreen</translation>
     </message>
@@ -62,43 +62,48 @@
         <translation type="obsolete">Exit fullscreen</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="338"/>
+        <location filename="cphoto.cpp" line="317"/>
         <source>Exit Fullscreen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="339"/>
+        <location filename="cphoto.cpp" line="318"/>
         <source>End SlideShow</source>
         <translation>End slideshow</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="340"/>
+        <location filename="cphoto.cpp" line="319"/>
         <source>Pause SlideShow</source>
         <translation>Pause SlideShow</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="341"/>
-        <location filename="cphoto.cpp" line="344"/>
+        <location filename="cphoto.cpp" line="320"/>
+        <location filename="cphoto.cpp" line="324"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="345"/>
+        <location filename="cphoto.cpp" line="321"/>
+        <source>Edit Note</source>
+        <translation>Edit note</translation>
+    </message>
+    <message>
+        <location filename="cphoto.cpp" line="325"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="346"/>
+        <location filename="cphoto.cpp" line="326"/>
         <source>Exit</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="347"/>
+        <location filename="cphoto.cpp" line="327"/>
         <source>Open</source>
         <translation>Open</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="348"/>
+        <location filename="cphoto.cpp" line="328"/>
         <source>Notes</source>
         <translation>Notes</translation>
     </message>
@@ -107,32 +112,32 @@
         <translation type="obsolete">Save</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="349"/>
+        <location filename="cphoto.cpp" line="329"/>
         <source>Zoom Out</source>
         <translation>Zoom Out</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="350"/>
+        <location filename="cphoto.cpp" line="330"/>
         <source>Zoom in</source>
         <translation>Zoom in</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="351"/>
+        <location filename="cphoto.cpp" line="331"/>
         <source>See Previous Image</source>
         <translation>Show Previous Image</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="352"/>
+        <location filename="cphoto.cpp" line="332"/>
         <source>See Next Image</source>
         <translation>Show next image</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="450"/>
+        <location filename="cphoto.cpp" line="432"/>
         <source>Open List</source>
         <translation>Open List</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="472"/>
+        <location filename="cphoto.cpp" line="453"/>
         <source>Open Images</source>
         <translation>Open Images</translation>
     </message>
@@ -179,12 +184,12 @@
     <message>
         <location filename="collectiondlg.cpp" line="90"/>
         <source>Save playlist to library</source>
-        <translation type="unfinished"></translation>
+        <translation>Save playlist to library</translation>
     </message>
     <message>
         <location filename="collectiondlg.cpp" line="91"/>
         <source>Load current image preview to playlist</source>
-        <translation type="unfinished">Load current image preview to playlist</translation>
+        <translation>Load current image preview to playlist</translation>
     </message>
     <message>
         <location filename="collectiondlg.cpp" line="157"/>
@@ -197,22 +202,22 @@
     <message>
         <location filename="errordlg.ui" line="20"/>
         <source>Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Error Dialog</translation>
     </message>
     <message>
         <location filename="errordlg.ui" line="42"/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>Clear</translation>
     </message>
     <message>
         <location filename="errordlg.ui" line="55"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Close</translation>
     </message>
     <message>
-        <location filename="errordlg.cpp" line="33"/>
+        <location filename="errordlg.cpp" line="34"/>
         <source>Error Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Error dialog</translation>
     </message>
 </context>
 <context>
@@ -222,11 +227,26 @@
         <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="musicmgr.cpp" line="35"/>
+        <source>Music Manager</source>
+        <translation>Music Manager</translation>
+    </message>
+    <message>
+        <location filename="musicmgr.cpp" line="54"/>
+        <source>Add Music</source>
+        <translation>Add music</translation>
+    </message>
+    <message>
+        <location filename="musicmgr.cpp" line="103"/>
+        <source>Open Files</source>
+        <translation>Open Files</translation>
+    </message>
 </context>
 <context>
     <name>PhotoView</name>
     <message>
-        <location filename="photoview.cpp" line="235"/>
+        <location filename="photoview.cpp" line="226"/>
         <source>Insert your notes</source>
         <translation>Insert your notes</translation>
     </message>
@@ -240,13 +260,13 @@
     </message>
     <message>
         <location filename="settingsdlg.ui" line="42"/>
-        <location filename="settingsdlg.cpp" line="75"/>
+        <location filename="settingsdlg.cpp" line="72"/>
         <source>Default</source>
         <translation>Default</translation>
     </message>
     <message>
         <location filename="settingsdlg.ui" line="58"/>
-        <location filename="settingsdlg.cpp" line="71"/>
+        <location filename="settingsdlg.cpp" line="68"/>
         <source>Choose Color</source>
         <translation>Choose Color</translation>
     </message>
@@ -257,13 +277,13 @@
     </message>
     <message>
         <location filename="settingsdlg.ui" line="100"/>
-        <location filename="settingsdlg.cpp" line="73"/>
+        <location filename="settingsdlg.cpp" line="70"/>
         <source>Choose Font</source>
         <translation>Choose Font</translation>
     </message>
     <message>
         <location filename="settingsdlg.ui" line="136"/>
-        <location filename="settingsdlg.cpp" line="72"/>
+        <location filename="settingsdlg.cpp" line="69"/>
         <source>Fade type</source>
         <translation>Fade type</translation>
     </message>
@@ -274,27 +294,37 @@
     </message>
     <message>
         <location filename="settingsdlg.ui" line="175"/>
-        <location filename="settingsdlg.cpp" line="74"/>
+        <location filename="settingsdlg.cpp" line="71"/>
         <source>Choose Language</source>
         <translation>Choose Language</translation>
     </message>
     <message>
-        <location filename="settingsdlg.cpp" line="36"/>
+        <location filename="settingsdlg.cpp" line="35"/>
         <source>None</source>
         <translation>None</translation>
     </message>
     <message>
-        <location filename="settingsdlg.cpp" line="37"/>
+        <location filename="settingsdlg.cpp" line="36"/>
         <source>On SlideShow</source>
         <translation>On Slideshow</translation>
     </message>
     <message>
-        <location filename="settingsdlg.cpp" line="38"/>
+        <location filename="settingsdlg.cpp" line="37"/>
         <source>Always</source>
         <translation>Always</translation>
     </message>
     <message>
-        <location filename="settingsdlg.cpp" line="43"/>
+        <location filename="settingsdlg.cpp" line="39"/>
+        <source>English</source>
+        <translation>English</translation>
+    </message>
+    <message>
+        <location filename="settingsdlg.cpp" line="40"/>
+        <source>Italian</source>
+        <translation>Italian</translation>
+    </message>
+    <message>
+        <location filename="settingsdlg.cpp" line="42"/>
         <source>Settings dialog</source>
         <translation>Settings dialog</translation>
     </message>

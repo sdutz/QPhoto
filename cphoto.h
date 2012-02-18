@@ -128,6 +128,8 @@ private:
     QString              m_szFileName ;
     QString              m_szPrev ;
     QString              m_szLog ;
+    QString              m_szExt ;
+    QString              m_szFilters ;
     QAction*             m_pMoveUpAct ;
     QAction*             m_pMoveDownAct ;
     QAction*             m_pZoomAllAct ;

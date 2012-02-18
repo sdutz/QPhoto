@@ -23,6 +23,7 @@
 #include <QUrl>
 #include <QGraphicsSceneDragDropEvent>
 #include <QInputDialog>
+#include "macro.h"
 
 //----------------------------------------------------
 #define SCALE_FACTOR_MINUS 0.9
@@ -30,8 +31,6 @@
 #define SCALE_FACTOR       0.1
 #define OPACITY_FACTOR     0.1
 
-//----------------------------------------------------
-#define VALIDPTR( p)       if ( p != NULL)
 
 //----------------------------------------------------
 PhotoView::PhotoView(QWidget *parent) :
@@ -66,10 +65,10 @@ PhotoView::PhotoView(QWidget *parent) :
 //----------------------------------------------------
 PhotoView::~PhotoView()
 {
-    VALIDPTR( m_pScene)         delete m_pScene ;
-    VALIDPTR( m_pTextTimer)     delete m_pTextTimer ;
-    VALIDPTR( m_pFadeTimer)     delete m_pFadeTimer ;
-    VALIDPTR( m_pControlsTimer) delete m_pControlsTimer ;
+    SAFEDEL( m_pScene) ;
+    SAFEDEL( m_pTextTimer) ;
+    SAFEDEL( m_pFadeTimer) ;
+    SAFEDEL( m_pControlsTimer) ;
 }
 
 //----------------------------------------------------
@@ -184,8 +183,8 @@ void PhotoView::mouseMoveEvent( QMouseEvent* e)
         rect.setY( ptP.y()) ;
     }
 
-    rect.setWidth(  abs( nWidth));
-    rect.setHeight( abs( nHeight));
+    rect.setWidth(  abs( nWidth)) ;
+    rect.setHeight( abs( nHeight)) ;
 
     m_pRect = m_pScene->addRect( rect, pen) ;
 }
@@ -196,8 +195,8 @@ void PhotoView::mouseReleaseEvent( QMouseEvent* e)
 {
     if ( e->type() == QEvent::MouseButtonRelease) {
         if ( e->button() == Qt::LeftButton  &&  m_bDrag) {
-            EndZoomRect();
-            m_pParent->EndDrag();
+            EndZoomRect() ;
+            m_pParent->EndDrag() ;
         }
     }
 
@@ -210,7 +209,7 @@ void PhotoView::wheelEvent( QWheelEvent* e)
     if ( ! m_bShift)
         QGraphicsView::wheelEvent( e) ;
     else
-        e->delta() > 0 ? ZoomIn() : ZoomOut();
+        e->delta() > 0 ? ZoomIn() : ZoomOut() ;
 }
 
 //----------------------------------------------------

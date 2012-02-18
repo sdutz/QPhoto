@@ -36,14 +36,13 @@ public:
     explicit MusicMgr(QWidget *parent = 0);
     ~MusicMgr();
     void SetInitList( const QString& szFiles) ;
-    void GetList( QString* pszFiles) ;
+    void GetList(     QString* pszFiles) ;
 
 protected:
-    void    dragEnterEvent(   QDragEnterEvent *event);
-    void    dropEvent(        QDropEvent *event);
-    void    dragLeaveEvent(   QDragLeaveEvent *event);
-    void    dragMoveEvent(    QDragMoveEvent *event);
-
+    void dragEnterEvent(   QDragEnterEvent *event);
+    void dropEvent(        QDropEvent *event);
+    void dragLeaveEvent(   QDragLeaveEvent *event);
+    void dragMoveEvent(    QDragMoveEvent *event);
 
 private :
     void SetBtnIcons() ;
@@ -51,26 +50,21 @@ private :
     void SetToolTips() ;
 
 private slots:
-    void on_BtnAdd_clicked();
-
-    void on_BtnRemove_clicked();
-
-    void on_BtnPreviewStop_clicked();
-
-    void on_BtnCancel_clicked();
-
-    void on_BtnOk_clicked();
-
-    void keyPressEvent (  QKeyEvent * e ) ;
-
-    void keyReleaseEvent(  QKeyEvent * e ) ;
-
+    void on_BtnAdd_clicked() ;
+    void on_BtnRemove_clicked() ;
+    void on_BtnPreviewStop_clicked() ;
+    void on_BtnCancel_clicked() ;
+    void on_BtnOk_clicked() ;
+    void keyPressEvent (  QKeyEvent* e) ;
+    void keyReleaseEvent( QKeyEvent* e) ;
     void on_BtnPreviewStart_clicked();
-
-    void on_SongsList_itemDoubleClicked(QListWidgetItem* item);
+    void on_SongsList_itemDoubleClicked(QListWidgetItem* item) ;
 
 private:
     Ui::MusicMgr*        ui;
+    QString              m_szExt ;
+    QString              m_szFilters ;
+    QString              m_szFolder ;
     QStringList          m_lFilesList ;
     bool                 m_bShiftPressed ;
     Phonon::MediaObject* m_player ;

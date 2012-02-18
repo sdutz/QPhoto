@@ -18,6 +18,7 @@
 
 #include "errordlg.h"
 #include "ui_errordlg.h"
+#include "macro.h"
 
 
 //----------------------------------------------------
@@ -56,7 +57,6 @@ void ErrorDlg::on_CloseBtn_clicked()
     DoHide();
 }
 
-
 //----------------------------------------------------
 void ErrorDlg::DoHide()
 {
@@ -86,8 +86,7 @@ void ErrorDlg::DoShow( const QRect& cRect, const QString& szLog)
 //----------------------------------------------------
 bool ErrorDlg::SetMgr( ConfMgr* pConf)
 {
-    if ( pConf == NULL)
-        return false ;
+    CHECK_PTR_PARAM( pConf)
 
     m_pConf = pConf ;
     return true ;

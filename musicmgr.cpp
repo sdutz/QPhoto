@@ -1,3 +1,21 @@
+/*
+    QPhoto: a small gallery generator
+    Copyright (C) <Lorenzo Zambelli>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "musicmgr.h"
 #include "ui_musicmgr.h"
 #include "util.h"
@@ -14,99 +32,98 @@ MusicMgr::MusicMgr(QWidget *parent) :
     ui->setupUi(this);
     setMinimumSize( width(), height());
     setMaximumSize( width(), height());
-    setWindowTitle( "Music Manager");
+    setWindowTitle( tr( "Music Manager"));
     m_bShiftPressed = false ;
-    setAcceptDrops( true);
-    m_player = NULL ;
-    SetBtnIcons();
-    SetToolTips();
+    m_player        = NULL ;
+    m_szExt         = ".ogg.mp3" ;
+    m_szFilters     = "Songs (*.ogg *.mp3)" ;
+    setAcceptDrops( true) ;
+    SetBtnIcons() ;
+    SetToolTips() ;
     InitPlayer() ;
 }
 
 //----------------------------------------------------
 MusicMgr::~MusicMgr()
 {
-    if( m_player != NULL)
-        delete m_player ;
-
-    delete ui;
+    SAFEDEL( m_player)
+    delete ui ;
 }
 
 //----------------------------------------------------
 void MusicMgr::SetToolTips()
 {
-    ui->BtnAdd->setToolTip( "Add Music");
+    ui->BtnAdd->setToolTip( tr(      "Add Music")) ;
+    ui->BtnOk->setToolTip(           "Ok") ;
+    ui->BtnCancel->setToolTip(       "Cancel") ;
+    ui->BtnPreviewStop->setToolTip(  "Stop") ;
+    ui->BtnPreviewStart->setToolTip( "Play") ;
 }
 
 //----------------------------------------------------
 void MusicMgr::SetBtnIcons( void)
 {
-    QIcon   icon ;
-    QSize   pixSize ;
-
+    QIcon icon ;
+    QSize pixSize ;
 
     GetPixBtnSize( ui->BtnAdd->size(), &pixSize) ;
     icon.addFile( "icons/sound_add.png", pixSize) ;
-    ui->BtnAdd->setIcon( icon);
+    ui->BtnAdd->setIcon( icon) ;
 
     GetPixBtnSize( ui->BtnRemove->size(), &pixSize) ;
     icon.addFile( "icons/sound_delete.png", pixSize) ;
-    ui->BtnRemove->setIcon( icon);
+    ui->BtnRemove->setIcon( icon) ;
 
     GetPixBtnSize( ui->BtnPreviewStart->size(), &pixSize) ;
     icon.addFile( "icons/control_play_blue.png", pixSize) ;
-    ui->BtnPreviewStart->setIcon( icon);
+    ui->BtnPreviewStart->setIcon( icon) ;
 
     GetPixBtnSize( ui->BtnPreviewStop->size(), &pixSize) ;
     icon.addFile( "icons/control_stop_blue.png", pixSize) ;
-    ui->BtnPreviewStop->setIcon( icon);
+    ui->BtnPreviewStop->setIcon( icon) ;
 
     GetPixBtnSize( ui->BtnCancel->size(), &pixSize) ;
     icon.addFile( "icons/cross.png", pixSize) ;
-    ui->BtnCancel->setIcon( icon);
+    ui->BtnCancel->setIcon( icon) ;
 
     GetPixBtnSize( ui->BtnOk->size(), &pixSize) ;
     icon.addFile( "icons/accept.png", pixSize) ;
-    ui->BtnOk->setIcon( icon);
+    ui->BtnOk->setIcon( icon) ;
 }
-
 
 //----------------------------------------------------
 void MusicMgr::InitPlayer()
 {
-  m_player  = Phonon::createPlayer( Phonon::MusicCategory) ;
+    m_player = Phonon::createPlayer( Phonon::MusicCategory) ;
 }
 
 //----------------------------------------------------
 void MusicMgr::on_BtnAdd_clicked()
 {
     int         n ;
-    QString     szFilters ;
     QString     szCurr ;
     QStringList lszList ;
 
-
-    szFilters    = "Songs (*.ogg *.mp3)" ;
-    lszList      = QFileDialog::getOpenFileNames( this, "Open Files",
-                   "", szFilters) ;
+    lszList = QFileDialog::getOpenFileNames( this, tr( "Open Files"), m_szFolder, m_szFilters) ;
 
     for( n = 0 ;  n < lszList.count() ;  n ++) {
-        szCurr = lszList.at(n) ;
-        ui->SongsList->addItem( szCurr);
-        m_lFilesList.append( szCurr);
+        szCurr = lszList.at( n) ;
+        ui->SongsList->addItem( szCurr) ;
+        m_lFilesList.append( szCurr) ;
     }
 
+    m_szFolder = szCurr.left( szCurr.lastIndexOf("\\")) ;
 }
 
 //----------------------------------------------------
-void MusicMgr::keyPressEvent ( QKeyEvent* e)
+void MusicMgr::keyPressEvent( QKeyEvent* e)
 {
     if ( e->key() == Qt::Key_Shift)
         m_bShiftPressed = true ;
 }
 
 //----------------------------------------------------
-void MusicMgr::keyReleaseEvent(  QKeyEvent * e )
+void MusicMgr::keyReleaseEvent( QKeyEvent * e)
 {
     if ( e->key() == Qt::Key_Shift)
         m_bShiftPressed = false ;
@@ -138,14 +155,14 @@ void MusicMgr::on_BtnPreviewStart_clicked()
     if ( szCurr.isEmpty())
         return ;
 
-    m_player->setCurrentSource( Phonon::MediaSource( szCurr));
+    m_player->setCurrentSource( Phonon::MediaSource( szCurr)) ;
     m_player->play();
 }
 
 //----------------------------------------------------
 void MusicMgr::on_BtnPreviewStop_clicked()
 {
-    m_player->stop();
+    m_player->stop() ;
 }
 
 //----------------------------------------------------
@@ -177,7 +194,6 @@ void MusicMgr::SetInitList( const QString& szFiles)
 //----------------------------------------------------
 void MusicMgr::GetList( QString* pszFiles)
 {
-
     if ( pszFiles == NULL)
         return ;
 
@@ -185,12 +201,11 @@ void MusicMgr::GetList( QString* pszFiles)
 }
 
 //----------------------------------------------------
-void MusicMgr::on_SongsList_itemDoubleClicked(QListWidgetItem* item)
+void MusicMgr::on_SongsList_itemDoubleClicked( QListWidgetItem* item)
 {
     m_player->stop();
     on_BtnPreviewStart_clicked();
 }
-
 
 //----------------------------------------------------
 void MusicMgr::dragEnterEvent( QDragEnterEvent *event)
@@ -199,32 +214,34 @@ void MusicMgr::dragEnterEvent( QDragEnterEvent *event)
 }
 
 //----------------------------------------------------
-void MusicMgr::dragLeaveEvent(   QDragLeaveEvent *event)
+void MusicMgr::dragLeaveEvent( QDragLeaveEvent *event)
 {
-    event->accept();
+    event->accept() ;
 }
 
 //----------------------------------------------------
 void MusicMgr::dropEvent( QDropEvent *event)
 {
-    const QMimeData* pData ;
-
-    pData = event->mimeData() ;
-
-    if ( ! pData->hasUrls())
-        return ;
-
-    int  n ;
-    QUrl url ;
+    int              n, i;
+    QDir             dir ;
+    QString          szPath ;
+    QStringList      lszList ;
+    const QMimeData* pData = event->mimeData() ;
 
     for ( n = 0 ;  n < pData->urls().count() ;  n ++) {
-        url = pData->urls().at(n) ;
-        ui->SongsList->addItem( url.toLocalFile());
+        szPath = pData->urls().at(n).toLocalFile() ;
+        if ( dir.exists( szPath)) {
+            DirToFileList( szPath, m_szExt, &lszList) ;
+            for ( i = 0 ;  i < lszList.count() ;  i ++)
+                ui->SongsList->addItem( lszList.at( i));
+        }
+        else if ( m_szExt.indexOf( szPath.right( szPath.length() - szPath.lastIndexOf( ".")).toLower()) >= 0)
+            ui->SongsList->addItem( szPath) ;
     }
 }
 
 //----------------------------------------------------
 void MusicMgr::dragMoveEvent( QDragMoveEvent *event)
 {
-    event->acceptProposedAction();
+    event->acceptProposedAction() ;
 }

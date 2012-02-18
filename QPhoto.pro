@@ -32,7 +32,8 @@ HEADERS  += cphoto.h \
     util.h \
     musicmgr.h \
     collectionmgr.h \
-    collectiondlg.h
+    collectiondlg.h \
+    macro.h
 
 FORMS    += cphoto.ui \
     aboutdlg.ui \

@@ -56,6 +56,8 @@ CPhoto::CPhoto( QWidget *parent) :
     m_bShiftPressed = false ;
     m_bCtrlPressed  = false ;
     m_player        = NULL ;
+    m_szExt         = ".jpeg.jpg" ;
+    m_szFilters     = "Images (*.jpeg *.jpg)" ;
     setMinimumSize( MIN_WIDTH, MIN_HEIGHT) ;
     m_pConf = new ConfMgr() ;
     m_pColl = new CollectionMgr() ;
@@ -81,14 +83,9 @@ CPhoto::~CPhoto()
     DeleteAction() ;
     DeleteTimers() ;
 
-    if ( m_pConf != NULL)
-        delete m_pConf ;
-
-    if ( m_pColl != NULL)
-        delete m_pColl ;
-
-    if ( m_player != NULL)
-        delete m_player ;
+    SAFEDEL( m_pConf) ;
+    SAFEDEL( m_pColl) ;
+    SAFEDEL( m_player) ;
 
     delete ui ;
 }
@@ -146,41 +143,25 @@ void CPhoto::InitPlayer()
 //----------------------------------------------------
 void CPhoto::DeleteTimers()
 {
-    if ( m_pTimer != NULL)
-        delete m_pTimer ;
-
-    if ( m_pLoadIniTimer != NULL)
-        delete m_pLoadIniTimer ;
-
-    if ( m_pFullScreenTimer != NULL)
-        delete m_pFullScreenTimer ;
+    SAFEDEL( m_pTimer) ;
+    SAFEDEL( m_pLoadIniTimer) ;
+    SAFEDEL( m_pFullScreenTimer) ;
 }
 
 //----------------------------------------------------
 void CPhoto::DeleteAction()
 {
-    if ( m_pMoveUpAct != NULL)
-        delete m_pMoveUpAct ;
-    if ( m_pMoveDownAct != NULL)
-        delete m_pMoveDownAct ;
-    if ( m_pZoomAllAct != NULL)
-        delete m_pZoomAllAct ;
-    if ( m_pConfigAct != NULL)
-        delete m_pConfigAct ;
-    if ( m_pStartSlideShowAct != NULL)
-        delete m_pStartSlideShowAct ;
-    if ( m_pEndSlideShowAct != NULL)
-        delete m_pEndSlideShowAct ;
-    if ( m_pPauseSlideShowAct != NULL)
-        delete m_pPauseSlideShowAct ;
-    if ( m_pShowFullScreen != NULL)
-        delete m_pShowFullScreen ;
-    if ( m_pExitFullScreen != NULL)
-        delete m_pExitFullScreen ;
-    if ( m_pEditNotesAct != NULL)
-        delete m_pEditNotesAct ;
+    SAFEDEL( m_pMoveUpAct) ;
+    SAFEDEL( m_pMoveDownAct) ;
+    SAFEDEL( m_pZoomAllAct) ;
+    SAFEDEL( m_pConfigAct) ;
+    SAFEDEL( m_pStartSlideShowAct) ;
+    SAFEDEL( m_pEndSlideShowAct) ;
+    SAFEDEL( m_pPauseSlideShowAct) ;
+    SAFEDEL( m_pShowFullScreen) ;
+    SAFEDEL( m_pExitFullScreen) ;
+    SAFEDEL( m_pEditNotesAct) ;
 }
-
 
 //----------------------------------------------------
 void CPhoto::SetBtnIcons()
@@ -366,31 +347,27 @@ void CPhoto::on_UrlDropped( const QString& szUrl, bool bShow)
 //----------------------------------------------------
 void CPhoto::on_DirDropped( const QString& szDir, bool bShow)
 {
-    int           n ;
-    int           nTot ;
-    QString       szExt ;
-    QDir          dir( szDir) ;
-    QFileInfo     fileInfo ;
-    QFileInfoList list ;
+    int n ;
+    int nTot ;
+    QStringList lszFiles ;
 
-    dir.setFilter(  QDir::Files | QDir::NoSymLinks) ;
-    dir.setSorting( QDir::Type) ;
+    DirToFileList( szDir, m_szExt, &lszFiles) ;
+    nTot = lszFiles.count() ;
 
-    list = dir.entryInfoList() ;
-    nTot = list.count() ;
-    for ( n = 0 ;  n < nTot ;  n ++) {
-        fileInfo = list.at( n) ;
-        szExt    = fileInfo.suffix() ;
-        if ( QString::compare( szExt, "jpg",  Qt::CaseInsensitive) != 0  &&
-             QString::compare( szExt, "jpeg", Qt::CaseInsensitive) != 0)
-            continue ;
-        on_ImgDropped( fileInfo.filePath(), n == nTot -1 ? bShow : false) ;
-    }
+    for ( n = 0 ;  n < nTot ;  n ++)
+        on_ImgDropped( lszFiles.at( n), n == nTot -1 ? bShow : false) ;
 }
 
 //----------------------------------------------------
 void CPhoto::on_ImgDropped( const QString& szFile, bool bShow)
 {
+    QString szExt ;
+
+    szExt = szFile.right( szFile.length() - szFile.lastIndexOf(".")).toLower() ;
+
+    if ( m_szExt.indexOf( szExt) < 0)
+        return ;
+
     m_szFileName = szFile ;
     LoadImage( bShow) ;
 }
@@ -466,12 +443,10 @@ void CPhoto::LoadImages()
 {
     int         n ;
     QString     szLastDir ;
-    QString     szFilters ;
     QStringList lszList ;
 
-    szFilters = "Images (*.jpeg *.jpg)" ;
     m_pConf->GetStrProp( PROP_STR_LAST_DIR, &szLastDir) ;
-    lszList   = QFileDialog::getOpenFileNames( this, tr( "Open Images"), szLastDir, szFilters) ;
+    lszList   = QFileDialog::getOpenFileNames( this, tr( "Open Images"), szLastDir, m_szFilters) ;
 
     for( n = 0 ;  n < lszList.count() ;  n ++) {
         m_szFileName = lszList.at(n) ;
@@ -621,6 +596,7 @@ void CPhoto::DeleteAll()
     m_pConf->WriteList() ;
     m_pConf->ClearList() ;
     ui->ImgView->ResetView( true) ;
+    ui->ImgList->clear() ;
     setWindowTitle( QPHOTO) ;
 }
 
@@ -842,11 +818,10 @@ void CPhoto::UpdateLayoutAfterResize( int nXMove, int nYMove)
 //----------------------------------------------------
 void CPhoto::resizeEvent( QResizeEvent* event)
 {
-    int     nXMove ;
-    int     nYMove ;
-    QSize   cOldSize ;
-    QSize   cNewSize ;
-
+    int   nXMove ;
+    int   nYMove ;
+    QSize cOldSize ;
+    QSize cNewSize ;
 
     cOldSize = event->oldSize() ;
     cNewSize = event->size() ;
@@ -895,27 +870,21 @@ bool CPhoto::IsPosOnView( const QPoint& pos)
 //----------------------------------------------------
 void CPhoto::mousePressEvent( QMouseEvent* e)
 {
-    QPoint pos ;
-
-    pos = e->pos() ;
-
-    if ( ! IsPosOnView( pos))
+    if ( ! IsPosOnView( e->pos()))
         return ;
 
-    if ( e->type() == QEvent::MouseButtonPress) {
-        if ( e->button() == Qt::RightButton) {
-            QPoint ptGlob ;
-            ptGlob.setX( e->globalX()) ;
-            ptGlob.setY( e->globalY()) ;
-            if ( ! m_bFullScreen)
-                ShowContextMenu( ptGlob) ;
-            else
-                ShowSlideShowMenu( ptGlob) ;
-        }
-        else if ( e->button() == Qt::LeftButton) {
-            ui->ImgView->StartZoomRect( pos) ;
-            setCursor( Qt::CrossCursor) ;
-        }
+    if ( e->type() != QEvent::MouseButtonPress)
+        return ;
+
+    if ( e->button() == Qt::RightButton) {
+        QPoint ptGlob ;
+        ptGlob.setX( e->globalX()) ;
+        ptGlob.setY( e->globalY()) ;
+        ! m_bFullScreen ? ShowContextMenu( ptGlob) : ShowSlideShowMenu( ptGlob) ;
+    }
+    else if ( e->button() == Qt::LeftButton) {
+        ui->ImgView->StartZoomRect( e->pos()) ;
+        setCursor( Qt::CrossCursor) ;
     }
 }
 
@@ -964,7 +933,6 @@ void CPhoto::OnZoomAll()
 {
     ui->ImgView->ZoomAll() ;
 }
-
 
 //----------------------------------------------------
 void CPhoto::EndDrag( void)
@@ -1195,5 +1163,5 @@ void CPhoto::OnStartEditNotes()
 //----------------------------------------------------
 void CPhoto::on_BtnNotes_clicked()
 {
-    ui->ImgView->ShowHideNotes();
+    ui->ImgView->ShowHideNotes() ;
 }

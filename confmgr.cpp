@@ -20,6 +20,7 @@
 #include <QFile>
 #include <QTextStream>
 #include "settingsdlg.h"
+#include "macro.h"
 
 
 //----------------------------------------------------
@@ -51,9 +52,10 @@ ConfMgr::~ConfMgr()
 //----------------------------------------------------
 bool  ConfMgr::SetDbMgr( CollectionMgr* pMgr)
 {
-    m_pDbMgr = pMgr ;
+    CHECK_PTR_PARAM( pMgr)
 
-    return m_pDbMgr != NULL ;
+    m_pDbMgr = pMgr ;
+    return true ;
 }
 
 //----------------------------------------------------
@@ -104,17 +106,14 @@ void ConfMgr::LoadList( const QString& szFile)
     }
 
     QFile cFile( szMyFile) ;
-
-    if ( ! cFile.open(QIODevice::ReadOnly | QIODevice::Text))
-         return;
+    if ( ! cFile.open( QIODevice::ReadOnly | QIODevice::Text))
+         return ;
 
     QTextStream in( &cFile) ;
-
     while ( ! in.atEnd()) {
          szTmp = in.readLine() ;
          m_lszList.append( szTmp) ;
     }
-
     cFile.close() ;
 
     m_pDbMgr->InsertItem( szFile, m_lszList) ;
@@ -129,8 +128,7 @@ bool ConfMgr::FindInList( const QString& szFile, int* pnIdx)
     for ( n = 0 ;  n < m_lszList.count() ;  n ++) {
         szCurr = m_lszList.at( n) ;
         if ( szCurr.compare( szFile) == 0) {
-            if ( pnIdx != NULL)
-                *pnIdx = n ;
+            VALIDPTR( pnIdx) *pnIdx = n ;
             return true ;
         }
     }
@@ -159,17 +157,17 @@ void ConfMgr::RemoveFromList( const QString& szFile)
     }
 }
 
-
 //----------------------------------------------------
 void  ConfMgr::ClearList()
 {
-    m_lszList.clear();
+    m_lszRemoved.append( m_lszList) ;
+    m_lszList.clear() ;
 }
 
 //----------------------------------------------------
 QString ConfMgr::GetListItem( int n)
 {
-    return m_lszList.at(n) ;
+    return m_lszList.at( n) ;
 }
 
 //----------------------------------------------------
@@ -186,8 +184,8 @@ void ConfMgr::LoadSettings()
     QColor    DefColor ;
     QFont     DefFont ;
 
-    DefColor  = Qt::black ;
-    szBlack   = DefColor.name() ;
+    DefColor = Qt::black ;
+    szBlack  = DefColor.name() ;
 
     m_aIntProp[ PROP_INT_SEC]           = cSet.value( SLIDESHOWSEC, 5).toInt() ;
     m_aIntProp[ PROP_INT_FADE]          = cSet.value( FADETYPE, 0).toInt() ;
@@ -204,13 +202,13 @@ void ConfMgr::WriteSettings()
 {
     QSettings cSet ;
 
-    cSet.setValue( SLIDESHOWSEC, m_aIntProp[ PROP_INT_SEC]) ;
-    cSet.setValue( FADETYPE, m_aIntProp[ PROP_INT_FADE]) ;
-    cSet.setValue( LANG, m_aIntProp[ PROP_INT_LANG]) ;
-    cSet.setValue( COLOR, m_aStrProp[PROP_STR_COLOR])  ;
-    cSet.setValue( FONT, m_aStrProp[PROP_STR_FONT]) ;
-    cSet.setValue( SONGS, m_aStrProp[PROP_STR_SONGS]) ;
-    cSet.setValue( LAST_DIR, m_aStrProp[ PROP_STR_LAST_DIR]) ;
+    cSet.setValue( SLIDESHOWSEC,  m_aIntProp[ PROP_INT_SEC]) ;
+    cSet.setValue( FADETYPE,      m_aIntProp[ PROP_INT_FADE]) ;
+    cSet.setValue( LANG,          m_aIntProp[ PROP_INT_LANG]) ;
+    cSet.setValue( COLOR,         m_aStrProp[ PROP_STR_COLOR]) ;
+    cSet.setValue( FONT,          m_aStrProp[ PROP_STR_FONT]) ;
+    cSet.setValue( SONGS,         m_aStrProp[ PROP_STR_SONGS]) ;
+    cSet.setValue( LAST_DIR,      m_aStrProp[ PROP_STR_LAST_DIR]) ;
     cSet.setValue( LAST_DIR_LIST, m_aStrProp[ PROP_STR_LAST_DIR_LIST]) ;
 }
 
@@ -273,14 +271,14 @@ QString ConfMgr::GetHelpFile()
 }
 
 //----------------------------------------------------
-QString ConfMgr::GetLog( )
+QString ConfMgr::GetLog()
 {
     QFile cFile( LOG_FILE) ;
 
     if ( ! cFile.open( QIODevice::ReadOnly | QIODevice::Text))
         return "" ;
 
-    QByteArray  pByte ;
+    QByteArray pByte ;
 
     pByte = cFile.readAll() ;
 
@@ -302,11 +300,10 @@ bool ConfMgr::WriteLog( const QString szLog)
 
     if ( szLog.isEmpty())
         cFile.write( "") ;
-
     else {
         QByteArray pByte ;
         pByte.append( szLog) ;
-        cFile.write( pByte) ;
+        cFile.write(  pByte) ;
     }
 
     cFile.close() ;
@@ -323,10 +320,9 @@ bool ConfMgr::ResetLog()
 //----------------------------------------------------
 bool ConfMgr::GetStrProp( int nProp, QString* pVal)
 {
-    if ( nProp < 0  ||  nProp >= NUM_STR_PROP)
-        return false ;
+    CHECK_PTR_PARAM( pVal)
 
-    if ( pVal == NULL)
+    if ( nProp < 0  ||  nProp >= NUM_STR_PROP)
         return false ;
 
     *pVal = m_aStrProp[nProp] ;
@@ -337,10 +333,9 @@ bool ConfMgr::GetStrProp( int nProp, QString* pVal)
 //----------------------------------------------------
 bool ConfMgr::GetIntProp( int nProp, int* pVal)
 {
-    if ( nProp < 0  ||  nProp >= NUM_INT_PROP)
-        return false ;
+    CHECK_PTR_PARAM( pVal)
 
-    if ( pVal == NULL)
+    if ( nProp < 0  ||  nProp >= NUM_INT_PROP)
         return false ;
 
     *pVal = m_aIntProp[nProp] ;

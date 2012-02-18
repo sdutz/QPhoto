@@ -45,9 +45,6 @@
 #define FILES_VAL               1
 #define NOTES_VAL               1
 
-//----------------------------------------------------
-#define CHECK_ST_PARAM( s)      if ( s.isEmpty()) return false ;
-
 
 //----------------------------------------------------
 CollectionMgr::CollectionMgr()
@@ -129,8 +126,7 @@ bool CollectionMgr::InsertItem( const QString& szName, const QStringList& lszFil
     CHECK_ST_PARAM( szName)
     CHECK_ST_PARAM( lszFiles)
 
-    FromStringListToString( lszFiles, &szList) ;
-
+    szList    = lszFiles.join( ",") ;
     m_szQuery = FindItem( szName, PICTURECOLLECTION) ? QString( "UPDATE %1 SET %2 = '%3' WHERE %4 = '%5';").arg( PICTURECOLLECTION).arg( FILES).arg( szList).arg( NAME).arg( szName) :
                                                        QString( "INSERT INTO %1 (%2,%3) VALUES ('%4','%5');").arg( PICTURECOLLECTION).arg( NAME).arg( FILES).arg( szName).arg( szList) ;
 
@@ -225,7 +221,7 @@ QStringList CollectionMgr::GetItemData( const QString& szName)
     if ( ! FindItem( szName, PICTURECOLLECTION))
         return lszList ;
 
-    FromStringToStringList( m_qQuery.value( FILES_VAL).toString(), &lszList) ;
+    lszList = m_qQuery.value( FILES_VAL).toString().split( ",") ;
 
     return lszList ;
 }

@@ -18,25 +18,26 @@
 
 #include "util.h"
 #include <QMessageBox>
+#include <QDir>
 
 
 //----------------------------------------------------
 #define PIX_OFFS   1
 
-//----------------------------------------------------
-#define CHECK_PTR_PARAM( p)   if ( p == NULL) return false ;
-
 
 //----------------------------------------------------
-void GetPixBtnSize( const QSize& btnSize, QSize* pPixSize)
+bool GetPixBtnSize( const QSize& btnSize, QSize* pPixSize)
 {
+    CHECK_PTR_PARAM( pPixSize)
+
     int nMin ;
 
     nMin = qMin( btnSize.width(), btnSize.height()) - PIX_OFFS ;
-    pPixSize->setHeight( nMin);
-    pPixSize->setWidth(  nMin);
-}
+    pPixSize->setHeight( nMin) ;
+    pPixSize->setWidth(  nMin) ;
 
+    return true ;
+}
 
 //----------------------------------------------------
 void DoDebug( const QString& szDebug)
@@ -48,36 +49,31 @@ void DoDebug( const QString& szDebug)
 }
 
 //----------------------------------------------------
-bool FromStringListToString( const QStringList& lszList, QString* pszRes) {
-
-    CHECK_PTR_PARAM( pszRes)
-
-    pszRes->clear();
-
-    for ( int n = 0 ;  n < lszList.count()  ; n ++)
-        pszRes->append( QString( "%1,").arg( lszList.at(n))) ;
-
-    return true ;
-}
-
-
-//----------------------------------------------------
-bool FromStringToStringList( const QString& szList, QStringList* plszRes)
+bool DirToFileList( const QString& szDir, const QString& szValExt, QStringList* plszFiles)
 {
-    int nPos ;
-    int nCurr ;
+    CHECK_ST_PARAM( szDir)
+    CHECK_PTR_PARAM( plszFiles)
 
-    CHECK_PTR_PARAM( plszRes)
+    int           n ;
+    int           nTot ;
+    QString       szExt ;
+    QDir          dir( szDir) ;
+    QFileInfo     fileInfo ;
+    QFileInfoList list ;
 
-    plszRes->clear();
+    dir.setFilter(  QDir::Files | QDir::NoSymLinks) ;
+    dir.setSorting( QDir::Type) ;
 
-    nPos = 0 ;
-    while ( nPos < szList.count()) {
+    list = dir.entryInfoList() ;
+    nTot = list.count() ;
 
-        nCurr = szList.indexOf( ",", nPos) ;
-        plszRes->append( szList.mid( nPos, nCurr - nPos));
-        nPos  = nCurr + 1 ;
+    for ( n = 0 ;  n < nTot ;  n ++) {
+        fileInfo = list.at( n) ;
+        szExt    = fileInfo.suffix().toLower() ;
+        if ( szValExt.isEmpty()  ||  szValExt.indexOf( szExt) >= 0)
+            plszFiles->append( fileInfo.filePath()) ;
     }
 
     return true ;
 }
+

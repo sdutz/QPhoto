@@ -16,16 +16,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef MACRO_H
+#define MACRO_H
 
-#include <QSize>
-#include <QStringList>
-#include "macro.h"
+//----------------------------------------------------
+#define CHECK_PTR_PARAM( p)   if ( p == NULL) return false ;
+#define CHECK_ST_PARAM( s)    if ( s.isEmpty()) return false ;
+#define VALIDPTR( p)          if ( p != NULL)
+#define SAFEDEL( p)           VALIDPTR( p) delete p ;
 
-
-bool GetPixBtnSize( const QSize& btnSize, QSize* pPixSize) ;
-void DoDebug(       const QString& szDebug) ;
-bool DirToFileList( const QString& szDir, const QString& szValExt, QStringList* plszFiles) ;
-
-#endif // UTIL_H
+#endif // MACRO_H

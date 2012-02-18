@@ -31,28 +31,25 @@ SettingsDlg::SettingsDlg(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SettingsDlg)
 {
-
     ui->setupUi(this);
-    ui->FadeCmbBox->addItem( tr( "None"));
-    ui->FadeCmbBox->addItem( tr( "On SlideShow"));
-    ui->FadeCmbBox->addItem( tr( "Always"));
+    ui->FadeCmbBox->addItem( tr( "None")) ;
+    ui->FadeCmbBox->addItem( tr( "On SlideShow")) ;
+    ui->FadeCmbBox->addItem( tr( "Always")) ;
 
-    ui->LangCmbBox->addItem( "English");
-    ui->LangCmbBox->addItem( "Italian");
+    ui->LangCmbBox->addItem( tr( "English")) ;
+    ui->LangCmbBox->addItem( tr( "Italian")) ;
 
     setWindowTitle( tr( "Settings dialog"));
-    setMinimumSize( width(), height());
-    setMaximumSize( width(), height());
+    setMinimumSize( width(), height()) ;
+    setMaximumSize( width(), height()) ;
     InitButton() ;
 }
-
 
 //----------------------------------------------------
 SettingsDlg::~SettingsDlg()
 {
     delete ui;
 }
-
 
 //----------------------------------------------------
 void SettingsDlg::InitButton()
@@ -62,19 +59,18 @@ void SettingsDlg::InitButton()
 
     GetPixBtnSize( ui->Font_Btn->size(), &pixSize) ;
     icon.addFile( "icons/font.png", pixSize);
-    ui->Font_Btn->setIcon( icon);
+    ui->Font_Btn->setIcon( icon) ;
 
     GetPixBtnSize( ui->Music_Btn->size(), &pixSize) ;
     icon.addFile( "icons/music.png", pixSize);
-    ui->Music_Btn->setIcon( icon);
+    ui->Music_Btn->setIcon( icon) ;
 
-    ui->label_color->setText( tr( "Choose Color"));
-    ui->label_fade->setText( tr( "Fade type"));
-    ui->label_font->setText(( tr( "Choose Font")));
-    ui->label_lang->setText( tr( "Choose Language"));
-    ui->Default_Btn->setText( tr( "Default"));
+    ui->label_color->setText( tr( "Choose Color")) ;
+    ui->label_fade->setText( tr(  "Fade type")) ;
+    ui->label_font->setText( tr( "Choose Font")) ;
+    ui->label_lang->setText( tr(  "Choose Language")) ;
+    ui->Default_Btn->setText( tr( "Default")) ;
 }
-
 
 //----------------------------------------------------
 void SettingsDlg::UpdateColorButton()
@@ -86,11 +82,9 @@ void SettingsDlg::UpdateColorButton()
     if ( ! color.isValid())
         color = Qt::black ;
 
-
     szStyle = QString( "* { background-color: rgb(%1,%2,%3)}").arg( color.red()).arg( color.green()).arg( color.blue()) ;
     ui->Color_Btn->setStyleSheet( szStyle);
 }
-
 
 //----------------------------------------------------
 void SettingsDlg::on_Color_Btn_clicked()
@@ -115,13 +109,13 @@ void SettingsDlg::on_Default_Btn_clicked()
     QColor black ;
     QFont  font  ;
 
-    m_sets.szColor = black.name() ;
-    m_sets.szFont  = font.toString() ;
-    m_sets.nSec    = 5 ;
+    m_sets.szColor   = black.name() ;
+    m_sets.szFont    = font.toString() ;
+    m_sets.nSec      = 5 ;
     ui->spinSec->setValue( 5);
     m_sets.nFadeType = FADE_NONE ;
     ui->FadeCmbBox->setCurrentIndex( FADE_NONE);
-    m_sets.nLang = ENGLISH ;
+    m_sets.nLang     = ENGLISH ;
     ui->LangCmbBox->setCurrentIndex( ENGLISH);
 
     UpdateColorButton();
@@ -140,7 +134,6 @@ void SettingsDlg::on_Font_Btn_clicked()
     QFontDialog  cDlg ;
     QFont        NewFont ;
     QFont        OldFont ;
-
 
     OldFont.fromString( m_sets.szFont) ;
     NewFont = cDlg.getFont( &bOk, OldFont) ;
@@ -173,11 +166,10 @@ void SettingsDlg::on_Music_Btn_clicked()
 {
     MusicMgr mmgr ;
 
-    mmgr.SetInitList( m_sets.szSongs);
+    mmgr.SetInitList( m_sets.szSongs) ;
 
-    if ( mmgr.exec() == QDialog::Accepted) {
+    if ( mmgr.exec() == QDialog::Accepted)
         mmgr.GetList( &m_sets.szSongs);
-    }
 }
 
 //---------------------------------------------------
