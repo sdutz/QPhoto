@@ -18,14 +18,17 @@
 
 #include "aboutdlg.h"
 #include "ui_aboutdlg.h"
+#include <QLibraryInfo>
 
+#define  VERSION  "1.0"
 
 //----------------------------------------------------
 AboutDlg::AboutDlg(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AboutDlg)
 {
-    ui->setupUi(this);
+    ui->setupUi(this) ;
+    setWindowTitle( "QPhoto about");
 
     FillSysInfo() ;
 }
@@ -45,9 +48,5 @@ void AboutDlg::on_buttonBox_accepted()
 //----------------------------------------------------
 void AboutDlg::FillSysInfo()
 {
-    QString  szBuff ;
-
-    szBuff = "QPhoto version 0.1 by Sdutz" ;
-
-    ui->textEdit->setText( szBuff);
+    ui->textEdit->setText( QString( "QPhoto version %1 by Sdutz\n using %2").arg( VERSION).arg( QLibraryInfo::buildKey())) ;
 }

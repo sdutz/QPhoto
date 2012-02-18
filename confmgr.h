@@ -86,6 +86,7 @@ private :
 private :
     CollectionMgr*  m_pDbMgr ;
     QStringList     m_lszList ;
+    QStringList     m_lszRemoved ;
     QString         m_szList ;
     QString         m_aStrProp[NUM_STR_PROP] ;
     int             m_aIntProp[NUM_INT_PROP] ;

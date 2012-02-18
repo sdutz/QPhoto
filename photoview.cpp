@@ -22,6 +22,7 @@
 #include <QGraphicsRectItem>
 #include <QUrl>
 #include <QGraphicsSceneDragDropEvent>
+#include <QInputDialog>
 
 //----------------------------------------------------
 #define SCALE_FACTOR_MINUS 0.9
@@ -29,7 +30,8 @@
 #define SCALE_FACTOR       0.1
 #define OPACITY_FACTOR     0.1
 
-
+//----------------------------------------------------
+#define VALIDPTR( p)       if ( p != NULL)
 
 //----------------------------------------------------
 PhotoView::PhotoView(QWidget *parent) :
@@ -40,6 +42,11 @@ PhotoView::PhotoView(QWidget *parent) :
     m_pScene         = new QGraphicsScene( this) ;
     setScene( m_pScene);
     m_bDrag          = false ;
+    m_bShowNotes     = false ;
+    m_bFullScreen    = false ;
+    m_bSlideShow     = false ;
+    m_pCurrImgNotes  = NULL ;
+    m_pPrevImgNotes  = NULL ;
     m_pRect          = NULL ;
     m_pHelpText      = NULL ;
     m_pCurrImgTitle  = NULL ;
@@ -47,8 +54,6 @@ PhotoView::PhotoView(QWidget *parent) :
     m_pCurrImg       = NULL ;
     m_pauseGrp       = NULL ;
     m_pTria          = NULL ;
-    m_bFullScreen    = false ;
-    m_bSlideShow     = false ;
     setAcceptDrops( true);
     m_pTextTimer     = new QTimer( this) ;
     m_pFadeTimer     = new QTimer( this) ;
@@ -61,16 +66,11 @@ PhotoView::PhotoView(QWidget *parent) :
 //----------------------------------------------------
 PhotoView::~PhotoView()
 {
-    if ( m_pScene != NULL)
-        delete m_pScene ;
-    if ( m_pTextTimer != NULL)
-        delete m_pTextTimer ;
-    if ( m_pFadeTimer != NULL)
-        delete m_pFadeTimer ;
-    if ( m_pControlsTimer != NULL)
-        delete m_pControlsTimer ;
+    VALIDPTR( m_pScene)         delete m_pScene ;
+    VALIDPTR( m_pTextTimer)     delete m_pTextTimer ;
+    VALIDPTR( m_pFadeTimer)     delete m_pFadeTimer ;
+    VALIDPTR( m_pControlsTimer) delete m_pControlsTimer ;
 }
-
 
 //----------------------------------------------------
 void PhotoView::PrepareSlideshowItems()
@@ -79,7 +79,7 @@ void PhotoView::PrepareSlideshowItems()
     QBrush                 brush ;
     QList< QGraphicsItem*> list ;
     QVector< QPoint>       points ;
-    QRect                  rect1(0, 0, 20, 60 ) ;
+    QRect                  rect1( 0, 0, 20, 60 ) ;
     QRect                  rect2(40, 0, 20, 60 ) ;
 
     pen.setColor( GetColorFromConfig());
@@ -107,7 +107,7 @@ void PhotoView::DrawPlay()
 
     sceneSize = m_pParent->GetSceneSize() ;
     grpSize   = m_pTria->boundingRect().size();
-    pos.setX( sceneSize.width() * 0.5 - grpSize.width() * 0.5);
+    pos.setX( sceneSize.width() *  0.5 - grpSize.width() *  0.5);
     pos.setY( sceneSize.height() * 0.5 - grpSize.height() * 0.5);
 
     m_pTria->setPos( pos);
@@ -138,7 +138,7 @@ void PhotoView::DrawPause()
 
     sceneSize = m_pParent->GetSceneSize() ;
     grpSize   = m_pauseGrp->boundingRect().size() ;
-    pos.setX( sceneSize.width() * 0.5 - grpSize.width() * 0.5);
+    pos.setX( sceneSize.width() *  0.5 - grpSize.width() *  0.5);
     pos.setY( sceneSize.height() * 0.5 - grpSize.height() * 0.5);
 
     m_pauseGrp->setPos( pos);
@@ -163,29 +163,28 @@ void PhotoView::mouseMoveEvent( QMouseEvent* e)
     nWidth  = ptP.x() - m_Pt.x() ;
     nHeight = ptP.y() - m_Pt.y() ;
 
-    if ( m_pRect != NULL)
-        m_pScene->removeItem( ( QGraphicsItem*) m_pRect) ;
+    VALIDPTR( m_pRect) m_pScene->removeItem( ( QGraphicsItem*) m_pRect) ;
 
-    pen.setColor( GetColorFromConfig());
+    pen.setColor( GetColorFromConfig()) ;
 
     if ( nWidth > 0  &&  nHeight > 0) {
-        rect.setX( m_Pt.x());
-        rect.setY( m_Pt.y());
+        rect.setX( m_Pt.x()) ;
+        rect.setY( m_Pt.y()) ;
     }
     else if ( nWidth < 0  &&  nHeight < 0) {
-        rect.setX( ptP.x());
-        rect.setY( ptP.y());
+        rect.setX( ptP.x()) ;
+        rect.setY( ptP.y()) ;
     }
     else if ( nWidth < 0) {
-        rect.setX( ptP.x());
-        rect.setY( m_Pt.y());
+        rect.setX( ptP.x()) ;
+        rect.setY( m_Pt.y()) ;
     }
     else if ( nHeight < 0) {
-        rect.setX( m_Pt.x());
-        rect.setY( ptP.y());
+        rect.setX( m_Pt.x()) ;
+        rect.setY( ptP.y()) ;
     }
 
-    rect.setWidth( abs( nWidth));
+    rect.setWidth(  abs( nWidth));
     rect.setHeight( abs( nHeight));
 
     m_pRect = m_pScene->addRect( rect, pen) ;
@@ -208,12 +207,31 @@ void PhotoView::mouseReleaseEvent( QMouseEvent* e)
 //----------------------------------------------------
 void PhotoView::wheelEvent( QWheelEvent* e)
 {
-    if ( ! m_bShift) {
+    if ( ! m_bShift)
         QGraphicsView::wheelEvent( e) ;
-        return ;
-    }
+    else
+        e->delta() > 0 ? ZoomIn() : ZoomOut();
+}
 
-    e->delta() > 0 ? ZoomIn() : ZoomOut();
+//----------------------------------------------------
+void PhotoView::mouseDoubleClickEvent( QMouseEvent* e)
+{
+    EditCurrImgNotes() ;
+}
+
+//----------------------------------------------------
+void PhotoView::EditCurrImgNotes()
+{
+    bool bOk ;
+
+    QString szNotes = QInputDialog::getText( this, tr( "Insert your notes"), "", QLineEdit::Normal,
+                                             m_pCurrImgNotes != NULL ? m_pCurrImgNotes->toPlainText() : "", &bOk) ;
+
+    if ( ! szNotes.isEmpty()  &&  bOk) {
+        m_bShowNotes = true ;
+        m_pParent->SetCurrImgNotes( szNotes) ;
+        DrawNotes( szNotes) ;
+    }
 }
 
 //----------------------------------------------------
@@ -237,7 +255,7 @@ void PhotoView::ResetView( bool bClearAll)
 
 //----------------------------------------------------
 bool
-PhotoView::ShowPhoto( const QString& szFile)
+PhotoView::ShowPhoto( const QString& szFile, const QString& szNotes)
 {
     bool bRet ;
     bool bDoFade ;
@@ -249,13 +267,13 @@ PhotoView::ShowPhoto( const QString& szFile)
     ResetView();
 
     bDoFade = nFadeType == FADE_ALWAYS  ||
-              ( nFadeType == FADE_ONSLIDESHOW  &&  m_bSlideShow) ;
+            ( nFadeType == FADE_ONSLIDESHOW  &&  m_bSlideShow) ;
 
     if ( bDoFade)
         CheckFading() ;
 
-    if ( m_pCurrImg != NULL)
-        m_pPrevImg = m_pCurrImg ;
+    m_pPrevImg      = m_pCurrImg      != NULL ? m_pCurrImg      : NULL ;
+    m_pPrevImgNotes = m_pCurrImgNotes != NULL ? m_pCurrImgNotes : NULL ;
 
     if ( nFadeType == FADE_NONE)
         m_pScene->removeItem( m_pPrevImg);
@@ -277,20 +295,39 @@ PhotoView::ShowPhoto( const QString& szFile)
     if ( m_bFullScreen)
         SetCurrTitleOnScene() ;
 
+    DrawNotes( szNotes) ;
+
     return bRet ;
+}
+
+//----------------------------------------------------
+void
+PhotoView::DrawNotes( const QString& szNotes)
+{
+    if ( ! szNotes.isEmpty()) {
+        m_pCurrImgNotes  = m_pScene->addText( szNotes, GetFontFromConfig()) ;
+        m_pCurrImgNotes->setDefaultTextColor( GetColorFromConfig()) ;
+        QRectF   txtRect = m_pCurrImgNotes->boundingRect() ;
+        QPointF  anglePt = m_pCurrImg->boundingRect().bottomRight() ;
+        m_pCurrImgNotes->setPos( QPointF( anglePt.x() - txtRect.width(), anglePt.y() - txtRect.height()));
+        m_pCurrImgNotes->setVisible( m_bShowNotes) ;
+    }
+    else
+        m_pScene->removeItem( m_pCurrImgNotes);
 }
 
 //----------------------------------------------------
 void
 PhotoView::CheckFading()
 {
-    if ( m_pFadeTimer->isActive()) {
-        m_pFadeTimer->stop() ;
-        if ( m_pPrevImg != NULL)
-            m_pScene->removeItem( m_pPrevImg);
-        m_pCurrImg->setOpacity( 1.);
-    }
+    if ( ! m_pFadeTimer->isActive())
+        return ;
 
+    m_pFadeTimer->stop() ;
+    VALIDPTR( m_pPrevImg)      m_pScene->removeItem( m_pPrevImg) ;
+    VALIDPTR( m_pPrevImgNotes) m_pScene->removeItem( m_pPrevImgNotes) ;
+    m_pCurrImg->setOpacity( 1.) ;
+    VALIDPTR( m_pCurrImgNotes) m_pCurrImgNotes->setOpacity( 1.) ;
 }
 
 //----------------------------------------------------
@@ -307,18 +344,12 @@ void PhotoView::ZoomIn()
     m_dScale += SCALE_FACTOR ;
 }
 
-
 //----------------------------------------------------
 void PhotoView::ZoomAll()
 {
-    QSize ImgSize ;
-
-    ImgSize = m_cImage.size() ;
-
-    fitInView( 0, 0, ImgSize.width(), ImgSize.height(), Qt::KeepAspectRatio);
+    fitInView( 0, 0, m_cImage.width(), m_cImage.height(), Qt::KeepAspectRatio);
     setSceneRect( m_cImage.rect());
 }
-
 
 //----------------------------------------------------
 void PhotoView::StartZoomRect( const QPoint& pos)
@@ -339,7 +370,7 @@ void PhotoView::EndZoomRect()
 
     if( cRect.width() > 10 && cRect.height() > 10)
         fitInView( cRect.topLeft().x(), cRect.topLeft().y(),
-               cRect.width(), cRect.height(), Qt::KeepAspectRatio);
+                   cRect.width(), cRect.height(), Qt::KeepAspectRatio);
 
     m_bDrag = false ;
     m_pScene->removeItem( ( QGraphicsItem*) m_pRect);
@@ -350,7 +381,6 @@ void PhotoView::EndZoomRect()
 //----------------------------------------------------
 void PhotoView::ShowHelp( bool bShow)
 {
-
     if ( bShow) {
         if ( m_pHelpText == NULL) {
             QString szHelp ;
@@ -366,16 +396,14 @@ void PhotoView::ShowHelp( bool bShow)
         m_pHelpText->hide();
 }
 
-
 //----------------------------------------------------
 void PhotoView::SetCurrTitleOnScene()
 {
     int nSec ;
 
-    if ( m_pCurrImgTitle != NULL)
-        m_pCurrImgTitle->hide();
+    VALIDPTR( m_pCurrImgTitle) m_pCurrImgTitle->hide() ;
     if ( m_pTextTimer->isActive())
-        m_pTextTimer->stop();
+        m_pTextTimer->stop() ;
 
     m_pConf->GetIntProp( PROP_INT_SEC, &nSec) ;
     m_pCurrImgTitle = m_pScene->addText( toolTip(), GetFontFromConfig()) ;
@@ -417,15 +445,18 @@ void PhotoView::DoFadeInOut()
 
     if ( m_pPrevImg != NULL) {
         fOpacity = m_pPrevImg->opacity() - OPACITY_FACTOR ;
-        m_pPrevImg->setOpacity( fOpacity);
+        m_pPrevImg->setOpacity( fOpacity) ;
+        VALIDPTR( m_pPrevImgNotes) m_pPrevImgNotes->setOpacity( fOpacity) ;
     }
 
     fOpacity = m_pCurrImg->opacity() + OPACITY_FACTOR ;
 
     if ( fOpacity > 1 - OPACITY_FACTOR)
         CheckFading() ;
-    else
+    else {
         m_pCurrImg->setOpacity( fOpacity);
+        VALIDPTR( m_pCurrImgNotes) m_pCurrImgNotes->setOpacity( fOpacity) ;
+    }
 }
 
 //----------------------------------------------------
@@ -456,6 +487,7 @@ QFont PhotoView::GetFontFromConfig()
         return QFont() ;
 
     font.fromString( szFont) ;
+
     return font ;
 }
 
@@ -509,4 +541,14 @@ void PhotoView::dropEvent( QDropEvent *event)
 void PhotoView::dragMoveEvent( QDragMoveEvent *event)
 {
     event->acceptProposedAction();
-}    
+}
+
+//----------------------------------------------------
+void PhotoView::ShowHideNotes()
+{
+    if ( m_pCurrImgNotes == NULL)
+        return ;
+
+    m_bShowNotes = ! m_bShowNotes ;
+    m_pCurrImgNotes->setVisible( m_bShowNotes) ;
+}

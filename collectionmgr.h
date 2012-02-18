@@ -36,14 +36,15 @@ public :
     QStringList  GetItemData( const QString& szName) ;
     QStringList  GetItemsList() ;
     bool         HasLastQueryMod() ;
+    QString      GetNote(     const QString& szName) ;
+    bool         AddNote(     const QString& szName, const QString& szNote) ;
+    bool         DeleteNotes( const QStringList& lszList) ;
 
 private :
+    bool         FindItem(    const QString& szName, const QString& szTable) ;
     bool         InitDb() ;
-    void         CloseDb() ;
     bool         PopulateDb() ;
     bool         ExecQuery() ;
-    bool         FindItem( const QString& szName) ;
-
 
 private :
     int          m_nLastErr ;

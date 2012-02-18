@@ -48,7 +48,8 @@ public:
     void     EndDrag() ;
     QSize    GetSceneSize() ;
     void     ShowList( const QString& szFile = "") ;
-     void    OnSave();
+    void     OnSave() ;
+    void     SetCurrImgNotes( const QString& szNotes) ;
 
 
 private :
@@ -112,6 +113,8 @@ private slots:
     void OnShowLog() ;
     void on_BtnConfig_clicked();
     void on_BtnLibrary_clicked();
+    void on_BtnNotes_clicked();
+    void OnStartEditNotes() ;
 
 private:
     Ui::CPhoto*          ui;
@@ -134,6 +137,7 @@ private:
     QAction*             m_pPauseSlideShowAct ;
     QAction*             m_pShowFullScreen ;
     QAction*             m_pExitFullScreen ;
+    QAction*             m_pEditNotesAct ;
     QMenu                m_ContextMenu ;
     QMenu                m_SlideShowMenu ;
     QSize                m_DiffSize ;

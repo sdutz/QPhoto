@@ -64,12 +64,15 @@ void ConfMgr::WriteList( const QString& szFile, bool bSaveDir)
     QString szMyFile ;
 
     szMyFile = szFile.isEmpty() ? HISTORY_FILE : szFile ;
+
     if ( bSaveDir) {
         nIdx = szFile.lastIndexOf( "/") ;
         m_aStrProp[ PROP_STR_LAST_DIR_LIST] = nIdx > 0 ? szFile.left( nIdx) : "" ;
     }
 
-    m_pDbMgr->InsertItem( szFile.isEmpty() ? m_szList : szFile, m_lszList) ;
+    m_pDbMgr->DeleteNotes( m_lszRemoved) ;
+    m_lszRemoved.empty() ;
+    m_pDbMgr->InsertItem(  szFile.isEmpty() ? m_szList : szFile, m_lszList) ;
 
     QFile cFile( szMyFile) ;
 
@@ -150,9 +153,12 @@ void ConfMgr::RemoveFromList( const QString& szFile)
 {
     int nToErase ;
 
-    if ( FindInList( szFile, &nToErase))
+    if ( FindInList( szFile, &nToErase)) {
         m_lszList.takeAt( nToErase) ;
+        m_lszRemoved.append( szFile) ;
+    }
 }
+
 
 //----------------------------------------------------
 void  ConfMgr::ClearList()

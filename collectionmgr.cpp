@@ -27,7 +27,8 @@
 //----------------------------------------------------
 #define DATABASE                "Db.db"
 #define SQLITE                  "QSQLITE"
-#define TABLENAME               "PICTURECOLLECTION"
+#define PICTURECOLLECTION       "PICTURECOLLECTION"
+#define PICTURENOTES            "PICTURENOTES"
 
 //----------------------------------------------------
 #define ERR_NO                  0
@@ -38,9 +39,11 @@
 //----------------------------------------------------
 #define NAME                    "name"
 #define FILES                   "files"
+#define NOTES                   "notes"
 
 #define NAME_VAL                0
 #define FILES_VAL               1
+#define NOTES_VAL               1
 
 //----------------------------------------------------
 #define CHECK_ST_PARAM( s)      if ( s.isEmpty()) return false ;
@@ -53,13 +56,11 @@ CollectionMgr::CollectionMgr()
     InitDb() ;
 }
 
-
 //----------------------------------------------------
 CollectionMgr::~CollectionMgr()
 {
-    CloseDb() ;
+     m_db.close() ;
 }
-
 
 //----------------------------------------------------
 bool CollectionMgr::HasLastQueryMod()
@@ -86,7 +87,7 @@ bool CollectionMgr::InitDb()
 
     QStringList lszTabs = m_db.tables() ;
 
-    if ( lszTabs.count() == 0) {
+    if ( lszTabs.count() < 2) {
         if ( ! PopulateDb()) {
             m_nLastErr = ERR_POPULATEDB ;
             return false ;
@@ -109,17 +110,16 @@ bool CollectionMgr::ExecQuery()
 //----------------------------------------------------
 bool CollectionMgr::PopulateDb()
 {
-    m_szQuery = QString( "CREATE TABLE %1( %2 STRING, %3 STRING);").arg( TABLENAME).arg( NAME).arg(FILES) ;
+    bool bOk ;
 
-    return ExecQuery() ;
+    m_szQuery = QString( "CREATE TABLE %1( %2 STRING, %3 STRING);").arg( PICTURECOLLECTION).arg( NAME).arg( FILES) ;
+
+    bOk = ExecQuery() ;
+
+    m_szQuery = QString( "CREATE TABLE %1( %2 STRING, %3 STRING);").arg( PICTURENOTES).arg( NAME).arg( NOTES) ;
+
+    return bOk  &&  ExecQuery() ;
 }
-
-//----------------------------------------------------
-void CollectionMgr::CloseDb()
-{
-    m_db.close() ;
-}
-
 
 //----------------------------------------------------
 bool CollectionMgr::InsertItem( const QString& szName, const QStringList& lszFiles)
@@ -131,8 +131,26 @@ bool CollectionMgr::InsertItem( const QString& szName, const QStringList& lszFil
 
     FromStringListToString( lszFiles, &szList) ;
 
-    m_szQuery = FindItem( szName) ? QString( "UPDATE %1 SET %2 = '%3' WHERE %4 = '%5';").arg(TABLENAME).arg( FILES).arg(szList).arg( NAME).arg(szName) :
-                                    QString( "INSERT INTO %1 (%2,%3) VALUES ('%4','%5');").arg(TABLENAME).arg( NAME).arg( FILES).arg( szName).arg( szList) ;
+    m_szQuery = FindItem( szName, PICTURECOLLECTION) ? QString( "UPDATE %1 SET %2 = '%3' WHERE %4 = '%5';").arg( PICTURECOLLECTION).arg( FILES).arg( szList).arg( NAME).arg( szName) :
+                                                       QString( "INSERT INTO %1 (%2,%3) VALUES ('%4','%5');").arg( PICTURECOLLECTION).arg( NAME).arg( FILES).arg( szName).arg( szList) ;
+
+    return ExecQuery() ;
+}
+
+//----------------------------------------------------
+QString CollectionMgr::GetNote( const QString& szName)
+{
+    return FindItem( szName, PICTURENOTES) ? m_qQuery.value( NOTES_VAL).toString() : "" ;
+}
+
+//----------------------------------------------------
+bool CollectionMgr::AddNote( const QString& szName, const QString& szNote)
+{
+    CHECK_ST_PARAM( szName)
+    CHECK_ST_PARAM( szNote)
+
+    m_szQuery = FindItem( szName, PICTURENOTES) ? QString( "UPDATE %1 SET %2 = '%3' WHERE %4 = '%5';").arg( PICTURENOTES).arg( NOTES).arg( szNote).arg( NAME).arg( szName) :
+                                                  QString( "INSERT INTO %1 (%2,%3) VALUES ('%4','%5');").arg( PICTURENOTES).arg( NAME).arg( NOTES).arg( szName).arg( szNote) ;
 
     return ExecQuery() ;
 }
@@ -142,17 +160,41 @@ bool CollectionMgr::DeleteItem( const QString& szName)
 {
     CHECK_ST_PARAM( szName)
 
-    m_szQuery = QString( "DELETE FROM %1 WHERE %2 = '%3';").arg( TABLENAME).arg( NAME).arg( szName) ;
+    DeleteNotes( GetItemData( szName)) ;
+
+    m_szQuery = QString( "DELETE FROM %1 WHERE %2 = '%3';").arg( PICTURECOLLECTION).arg( NAME).arg( szName) ;
 
     return ExecQuery() ;
 }
 
 //----------------------------------------------------
-bool CollectionMgr::FindItem( const QString& szName)
+bool CollectionMgr::DeleteNotes( const QStringList& lszList)
+{
+    bool    bOk ;
+    int     n ;
+    QString szCurr ;
+
+    CHECK_ST_PARAM( lszList)
+    bOk = true ;
+
+    for ( n = 0 ;  n < lszList.count() ;  n ++) {
+        szCurr = lszList.at( n) ;
+        if ( FindItem( szCurr, PICTURENOTES)) {
+            m_szQuery = QString( "DELETE FROM %1 WHERE %2 = '%3';").arg( PICTURENOTES).arg( NAME).arg( szCurr) ;
+            bOk = bOk  &&  ExecQuery() ;
+        }
+    }
+
+    return bOk ;
+}
+
+//----------------------------------------------------
+bool CollectionMgr::FindItem( const QString& szName, const QString& szTable)
 {
     CHECK_ST_PARAM( szName)
+    CHECK_ST_PARAM( szTable)
 
-    m_szQuery = QString( "SELECT * FROM %1 WHERE %2 = '%3';").arg( TABLENAME).arg( NAME).arg( szName) ;
+    m_szQuery = QString( "SELECT * FROM %1 WHERE %2 = '%3';").arg( szTable).arg( NAME).arg( szName) ;
 
     ExecQuery() ;
 
@@ -164,7 +206,7 @@ QStringList CollectionMgr::GetItemsList()
 {
     QStringList lszList ;
 
-    m_szQuery = QString( "SELECT * FROM %1;").arg( TABLENAME) ;
+    m_szQuery = QString( "SELECT * FROM %1;").arg( PICTURECOLLECTION) ;
 
     if ( ! ExecQuery())
         return lszList ;
@@ -180,7 +222,7 @@ QStringList CollectionMgr::GetItemData( const QString& szName)
 {
     QStringList lszList ;
 
-    if ( ! FindItem( szName))
+    if ( ! FindItem( szName, PICTURECOLLECTION))
         return lszList ;
 
     FromStringToStringList( m_qQuery.value( FILES_VAL).toString(), &lszList) ;
@@ -191,15 +233,5 @@ QStringList CollectionMgr::GetItemData( const QString& szName)
 //----------------------------------------------------
 QString CollectionMgr::GetLastErr()
 {
-    QString   szLog ;
-    QSqlError qErr ;
-
-    qErr   = m_db.lastError() ;
-
-    szLog  = QString( "%1:").arg( m_nLastErr) ;
-    szLog += qErr.text() ;
-    szLog += " Executing " ;
-    szLog += m_qQuery.lastQuery() ;
-
-    return szLog ;
+    return QString( "%1: %2 Executing %3").arg( m_nLastErr).arg( m_db.lastError().text()).arg( m_qQuery.lastQuery()) ;
 }

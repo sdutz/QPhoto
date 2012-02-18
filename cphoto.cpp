@@ -177,6 +177,8 @@ void CPhoto::DeleteAction()
         delete m_pShowFullScreen ;
     if ( m_pExitFullScreen != NULL)
         delete m_pExitFullScreen ;
+    if ( m_pEditNotesAct != NULL)
+        delete m_pEditNotesAct ;
 }
 
 
@@ -318,6 +320,11 @@ void CPhoto::CreateActions()
     icon.addFile( "icons/monitor_go.png") ;
     m_pExitFullScreen->setIcon( icon) ;
     connect( m_pExitFullScreen, SIGNAL( triggered()), this, SLOT( SwitchFullScreen())) ;
+
+    m_pEditNotesAct = new QAction( "", this) ;
+    icon.addFile( "icons/picture_edit.png") ;
+    m_pEditNotesAct->setIcon( icon) ;
+    connect( m_pEditNotesAct, SIGNAL( triggered()), this, SLOT( OnStartEditNotes())) ;
 }
 
 //----------------------------------------------------
@@ -332,6 +339,7 @@ void CPhoto::RetranslateDialog()
     m_pEndSlideShowAct->setText( tr(   "End SlideShow")) ;
     m_pPauseSlideShowAct->setText( tr( "Pause SlideShow")) ;
     m_pConfigAct->setText( tr(         "Settings")) ;
+    m_pEditNotesAct->setText( tr(      "Edit Note"));
 
 
     ui->BtnConfig->setToolTip( tr( "Settings")) ;
@@ -408,6 +416,7 @@ void CPhoto::BuildContextMenu()
     m_ContextMenu.addAction( m_pMoveDownAct) ;
     m_ContextMenu.addAction( m_pZoomAllAct) ;
     m_ContextMenu.addAction( m_pConfigAct) ;
+    m_ContextMenu.addAction( m_pEditNotesAct) ;
     m_ContextMenu.addAction( m_pShowFullScreen) ;
     m_ContextMenu.addAction( m_pStartSlideShowAct) ;
 }
@@ -419,6 +428,7 @@ void CPhoto::BuildSlideShowMenu()
     m_SlideShowMenu.addAction( m_pPauseSlideShowAct) ;
     m_SlideShowMenu.addAction( m_pEndSlideShowAct) ;
     m_SlideShowMenu.addAction( m_pZoomAllAct) ;
+    m_SlideShowMenu.addAction( m_pEditNotesAct) ;
     m_SlideShowMenu.addAction( m_pExitFullScreen) ;
 
     m_pPauseSlideShowAct->setEnabled( false) ;
@@ -459,7 +469,6 @@ void CPhoto::LoadImages()
     QString     szFilters ;
     QStringList lszList ;
 
-
     szFilters = "Images (*.jpeg *.jpg)" ;
     m_pConf->GetStrProp( PROP_STR_LAST_DIR, &szLastDir) ;
     lszList   = QFileDialog::getOpenFileNames( this, tr( "Open Images"), szLastDir, szFilters) ;
@@ -489,7 +498,7 @@ bool CPhoto::ShowPhoto( bool bToAddToList, bool bShow)
     if ( m_szFileName.isEmpty())
         return false ;
 
-    if ( ! bShow  ||  ui->ImgView->ShowPhoto( m_szFileName)) {
+    if ( ! bShow  ||  ui->ImgView->ShowPhoto( m_szFileName, m_pColl->GetNote( m_szFileName))) {
         QString title ;
         title  = QPHOTO ;
         title += ":  " + m_szFileName ;
@@ -545,7 +554,6 @@ void CPhoto::on_BtnPlus_clicked()
     ui->ImgView->ZoomIn() ;
 }
 
-
 //----------------------------------------------------
 void CPhoto::ShowList(  const QString& szFile)
 {
@@ -575,7 +583,6 @@ void CPhoto::SeePrevImg()
     m_szFileName = ui->ImgList->item(m_nCurr)->text() ;
     ui->ImgList->setCurrentRow( m_nCurr);
     ShowPhoto( false) ;
-
 }
 
 //----------------------------------------------------
@@ -735,14 +742,15 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
         break ;
 
         case Qt::Key_M :
-        if ( m_player->state() == Phonon::PausedState)
-            m_player->play();
-        else
-            m_player->pause();
+        m_player->state() == Phonon::PausedState ? m_player->play() : m_player->pause() ;
         break ;
 
         case Qt::Key_B :
-        OnPauseSlideShow();
+        OnPauseSlideShow() ;
+        break ;
+
+        case Qt::Key_N :
+        on_BtnNotes_clicked() ;
         break ;
     }
 }
@@ -1118,7 +1126,6 @@ void CPhoto::OnShowLog()
         m_cErrDlg.DoHide();
 
     else {
-
         QPoint pos ;
         QSize  size ;
         QRect  rect ;
@@ -1171,4 +1178,22 @@ void CPhoto::on_BtnLibrary_clicked()
     UpdateCollDlg() ;
 
     m_cCollDlg.DoShowHide( ! m_cCollDlg.isVisible()) ;
+}
+
+//----------------------------------------------------
+void CPhoto::SetCurrImgNotes( const QString& szNotes)
+{
+    m_pColl->AddNote( m_szFileName, szNotes) ;
+}
+
+//----------------------------------------------------
+void CPhoto::OnStartEditNotes()
+{
+    ui->ImgView->EditCurrImgNotes() ;
+}
+
+//----------------------------------------------------
+void CPhoto::on_BtnNotes_clicked()
+{
+    ui->ImgView->ShowHideNotes();
 }

@@ -32,27 +32,28 @@ class PhotoView : public QGraphicsView
 public:
     explicit PhotoView(QWidget *parent = 0);
     ~PhotoView() ;
-    bool     ShowPhoto(       const QString& szFile) ;
+    bool     ShowPhoto(       const QString& szFile, const QString& szNotes) ;
     void     ZoomOut() ;
     void     ZoomIn() ;
     void     ZoomAll() ;
     void     ResetView(       bool bClearAll = false) ;
     void     StartZoomRect(   const QPoint& pos) ;
-    void     SetShiftPressed( bool bPress)    { m_bShift = bPress ; } ;
-    void     SetConfMgr(      ConfMgr* pConf) { m_pConf = pConf ; } ;
+    void     SetShiftPressed( bool bPress)     { m_bShift = bPress ; } ;
+    void     SetConfMgr(      ConfMgr* pConf)  { m_pConf = pConf ; } ;
     void     ShowHelp(        bool bShow) ;
     void     SetFullScreen(   bool bFullScreen) ;
     void     SetSlideShow(    bool bSlideShow) { m_bSlideShow = bSlideShow ; } ;
     void     DrawPause() ;
     void     DrawPlay() ;
     void     PrepareSlideshowItems() ;
+    void     ShowHideNotes() ;
+    void     EditCurrImgNotes() ;
 
 protected:
     void    dragEnterEvent(   QDragEnterEvent *event);
     void    dropEvent(        QDropEvent *event);
     void    dragLeaveEvent(   QDragLeaveEvent *event);
     void    dragMoveEvent(    QDragMoveEvent *event);
-
 
 private:
 
@@ -62,14 +63,16 @@ private:
     QColor   GetColorFromConfig() ;
     void     StartControlsTimer() ;
     void     CheckFading() ;
+    void     DrawNotes( const QString& szNotes) ;
 
 signals:
 
 
 public slots:
-    void     mouseMoveEvent(    QMouseEvent* e);
-    void     mouseReleaseEvent( QMouseEvent* e);
-    void     wheelEvent(        QWheelEvent* e);
+    void     mouseMoveEvent(        QMouseEvent* e);
+    void     mouseReleaseEvent(     QMouseEvent* e);
+    void     mouseDoubleClickEvent( QMouseEvent* e);
+    void     wheelEvent(            QWheelEvent* e);
     void     DecreaseAlfa() ;
     void     DoFadeInOut() ;
     void     DoControlsFadeOut();
@@ -80,12 +83,15 @@ private:
     bool                  m_bDrag ;
     bool                  m_bShift ;
     bool                  m_bSlideShow ;
+    bool                  m_bShowNotes ;
     float                 m_dScale ;
     CPhoto*               m_pParent ;
     QGraphicsScene*       m_pScene ;
     QGraphicsRectItem*    m_pRect ;
     QGraphicsTextItem*    m_pHelpText ;
     QGraphicsTextItem*    m_pCurrImgTitle ;
+    QGraphicsTextItem*    m_pCurrImgNotes ;
+    QGraphicsTextItem*    m_pPrevImgNotes ;
     QGraphicsPixmapItem*  m_pPrevImg ;
     QGraphicsPixmapItem*  m_pCurrImg ;
     QGraphicsItemGroup*   m_pauseGrp ;

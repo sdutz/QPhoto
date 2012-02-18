@@ -33,27 +33,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="339"/>
+        <location filename="cphoto.cpp" line="333"/>
         <source>Move Up</source>
         <translation>Sposta in alto</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="340"/>
+        <location filename="cphoto.cpp" line="334"/>
         <source>Move Down</source>
         <translation>Sposta in basso</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="341"/>
+        <location filename="cphoto.cpp" line="335"/>
         <source>Start SlideShow</source>
         <translation>Inizia presentazione</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="342"/>
+        <location filename="cphoto.cpp" line="336"/>
         <source>Zoom All</source>
         <translation>Mostra tutto</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="343"/>
+        <location filename="cphoto.cpp" line="337"/>
         <source>Show Fullscreen</source>
         <translation>Mostra a tutto schermo</translation>
     </message>
@@ -62,73 +62,77 @@
         <translation type="obsolete">Finestra normale</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="344"/>
+        <location filename="cphoto.cpp" line="338"/>
         <source>Exit Fullscreen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="345"/>
+        <location filename="cphoto.cpp" line="339"/>
         <source>End SlideShow</source>
         <translation>Fine presentazione</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="346"/>
+        <location filename="cphoto.cpp" line="340"/>
         <source>Pause SlideShow</source>
         <translation>Pausa presentazione</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="347"/>
-        <location filename="cphoto.cpp" line="350"/>
+        <location filename="cphoto.cpp" line="341"/>
+        <location filename="cphoto.cpp" line="344"/>
         <source>Settings</source>
         <translation>Impostazioni</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="351"/>
+        <location filename="cphoto.cpp" line="345"/>
         <source>Delete</source>
         <translation>Cancella</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="352"/>
+        <location filename="cphoto.cpp" line="346"/>
         <source>Exit</source>
         <translation>Esci</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="353"/>
+        <location filename="cphoto.cpp" line="347"/>
         <source>Open</source>
         <translation>Apri</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="354"/>
-        <source>Save</source>
-        <translation>Salva</translation>
+        <location filename="cphoto.cpp" line="348"/>
+        <source>Notes</source>
+        <translation>Note</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="355"/>
+        <source>Save</source>
+        <translation type="obsolete">Salva</translation>
+    </message>
+    <message>
+        <location filename="cphoto.cpp" line="349"/>
         <source>Zoom Out</source>
         <translation>Rimpicciolisci</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="356"/>
+        <location filename="cphoto.cpp" line="350"/>
         <source>Zoom in</source>
         <translation>Ingrandisci</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="357"/>
+        <location filename="cphoto.cpp" line="351"/>
         <source>See Previous Image</source>
         <translation>Mostra immagine precedente</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="358"/>
+        <location filename="cphoto.cpp" line="352"/>
         <source>See Next Image</source>
         <translation>Mostra immagine successiva</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="423"/>
+        <location filename="cphoto.cpp" line="450"/>
         <source>Open List</source>
         <translation>Apri lista</translation>
     </message>
     <message>
-        <location filename="cphoto.cpp" line="445"/>
+        <location filename="cphoto.cpp" line="472"/>
         <source>Open Images</source>
         <translation>Apri immagini</translation>
     </message>
@@ -158,27 +162,32 @@
         <translation>Anteprima</translation>
     </message>
     <message>
-        <location filename="collectiondlg.cpp" line="82"/>
+        <location filename="collectiondlg.cpp" line="87"/>
         <source>Collection</source>
         <translation>Libreria</translation>
     </message>
     <message>
-        <location filename="collectiondlg.cpp" line="83"/>
+        <location filename="collectiondlg.cpp" line="88"/>
         <source>Load from library</source>
         <translation>Carica da libreria</translation>
     </message>
     <message>
-        <location filename="collectiondlg.cpp" line="84"/>
+        <location filename="collectiondlg.cpp" line="89"/>
         <source>Delete from library</source>
         <translation>Cancella da libreria</translation>
     </message>
     <message>
-        <location filename="collectiondlg.cpp" line="85"/>
+        <location filename="collectiondlg.cpp" line="90"/>
+        <source>Save playlist to library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="collectiondlg.cpp" line="91"/>
         <source>Load current image preview to playlist</source>
         <translation type="unfinished">Carica l&apos;anteprima corrente nella playlist</translation>
     </message>
     <message>
-        <location filename="collectiondlg.cpp" line="151"/>
+        <location filename="collectiondlg.cpp" line="157"/>
         <source>No preview available</source>
         <translation>Nessuna anteprima disponibile</translation>
     </message>
@@ -212,6 +221,14 @@
         <location filename="musicmgr.ui" line="14"/>
         <source>Dialog</source>
         <translation type="unfinished">Dialogo errori</translation>
+    </message>
+</context>
+<context>
+    <name>PhotoView</name>
+    <message>
+        <location filename="photoview.cpp" line="235"/>
+        <source>Insert your notes</source>
+        <translation>Inserisci le tue note</translation>
     </message>
 </context>
 <context>
