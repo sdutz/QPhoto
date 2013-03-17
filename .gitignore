@@ -2,3 +2,10 @@
 /*.qm
 /QPhoto.pro.user.2.2pre5
 /*.cpp.autosave
+/*.o
+/moc*
+/ui_*
+/*.db
+/Makefile
+/QPhoto
+/*.txt

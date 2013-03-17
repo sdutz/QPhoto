@@ -30,7 +30,7 @@ AboutDlg::AboutDlg(QWidget *parent) :
     ui->setupUi(this) ;
     setWindowTitle( "QPhoto about");
 
-    FillSysInfo() ;
+    FillInfo() ;
 }
 
 //----------------------------------------------------
@@ -46,7 +46,7 @@ void AboutDlg::on_buttonBox_accepted()
 }
 
 //----------------------------------------------------
-void AboutDlg::FillSysInfo()
+void AboutDlg::FillInfo()
 {
-    ui->textEdit->setText( QString( "QPhoto version %1 by Sdutz\n using %2").arg( VERSION).arg( QLibraryInfo::buildKey())) ;
+    ui->textEdit->setText( QString( "QPhoto version %1 by Sdutz\n using %2/n").arg( VERSION).arg( QLibraryInfo::LibraryLocation( QLibraryInfo::LibraryExecutablesPath))) ;
 }

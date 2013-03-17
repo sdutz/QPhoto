@@ -29,7 +29,8 @@
 #include "errordlg.h"
 #include "collectiondlg.h"
 #include <QTranslator>
-#include "Phonon"
+#include <QtMultimedia/QMediaPlayer>
+#include <QtMultimedia/QMediaPlaylist>
 
 namespace Ui {
     class CPhoto;
@@ -150,7 +151,8 @@ private:
     QTimer*              m_pTimer ;
     QTimer*              m_pLoadIniTimer ;
     QTimer*              m_pFullScreenTimer ;
-    Phonon::MediaObject* m_player ;
+    QMediaPlayer         m_player ;
+    QMediaPlaylist       m_playList ;
     QTranslator          m_cTranslator ;
 
 };

@@ -34,7 +34,7 @@ public:
     ~AboutDlg();
 
 private :
-    void FillSysInfo() ;
+    void FillInfo() ;
 
 private slots:
     void on_buttonBox_accepted();

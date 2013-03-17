@@ -21,6 +21,7 @@
 #include "util.h"
 #include <QFileDialog>
 #include <QKeyEvent>
+#include <QMimeData>
 #include <QUrl>
 
 
@@ -34,19 +35,17 @@ MusicMgr::MusicMgr(QWidget *parent) :
     setMaximumSize( width(), height());
     setWindowTitle( tr( "Music Manager"));
     m_bShiftPressed = false ;
-    m_player        = NULL ;
     m_szExt         = ".ogg.mp3" ;
     m_szFilters     = "Songs (*.ogg *.mp3)" ;
     setAcceptDrops( true) ;
     SetBtnIcons() ;
     SetToolTips() ;
-    InitPlayer() ;
+    m_player.setPlaylist( &m_playList);
 }
 
 //----------------------------------------------------
 MusicMgr::~MusicMgr()
 {
-    SAFEDEL( m_player)
     delete ui ;
 }
 
@@ -89,12 +88,6 @@ void MusicMgr::SetBtnIcons( void)
     GetPixBtnSize( ui->BtnOk->size(), &pixSize) ;
     icon.addFile( "icons/accept.png", pixSize) ;
     ui->BtnOk->setIcon( icon) ;
-}
-
-//----------------------------------------------------
-void MusicMgr::InitPlayer()
-{
-    m_player = Phonon::createPlayer( Phonon::MusicCategory) ;
 }
 
 //----------------------------------------------------
@@ -155,14 +148,15 @@ void MusicMgr::on_BtnPreviewStart_clicked()
     if ( szCurr.isEmpty())
         return ;
 
-    m_player->setCurrentSource( Phonon::MediaSource( szCurr)) ;
-    m_player->play();
+    m_playList.clear() ;
+    m_playList.addMedia( QMediaContent( QUrl::fromLocalFile( szCurr))) ;
+    m_player.play();
 }
 
 //----------------------------------------------------
 void MusicMgr::on_BtnPreviewStop_clicked()
 {
-    m_player->stop() ;
+    m_player.stop() ;
 }
 
 //----------------------------------------------------
@@ -203,7 +197,7 @@ void MusicMgr::GetList( QString* pszFiles)
 //----------------------------------------------------
 void MusicMgr::on_SongsList_itemDoubleClicked( QListWidgetItem* item)
 {
-    m_player->stop();
+    m_player.stop();
     on_BtnPreviewStart_clicked();
 }
 

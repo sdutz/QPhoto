@@ -55,7 +55,6 @@ CPhoto::CPhoto( QWidget *parent) :
     m_bShowHelp     = false ;
     m_bShiftPressed = false ;
     m_bCtrlPressed  = false ;
-    m_player        = NULL ;
     m_szExt         = ".jpeg.jpg" ;
     m_szFilters     = "Images (*.jpeg *.jpg)" ;
     setMinimumSize( MIN_WIDTH, MIN_HEIGHT) ;
@@ -72,7 +71,7 @@ CPhoto::CPhoto( QWidget *parent) :
     ui->ImgView->PrepareSlideshowItems() ;
     SetBtnIcons() ;
     setAcceptDrops( true) ;
-    InitPlayer() ;
+    m_player.setPlaylist( &m_playList) ;
     RetranslateDialog() ;
     InitDialogs() ;
 }
@@ -85,7 +84,6 @@ CPhoto::~CPhoto()
 
     SAFEDEL( m_pConf) ;
     SAFEDEL( m_pColl) ;
-    SAFEDEL( m_player) ;
 
     delete ui ;
 }
@@ -132,12 +130,6 @@ void CPhoto::ChangeLang( int nLang)
     QCoreApplication::installTranslator( &m_cTranslator) ;
 
     RetranslateDialog() ;
-}
-
-//----------------------------------------------------
-void CPhoto::InitPlayer()
-{
-    m_player = Phonon::createPlayer( Phonon::MusicCategory) ;
 }
 
 //----------------------------------------------------
@@ -717,9 +709,10 @@ void CPhoto::keyPressEvent ( QKeyEvent* e)
         on_BtnLibrary_clicked();
         break ;
 
-        case Qt::Key_M :
+        //TODO
+        /*case Qt::Key_M :
         m_player->state() == Phonon::PausedState ? m_player->play() : m_player->pause() ;
-        break ;
+        break ;*/
 
         case Qt::Key_B :
         OnPauseSlideShow() ;
@@ -1051,11 +1044,11 @@ void CPhoto::OnStartSlideShow()
 
     m_pConf->GetStrProp( PROP_STR_SONGS, &szSongs) ;
     lszPlayList = szSongs.split( ";") ;
-    m_player->clearQueue() ;
+    m_playList.clear() ;
     for ( n = 0 ;  n < lszPlayList.count() ;  n ++)
-        m_player->enqueue( Phonon::MediaSource( lszPlayList.at( n))) ;
+        m_playList.addMedia( QMediaContent( QUrl::fromLocalFile( lszPlayList.at(n)))) ;
 
-    m_player->play() ;
+    m_player.play() ;
 }
 
 //----------------------------------------------------
@@ -1068,22 +1061,22 @@ void CPhoto::OnEndSlideShow()
     m_pExitFullScreen->setEnabled(    true) ;
 
     m_pTimer->stop() ;
-    m_player->stop() ;
+    m_player.stop() ;
 }
 
 //----------------------------------------------------
 void CPhoto::OnPauseSlideShow()
 {
     if ( m_pTimer->isActive()) {
-        m_pTimer->stop();
-        ui->ImgView->DrawPause();
-        m_player->pause();
+        m_pTimer->stop() ;
+        ui->ImgView->DrawPause() ;
+        m_player.pause() ;
     }
     else {
-        SeeNextImg();
-        m_pTimer->start();
-        ui->ImgView->DrawPlay();
-        m_player->play();
+        SeeNextImg() ;
+        m_pTimer->start() ;
+        ui->ImgView->DrawPlay() ;
+        m_player.play() ;
     }
 }
 

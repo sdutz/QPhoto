@@ -4,12 +4,10 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
-QT       +=  phonon
-QT       += core sql
+QT  += core gui sql multimedia declarative
 
 TARGET = QPhoto
-TEMPLATE = app
+TEMPLATE += app
 
 SOURCES += main.cpp\
         cphoto.cpp \

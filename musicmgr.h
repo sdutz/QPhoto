@@ -22,7 +22,8 @@
 
 #include <QDialog>
 #include <QListWidgetItem>
-#include "Phonon"
+#include <QtMultimedia/QMediaPlayer>
+#include <QtMultimedia/QMediaPlaylist>
 
 namespace Ui {
     class MusicMgr;
@@ -46,7 +47,6 @@ protected:
 
 private :
     void SetBtnIcons() ;
-    void InitPlayer() ;
     void SetToolTips() ;
 
 private slots:
@@ -67,7 +67,8 @@ private:
     QString              m_szFolder ;
     QStringList          m_lFilesList ;
     bool                 m_bShiftPressed ;
-    Phonon::MediaObject* m_player ;
+    QMediaPlayer         m_player ;
+    QMediaPlaylist       m_playList ;
 };
 
 #endif // MUSICMGR_H
